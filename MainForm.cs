@@ -19,6 +19,7 @@ namespace CMMAuto
     public partial class MainForm : Form
     {
         private readonly CMMVisionHelp _cMMVisionHelp;
+        private readonly KeyboardSimulatorHelp simulator = new KeyboardSimulatorHelp();
         private static readonly ILog log = LogManager.GetLogger(typeof(MainForm));
         private readonly object _lock = new object();
         private static string _fullFileName = "";
@@ -96,16 +97,25 @@ namespace CMMAuto
             return System.Text.Encoding.Default.GetString(buffer);
         }
 
-        private void btnOpenFile_Click(object sender, EventArgs e)
+        private async void btnOpenFile_Click(object sender, EventArgs e)
         {
-            if (DialogResult.OK == openFileDialog.ShowDialog())
+            //if (DialogResult.OK == openFileDialog.ShowDialog())
+            //{
+            //    var filePath = openFileDialog.FileName;
+            //    //_cMMVisionHelp.CheckCmmIsClosed(filePath);
+            //    //_cMMVisionHelp.GetCmmFilePos(filePath, out float x, out float y);
+            //    int h=_cMMVisionHelp.GetCmmOpenFilePos(filePath, out float x0, out float y0, out float x1, out float y1);
+            //    //_cMMVisionHelp.CheckCmmRunState(filePath);
+            //}
+
+            if (string.IsNullOrEmpty(txtMeasureProgram.Text))
             {
-                var filePath = openFileDialog.FileName;
-                _cMMVisionHelp.CheckCmmIsClosed(filePath);
-                //_cMMVisionHelp.GetCmmFilePos(filePath, out float x, out float y);
-                //_cMMVisionHelp.GetCmmOpenFilePos(filePath, out float x0, out float y0, out float x1, out float y1);
-                //_cMMVisionHelp.CheckCmmRunState(filePath);
+                MessageBox.Show("量测程序不能为空！");
+                return;
             }
+
+            this.WindowState = FormWindowState.Minimized;
+            await Test1PrgAsync();
         }
 
         private void timerlog_Tick(object sender, EventArgs e)
@@ -119,9 +129,10 @@ namespace CMMAuto
             }
         }
 
-        private void btnSaveImg_Click(object sender, EventArgs e)
+        private async void btnSaveImg_Click(object sender, EventArgs e)
         {
-            GetCmmCurState();
+            await Test1Async();
+            //GetCmmCurState();
         }
 
         private void GetCmmCurState()
@@ -302,18 +313,28 @@ namespace CMMAuto
                 if (_cMMVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
                 {
                     //鼠标点击
-                    log.Info($"[Auto][Run] - Start Button: X: {x}, Y: {y}");
+                    log.Info($"[Auto][Run] 弹出文件窗口 - Start Button: X: {x}, Y: {y}");
                     //NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
-                    SendKeys.SendWait("^o");
+                    simulator.SimiuCrtlO();
+                    var imageBitmap = ScreenShotHelp.GetImage();
+                    imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+
                     if (_cMMVisionHelp.GetCmmOpenFilePos(_fullFileName, out float x0, out float y0, out float x1, out float y1) == 0)
                     {
-                        NativeWindowHelp.Click(Convert.ToInt32(x0), Convert.ToInt32(y0));
+                        log.Info($"[Auto][Run] 打开量测程序 - Start Button: X: {x0}, Y: {y0}");
+                        //NativeWindowHelp.Click(Convert.ToInt32(x0), Convert.ToInt32(y0));
                         // 将文本放入剪贴板
                         Clipboard.SetText(txtMeasureProgram.Text.Trim());
                         // 模拟Ctrl+V
-                        SendKeys.SendWait("^v");
+                        //SendKeys.SendWait("^v");
+                        simulator.SimiuCrtlV();
+                        Thread.Sleep(2000);
                         NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
-                        log.Info($"开始测量。。。");
+
+                        Thread.Sleep(3000);
+                        //SendKeys.SendWait("^Q");
+                        simulator.SimiuCrtlQ();
+                        log.Info($"开始运行。。。");
                         //写入数据库
                         RecordMeasure("开始", 1);
                         if (!IsAuto)
@@ -322,7 +343,7 @@ namespace CMMAuto
                     else
                     {
                         //RecordMeasure("开始", 0);
-                        //log.Error("获取打开测量程序位置失败。");
+                        log.Error("获取打开测量程序位置失败。");
                     }
                 }
                 else
@@ -358,7 +379,51 @@ namespace CMMAuto
 
         private void btnClear_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty(txtMeasureProgram.Text))
+            {
+                MessageBox.Show("量测程序不能为空！");
+                return;
+            }
 
+            this.WindowState = FormWindowState.Minimized;
+            Thread.Sleep(3000);
+
+            //获取文件位置
+            if (_cMMVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
+            {
+                //鼠标点击
+                log.Info($"[Auto][Run] 打开文件 - Start Button: X: {x}, Y: {y}");
+                //NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
+                SendKeys.SendWait("^o");
+                Thread.Sleep(3000);
+
+                if (_cMMVisionHelp.GetCmmOpenFilePos(_fullFileName, out float x0, out float y0, out float x1, out float y1) == 0)
+                {
+                    log.Info($"[Auto][Run] 打开量测程序 - Start Button: X: {x0}, Y: {y0}");
+                    //NativeWindowHelp.Click(Convert.ToInt32(x0), Convert.ToInt32(y0));
+                    // 将文本放入剪贴板
+                    Clipboard.SetText(txtMeasureProgram.Text.Trim());
+                    // 模拟Ctrl+V
+                    SendKeys.SendWait("^v");
+                    NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
+
+                    Thread.Sleep(3000);
+                    SendKeys.SendWait("^Q");
+                    log.Info($"开始运行。。。");
+                    //写入数据库
+                    RecordMeasure("开始", 1);
+                }
+                else
+                {
+                    //RecordMeasure("开始", 0);
+                    log.Error("获取打开测量程序位置失败。");
+                }
+            }
+            else
+            {
+                //RecordMeasure("开始", 0);
+                log.Error("获取文件位置失败。");
+            }
         }
 
         private void btnManual_Click(object sender, EventArgs e)
@@ -376,6 +441,12 @@ namespace CMMAuto
 
         private void btnAutoRun_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty(txtMeasureProgram.Text))
+            {
+                MessageBox.Show("量测程序不能为空！");
+                return;
+            }
+
             IsAuto = true;
             this.WindowState = FormWindowState.Minimized;
         }
@@ -506,6 +577,66 @@ namespace CMMAuto
             if (dataSet != null)
             {
                 drvCmmLog.DataSource = dataSet.Tables[0];
+            }
+        }
+
+        public async Task Test1Async()
+        {
+            log.Info($"11111111");
+            await Task.Delay(5000); // 等待5秒
+            log.Info($"2222222");
+            await Task.Delay(5000); // 等待5秒
+            log.Info($"333333");
+            await Task.Delay(5000); // 等待5秒
+            log.Info($"444444444");
+            await Task.Delay(5000); // 等待5秒
+            log.Info($"55555555");
+            await Task.Delay(5000); // 等待5秒
+            log.Info($"6666666666");
+        }
+
+        public async Task Test1PrgAsync()
+        {
+            await Task.Delay(3000);
+
+            //获取文件位置
+            if (_cMMVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
+            {
+                //鼠标点击
+                log.Info($"[Auto][Run] 弹出文件窗口 - Start Button: X: {x}, Y: {y}");
+                //NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
+                simulator.SimiuCrtlO();
+                await Task.Delay(4000);
+
+                if (_cMMVisionHelp.GetCmmOpenFilePos(_fullFileName, out float x0, out float y0, out float x1, out float y1) == 0)
+                {
+                    log.Info($"[Auto][Run] 打开量测程序 - Start Button: X: {x0}, Y: {y0}");
+                    //NativeWindowHelp.Click(Convert.ToInt32(x0), Convert.ToInt32(y0));
+                    // 将文本放入剪贴板
+                    Clipboard.SetText(txtMeasureProgram.Text.Trim());
+                    // 模拟Ctrl+V
+                    //SendKeys.SendWait("^v");
+                    simulator.SimiuCrtlV();
+                    await Task.Delay(2000);
+                    NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
+
+                    await Task.Delay(3000);
+                    //SendKeys.SendWait("^Q");
+                    simulator.SimiuCrtlQ();
+                    log.Info($"开始运行。。。");
+                    //写入数据库
+                    RecordMeasure("开始", 1);
+                }
+                else
+                {
+                    //RecordMeasure("开始", 0);
+                    log.Error("获取打开测量程序位置失败。");
+                }
+            }
+            else
+            {
+                //RecordMeasure("开始", 0);
+                log.Error("获取文件位置失败。");
             }
         }
     }

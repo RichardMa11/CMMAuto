@@ -432,7 +432,7 @@ namespace CMMAuto
             this.btnClear.Name = "btnClear";
             this.btnClear.Size = new System.Drawing.Size(96, 42);
             this.btnClear.TabIndex = 7;
-            this.btnClear.Text = "清  除";
+            this.btnClear.Text = "测  试";
             this.btnClear.UseVisualStyleBackColor = true;
             this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
             // 
@@ -501,7 +501,7 @@ namespace CMMAuto
             this.btnOpenFile.Name = "btnOpenFile";
             this.btnOpenFile.Size = new System.Drawing.Size(96, 42);
             this.btnOpenFile.TabIndex = 0;
-            this.btnOpenFile.Text = "打开文件";
+            this.btnOpenFile.Text = "测  试2";
             this.btnOpenFile.UseVisualStyleBackColor = true;
             this.btnOpenFile.Click += new System.EventHandler(this.btnOpenFile_Click);
             // 
