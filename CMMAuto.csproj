@@ -55,6 +55,9 @@
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>cmmico.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="KENDLL">
       <HintPath>dll\KENDLL.dll</HintPath>
@@ -177,6 +180,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="cmmico.ico" />
     <Content Include="dll\autoImgBase40.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
