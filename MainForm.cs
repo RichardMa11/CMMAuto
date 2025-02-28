@@ -351,7 +351,7 @@ namespace CMMAuto
                         Thread.Sleep(3000);
                         imageBitmap = ScreenShotHelp.GetImage();
                         imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
-                        if (_cMMVisionHelp.CheckCmmRunState(_fullFileName) == 3)
+                        if (_cMMVisionHelp.CheckCmmRunState(_fullFileName) == 3)//check是否打开
                         {
                             //SendKeys.SendWait("^Q");
                             simulator.SimiuCrtlQ();
@@ -391,14 +391,10 @@ namespace CMMAuto
                     {
                         if (_cMMVisionHelp.CheckCmmRunState(_fullFileName) == 3)
                         {
+                            Thread.Sleep(3000);
                             //simulator.SimiuCrtlQ();
                             if (IsTheSame)
                             {
-                                //是同一个就关闭
-                                log.Info($"结束运行。。。");
-                                //写入数据库
-                                RecordMeasure("结束", 1);
-                                IsTheSame = false;
                                 //-----判断结束，并退出；
                                 var imageBitmap = ScreenShotHelp.GetImage();
                                 imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
@@ -412,6 +408,24 @@ namespace CMMAuto
                                     if (_cMMVisionHelp.GetCmmClosedPos(_fullFileName, out float x1, out float y1) == 0)
                                     {
                                         NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
+
+                                        Thread.Sleep(2000);
+                                        imageBitmap = ScreenShotHelp.GetImage();
+                                        imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+
+                                        if (_cMMVisionHelp.CheckCmmIsClosed(_fullFileName) == 0)
+                                        {
+                                            //是同一个就关闭
+                                            log.Info($"结束运行。。。");
+                                            //写入数据库
+                                            RecordMeasure("结束", 1);
+                                            IsTheSame = false;
+
+                                            if (!IsCycle)
+                                                IsSingle = false;
+                                        }
+                                        else
+                                        { log.Error("程式退出失败。"); }
                                     }
                                     else
                                     { log.Error("退出获取退出位置失败。"); }
@@ -427,10 +441,6 @@ namespace CMMAuto
                                 RecordMeasure("开始", 1);
                                 IsTheSame = true;
                             }
-
-                            if (!IsCycle)
-                                IsSingle = false;
-
                         }
                     }
                     else
@@ -605,7 +615,7 @@ namespace CMMAuto
         private void LoadMeasureData()
         {
             drvCmmLog.DataSource = null;
-            string sql = $@"SELECT PrgName,PrgPath,CMMState,CMMResult,CMMTime,Remark FROM MeaSureData WHERE strftime('%Y-%m-%d %H:%M:%S', CMMTime)  >= '{DateTime.Now.AddMinutes(-10).ToString("yyyy-MM-dd HH:mm:ss")}'";
+            string sql = $@"SELECT PrgName,PrgPath,CMMState,CMMResult,CMMTime,Remark FROM MeaSureData WHERE strftime('%Y-%m-%d %H:%M:%S', CMMTime)  >= '{DateTime.Now.AddMinutes(-10).ToString("yyyy-MM-dd HH:mm:ss")}' order by CMMTime desc ";
             //string sql = $@"SELECT PrgName,PrgPath,CMMState,CMMResult,CMMTime,Remark FROM MeaSureData ";
 
             DataSet dataSet = SQLiteHelpers.ExecuteDataSet(sql, null);
