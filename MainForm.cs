@@ -34,6 +34,12 @@ namespace CMMAuto
             _cMMVisionHelp = new CMMVisionHelp();
         }
 
+        //protected override void OnPaint(PaintEventArgs e)
+        //{
+        //    base.OnPaint(e);
+        //    ControlPaint.DrawBorder(e.Graphics, this.ClientRectangle, Color.LightBlue, ButtonBorderStyle.Solid);
+        //}
+
         private void MainForm_Load(object sender, EventArgs e)
         {
             this.txtLog.ScrollBars = ScrollBars.Vertical;
@@ -109,12 +115,12 @@ namespace CMMAuto
 
             if (string.IsNullOrEmpty(txtMeasureProgram.Text))
             {
-                MessageBox.Show("量测程序不能为空！");
+                MessageBox.Show("量测程式不能为空！");
                 return;
             }
 
             this.WindowState = FormWindowState.Minimized;
-            await Test1PrgAsync();
+            await TestOpenPrgAsync();
         }
 
         private void timerlog_Tick(object sender, EventArgs e)
@@ -380,7 +386,7 @@ namespace CMMAuto
             else
             {
                 //RecordMeasure("开始", 0);
-                log.Error("运行中不能打开程式。");
+                log.Error("运行中不能打开程式或者程式已经打开。");
                 if (_cMMVisionHelp.CheckCmmRunState(_fullFileName) == 3)
                 {
                     //simulator.SimiuCrtlQ();
@@ -445,55 +451,6 @@ namespace CMMAuto
             txtHeartBeat.BackColor = System.Drawing.Color.White;
             lblCommInfo.Text = "AGV通讯中断";
             lblCommInfo.ForeColor = System.Drawing.Color.Red;
-        }
-
-        private void btnClear_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty(txtMeasureProgram.Text))
-            {
-                MessageBox.Show("量测程序不能为空！");
-                return;
-            }
-
-            this.WindowState = FormWindowState.Minimized;
-            Thread.Sleep(3000);
-
-            //获取文件位置
-            if (_cMMVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
-            {
-                //鼠标点击
-                log.Info($"[Auto][Run] 打开文件 - Start Button: X: {x}, Y: {y}");
-                //NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
-                SendKeys.SendWait("^o");
-                Thread.Sleep(3000);
-
-                if (_cMMVisionHelp.GetCmmOpenFilePos(_fullFileName, out float x0, out float y0, out float x1, out float y1) == 0)
-                {
-                    log.Info($"[Auto][Run] 打开量测程序 - Start Button: X: {x0}, Y: {y0}");
-                    //NativeWindowHelp.Click(Convert.ToInt32(x0), Convert.ToInt32(y0));
-                    // 将文本放入剪贴板
-                    Clipboard.SetText(txtMeasureProgram.Text.Trim());
-                    // 模拟Ctrl+V
-                    SendKeys.SendWait("^v");
-                    NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
-
-                    Thread.Sleep(3000);
-                    SendKeys.SendWait("^Q");
-                    log.Info($"开始运行。。。");
-                    //写入数据库
-                    RecordMeasure("开始", 1);
-                }
-                else
-                {
-                    //RecordMeasure("开始", 0);
-                    log.Error("获取打开测量程序位置失败。");
-                }
-            }
-            else
-            {
-                //RecordMeasure("开始", 0);
-                log.Error("获取文件位置失败。");
-            }
         }
 
         private void btnManual_Click(object sender, EventArgs e)
@@ -643,6 +600,8 @@ namespace CMMAuto
         {
             drvCmmLog.DataSource = null;
             string sql = $@"SELECT PrgName,PrgPath,CMMState,CMMResult,CMMTime,Remark FROM MeaSureData WHERE strftime('%Y-%m-%d %H:%M:%S', CMMTime)  >= '{DateTime.Now.AddMinutes(-10).ToString("yyyy-MM-dd HH:mm:ss")}'";
+            //string sql = $@"SELECT PrgName,PrgPath,CMMState,CMMResult,CMMTime,Remark FROM MeaSureData ";
+
             DataSet dataSet = SQLiteHelpers.ExecuteDataSet(sql, null);
             if (dataSet != null)
             {
@@ -665,7 +624,7 @@ namespace CMMAuto
             log.Info($"6666666666");
         }
 
-        public async Task Test1PrgAsync()
+        public async Task TestOpenPrgAsync()
         {
             await Task.Delay(3000);
 
@@ -691,11 +650,17 @@ namespace CMMAuto
                     NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
 
                     await Task.Delay(3000);
-                    //SendKeys.SendWait("^Q");
-                    simulator.SimiuCrtlQ();
-                    log.Info($"开始运行。。。");
-                    //写入数据库
-                    RecordMeasure("开始", 1);
+                    //判断打开但没有运行状态  
+                    if (_cMMVisionHelp.CheckCmmRunState(_fullFileName) == 3)
+                    {
+                        //SendKeys.SendWait("^Q");
+                        simulator.SimiuCrtlQ();
+                        log.Info($"开始运行。。。");
+                        //写入数据库
+                        RecordMeasure("开始", 1);
+                    }
+                    else
+                    { log.Error("打开测量程式失败。"); }
                 }
                 else
                 {
@@ -708,6 +673,47 @@ namespace CMMAuto
                 //RecordMeasure("开始", 0);
                 log.Error("获取文件位置失败。");
             }
+        }
+
+        private async void btnTestExit_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
+
+            await TestExitPrgAsync();
+        }
+
+        public async Task TestExitPrgAsync()
+        {
+            await Task.Delay(3000);
+
+            if (_cMMVisionHelp.CheckCmmRunState(_fullFileName) == 3)
+            {
+                log.Info($"结束运行。。。");
+                //写入数据库
+                //RecordMeasure("结束", 1);              
+                //-----判断结束，并退出；
+                var imageBitmap = ScreenShotHelp.GetImage();
+                imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+
+                if (_cMMVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
+                {
+                    NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
+                    Thread.Sleep(1000);
+                    imageBitmap = ScreenShotHelp.GetImage();
+                    imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+                    if (_cMMVisionHelp.GetCmmClosedPos(_fullFileName, out float x1, out float y1) == 0)
+                    {
+                        NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
+                        log.Error("退出成功。");
+                    }
+                    else
+                    { log.Error("退出获取退出位置失败。"); }
+                }
+                else
+                { log.Error("退出获取文件位置失败。"); }
+            }
+            else
+            { log.Error("程式不是完成状态。"); }
         }
     }
 }
