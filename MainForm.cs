@@ -355,10 +355,19 @@ namespace CMMAuto
                         {
                             //SendKeys.SendWait("^Q");
                             simulator.SimiuCrtlQ();
-                            log.Info($"开始运行。。。");
-                            //写入数据库
-                            RecordMeasure("开始", 1);
-                            IsTheSame = true;
+
+                            Thread.Sleep(2000);
+                            imageBitmap = ScreenShotHelp.GetImage();
+                            imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+                            if (_cMMVisionHelp.CheckCmmRunState(_fullFileName) == 1 || _cMMVisionHelp.CheckCmmRunState(_fullFileName) == 2)//check是否打开
+                            {
+                                log.Info($"开始运行。。。");
+                                //写入数据库
+                                RecordMeasure("开始", 1);
+                                IsTheSame = true;
+                            }
+                            else
+                            { log.Error("测量程式运行失败。"); }
 
                             //if (!IsCycle)
                             //    IsSingle = false;
@@ -416,7 +425,7 @@ namespace CMMAuto
                                         if (_cMMVisionHelp.CheckCmmIsClosed(_fullFileName) == 0)
                                         {
                                             //是同一个就关闭
-                                            log.Info($"结束运行。。。");
+                                            log.Info($"退出成功。。。");
                                             //写入数据库
                                             RecordMeasure("结束", 1);
                                             IsTheSame = false;
@@ -436,10 +445,19 @@ namespace CMMAuto
                             else
                             {
                                 simulator.SimiuCrtlQ();
-                                log.Info($"开始运行。。。");
-                                //写入数据库
-                                RecordMeasure("开始", 1);
-                                IsTheSame = true;
+                                //判断是否运行成功
+                                Thread.Sleep(2000);
+                                var imageBitmap = ScreenShotHelp.GetImage();
+                                imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+                                if (_cMMVisionHelp.CheckCmmRunState(_fullFileName) == 1 || _cMMVisionHelp.CheckCmmRunState(_fullFileName) == 2)
+                                {
+                                    log.Info($"开始运行。。。");
+                                    //写入数据库
+                                    RecordMeasure("开始", 1);
+                                    IsTheSame = true;
+                                }
+                                else
+                                { log.Error("测量程式运行失败。"); }
                             }
                         }
                     }
@@ -671,9 +689,18 @@ namespace CMMAuto
                     {
                         //SendKeys.SendWait("^Q");
                         simulator.SimiuCrtlQ();
-                        log.Info($"开始运行。。。");
-                        //写入数据库
-                        RecordMeasure("开始", 1);
+                        //判断是否运行成功
+                        await Task.Delay(2000);
+                        var imageBitmap = ScreenShotHelp.GetImage();
+                        imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+                        if (_cMMVisionHelp.CheckCmmRunState(_fullFileName) == 1 || _cMMVisionHelp.CheckCmmRunState(_fullFileName) == 2)
+                        {
+                            log.Info($"开始运行。。。");
+                            //写入数据库
+                            RecordMeasure("开始", 1);
+                        }
+                        else
+                        { log.Error("测量程式运行失败。"); }
                     }
                     else
                     { log.Error("打开测量程式失败。"); }
@@ -704,9 +731,29 @@ namespace CMMAuto
 
             if (_cMMVisionHelp.CheckCmmRunState(_fullFileName) == 3)
             {
-                log.Info($"结束运行。。。");
-                //写入数据库
-                //RecordMeasure("结束", 1);              
+                //log.Info($"结束运行。。。");
+                ////写入数据库
+                ////RecordMeasure("结束", 1);              
+                ////-----判断结束，并退出；
+                //var imageBitmap = ScreenShotHelp.GetImage();
+                //imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+
+                //if (_cMMVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
+                //{
+                //    NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
+                //    Thread.Sleep(1000);
+                //    imageBitmap = ScreenShotHelp.GetImage();
+                //    imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+                //    if (_cMMVisionHelp.GetCmmClosedPos(_fullFileName, out float x1, out float y1) == 0)
+                //    {
+                //        NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
+                //        log.Error("退出成功。");
+                //    }
+                //    else
+                //    { log.Error("退出获取退出位置失败。"); }
+                //}
+                //else
+                //{ log.Error("退出获取文件位置失败。"); }
                 //-----判断结束，并退出；
                 var imageBitmap = ScreenShotHelp.GetImage();
                 imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
@@ -714,13 +761,24 @@ namespace CMMAuto
                 if (_cMMVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
                 {
                     NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
-                    Thread.Sleep(1000);
+                    await Task.Delay(1000);
                     imageBitmap = ScreenShotHelp.GetImage();
                     imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
                     if (_cMMVisionHelp.GetCmmClosedPos(_fullFileName, out float x1, out float y1) == 0)
                     {
                         NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
-                        log.Error("退出成功。");
+
+                        await Task.Delay(2000);
+                        imageBitmap = ScreenShotHelp.GetImage();
+                        imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+
+                        if (_cMMVisionHelp.CheckCmmIsClosed(_fullFileName) == 0)
+                        {
+                            //是同一个就关闭
+                            log.Info($"退出成功。。。");
+                        }
+                        else
+                        { log.Error("程式退出失败。"); }
                     }
                     else
                     { log.Error("退出获取退出位置失败。"); }
