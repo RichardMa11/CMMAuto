@@ -193,6 +193,9 @@
     <Content Include="statePic\error.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="statePic\fileClose.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="statePic\filePic.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

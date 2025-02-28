@@ -129,6 +129,33 @@ namespace CMMAuto.CommonHelp
             }
         }
 
+        /// <summary>
+        /// 确定【关闭】按钮位置用于关闭当前制程，点击【文件】后使用
+        /// </summary>
+        /// <param name="sourceImagePath">图像路径</param>
+        /// <param name="x">返回【关闭】位置的x坐标</param>
+        /// <param name="y">返回【关闭】位置的y坐标</param>
+        /// <returns>返回int, 0:表示运行成功；-1：表示运行失败；-2：表示识别阈值较低； </returns>
+        public int GetCmmClosedPos(string sourceImagePath, out float x, out float y)
+        {
+            try
+            {
+                log.Info("获取CMM软件退出图标的位置");
+                var res = CmmVisionInterface.CMMCloseBtnPos(GetPicImageData(sourceImagePath), out x, out y);
+                log.Info($"获取CMM软件退出图标的位置结果: { res }");
+                log.Info($"输出CMM软件退出图标信息: x0: { x }, y0: { y }");
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+                x = 0;
+                y = 0; ;
+                return -1;
+            }
+        }
+
         private static class CmmVisionInterface
         {
             //*******************CMM API***********************//
@@ -174,6 +201,18 @@ namespace CMMAuto.CommonHelp
             /// <returns>int,0:表示制程正常关闭；-1：表示该制程没有关闭；</returns>
             [DllImport(@"dll\CMMMiddlewareImg.dll", CallingConvention = CallingConvention.Cdecl)]
             public static extern int CMMFileIsClosed(ImageData inImage);
+
+            /// <summary>
+            /// 确定【关闭】按钮位置用于关闭当前制程，点击【文件】后使用
+            /// </summary>
+            /// <param name="inImage">输入图像</param>
+            /// <param name="x">返回【关闭】位置的x坐标</param>
+            /// <param name="y">返回【关闭】位置的y坐标</param>
+            /// <param name="score">识别分数阈值</param>
+            /// <returns>返回int, 0:表示运行成功；-1：表示运行失败；-2：表示识别阈值较低；</returns>
+
+            [DllImport(@"dll\CMMMiddlewareImg.dll", CallingConvention = CallingConvention.Cdecl)]
+            public static extern int CMMCloseBtnPos(ImageData inImage, out float x, out float y, float score = 80.0f);
         }
 
     }

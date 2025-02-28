@@ -27,12 +27,11 @@ namespace CMMAuto
         private static bool IsAuto = false;
         private SQLiteHelper SQLiteHelpers = null;
         private static string DBAddress = "";
-
+        private static bool IsTheSame = false;
         public MainForm()
         {
             InitializeComponent();
             _cMMVisionHelp = new CMMVisionHelp();
-
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -199,7 +198,7 @@ namespace CMMAuto
                 imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
 
                 if (_cMMVisionHelp.CheckCmmIsClosed(_fullFileName) == 0)
-                    SetState(3);
+                    SetState(4);
                 else
                 {
                     switch (_cMMVisionHelp.CheckCmmRunState(_fullFileName))
@@ -209,6 +208,9 @@ namespace CMMAuto
                             break;
                         case 2:
                             SetState(2);
+                            break;
+                        case 3:
+                            SetState(3);
                             break;
                         default:
                             SetState(0);
@@ -227,28 +229,39 @@ namespace CMMAuto
             switch (stateValue)
             {
                 case 1:
-                    txtPre.BackColor = System.Drawing.Color.White;
+                    txtOther.BackColor = System.Drawing.Color.White;
                     txtRun.BackColor = System.Drawing.Color.LimeGreen;
                     txtPause.BackColor = System.Drawing.Color.White;
                     txtExit.BackColor = System.Drawing.Color.White;
+                    txtPreOrEnd.BackColor = System.Drawing.Color.White;
                     break;
                 case 2:
-                    txtPre.BackColor = System.Drawing.Color.White;
+                    txtOther.BackColor = System.Drawing.Color.White;
                     txtRun.BackColor = System.Drawing.Color.White;
                     txtPause.BackColor = System.Drawing.Color.LimeGreen;
                     txtExit.BackColor = System.Drawing.Color.White;
+                    txtPreOrEnd.BackColor = System.Drawing.Color.White;
                     break;
                 case 3:
-                    txtPre.BackColor = System.Drawing.Color.White;
-                    txtRun.BackColor = System.Drawing.Color.White;
-                    txtPause.BackColor = System.Drawing.Color.White;
-                    txtExit.BackColor = System.Drawing.Color.LimeGreen;
-                    break;
-                default:
-                    txtPre.BackColor = System.Drawing.Color.LimeGreen;
+                    txtOther.BackColor = System.Drawing.Color.White;
                     txtRun.BackColor = System.Drawing.Color.White;
                     txtPause.BackColor = System.Drawing.Color.White;
                     txtExit.BackColor = System.Drawing.Color.White;
+                    txtPreOrEnd.BackColor = System.Drawing.Color.LimeGreen;
+                    break;
+                case 4:
+                    txtOther.BackColor = System.Drawing.Color.White;
+                    txtRun.BackColor = System.Drawing.Color.White;
+                    txtPause.BackColor = System.Drawing.Color.White;
+                    txtExit.BackColor = System.Drawing.Color.LimeGreen;
+                    txtPreOrEnd.BackColor = System.Drawing.Color.White;
+                    break;
+                default:
+                    txtOther.BackColor = System.Drawing.Color.LimeGreen;
+                    txtRun.BackColor = System.Drawing.Color.White;
+                    txtPause.BackColor = System.Drawing.Color.White;
+                    txtExit.BackColor = System.Drawing.Color.White;
+                    txtPreOrEnd.BackColor = System.Drawing.Color.White;
                     break;
             }
         }
@@ -306,7 +319,7 @@ namespace CMMAuto
 
         private void OpenTestRun()
         {
-            if (txtPre.BackColor == System.Drawing.Color.LimeGreen ||
+            if (txtOther.BackColor == System.Drawing.Color.LimeGreen ||
                  txtExit.BackColor == System.Drawing.Color.LimeGreen)
             {
                 //获取文件位置
@@ -321,7 +334,7 @@ namespace CMMAuto
 
                     if (_cMMVisionHelp.GetCmmOpenFilePos(_fullFileName, out float x0, out float y0, out float x1, out float y1) == 0)
                     {
-                        log.Info($"[Auto][Run] 打开量测程序 - Start Button: X: {x0}, Y: {y0}");
+                        log.Info($"[Auto][Run] 打开量测程式 - Start Button: X: {x0}, Y: {y0}");
                         //NativeWindowHelp.Click(Convert.ToInt32(x0), Convert.ToInt32(y0));
                         // 将文本放入剪贴板
                         Clipboard.SetText(txtMeasureProgram.Text.Trim());
@@ -330,20 +343,32 @@ namespace CMMAuto
                         simulator.SimiuCrtlV();
                         Thread.Sleep(2000);
                         NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
-
+                        //判断打开但没有运行状态
                         Thread.Sleep(3000);
-                        //SendKeys.SendWait("^Q");
-                        simulator.SimiuCrtlQ();
-                        log.Info($"开始运行。。。");
-                        //写入数据库
-                        RecordMeasure("开始", 1);
-                        if (!IsAuto)
-                            IsStart = false;
+                        imageBitmap = ScreenShotHelp.GetImage();
+                        imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+                        if (_cMMVisionHelp.CheckCmmRunState(_fullFileName) == 3)
+                        {
+                            //SendKeys.SendWait("^Q");
+                            simulator.SimiuCrtlQ();
+                            log.Info($"开始运行。。。");
+                            //写入数据库
+                            RecordMeasure("开始", 1);
+                            IsTheSame = true;
+
+                            if (!IsAuto)
+                            {
+                                IsStart = false;
+                                IsTheSame = false;
+                            }
+                        }
+                        else
+                        { log.Error("打开测量程式失败。"); }
                     }
                     else
                     {
                         //RecordMeasure("开始", 0);
-                        log.Error("获取打开测量程序位置失败。");
+                        log.Error("获取打开测量程式位置失败。");
                     }
                 }
                 else
@@ -355,7 +380,52 @@ namespace CMMAuto
             else
             {
                 //RecordMeasure("开始", 0);
-                log.Error("运行中不能开始。");
+                log.Error("运行中不能打开程式。");
+                if (_cMMVisionHelp.CheckCmmRunState(_fullFileName) == 3)
+                {
+                    //simulator.SimiuCrtlQ();
+                    if (IsTheSame)
+                    {
+                        //是同一个就关闭
+                        log.Info($"结束运行。。。");
+                        //写入数据库
+                        RecordMeasure("结束", 1);
+                        IsTheSame = false;
+                        //-----判断结束，并退出；
+                        var imageBitmap = ScreenShotHelp.GetImage();
+                        imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+
+                        if (_cMMVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
+                        {
+                            NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
+                            Thread.Sleep(1000);
+                            imageBitmap = ScreenShotHelp.GetImage();
+                            imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+                            if (_cMMVisionHelp.GetCmmClosedPos(_fullFileName, out float x1, out float y1) == 0)
+                            {
+                                NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
+                            }
+                            else
+                            { log.Error("退出获取退出位置失败。"); }
+                        }
+                        else
+                        { log.Error("退出获取文件位置失败。"); }
+                    }
+                    else
+                    {
+                        simulator.SimiuCrtlQ();
+                        log.Info($"开始运行。。。");
+                        //写入数据库
+                        RecordMeasure("开始", 1);
+                        IsTheSame = true;
+                    }
+
+                    if (!IsAuto)
+                    {
+                        IsStart = false;
+                        IsTheSame = false;
+                    }
+                }
             }
         }
 
