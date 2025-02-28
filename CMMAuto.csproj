@@ -187,6 +187,9 @@
     <Content Include="dll\CMMMiddlewareImg.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="dll\glog.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="dll\log4net.dll" />
     <Content Include="Resources\icon\cmmico.ico" />
     <Content Include="Resources\icon\cmmico.png" />

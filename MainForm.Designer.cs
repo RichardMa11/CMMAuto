@@ -506,7 +506,7 @@ namespace CMMAuto
             this.btnManual.Name = "btnManual";
             this.btnManual.Size = new System.Drawing.Size(96, 42);
             this.btnManual.TabIndex = 5;
-            this.btnManual.Text = "手动测量";
+            this.btnManual.Text = "单次测量";
             this.btnManual.UseVisualStyleBackColor = true;
             this.btnManual.Click += new System.EventHandler(this.btnManual_Click);
             // 
@@ -523,7 +523,7 @@ namespace CMMAuto
             this.btnAutoRun.Name = "btnAutoRun";
             this.btnAutoRun.Size = new System.Drawing.Size(96, 42);
             this.btnAutoRun.TabIndex = 4;
-            this.btnAutoRun.Text = "自动测量";
+            this.btnAutoRun.Text = "循环测量";
             this.btnAutoRun.UseVisualStyleBackColor = true;
             this.btnAutoRun.Click += new System.EventHandler(this.btnAutoRun_Click);
             // 

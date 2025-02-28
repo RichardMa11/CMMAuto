@@ -23,8 +23,8 @@ namespace CMMAuto
         private static readonly ILog log = LogManager.GetLogger(typeof(MainForm));
         private readonly object _lock = new object();
         private static string _fullFileName = "";
-        private static bool IsStart = false;
-        private static bool IsAuto = false;
+        private static bool IsSingle = false;
+        private static bool IsCycle = false;
         private SQLiteHelper SQLiteHelpers = null;
         private static string DBAddress = "";
         private static bool IsTheSame = false;
@@ -274,8 +274,7 @@ namespace CMMAuto
 
         private void btnEnd_Click(object sender, EventArgs e)
         {
-            IsAuto = false;
-            IsStart = false;
+            IsCycle = false;
         }
 
         private void Crtlcv()
@@ -299,11 +298,11 @@ namespace CMMAuto
             while (true) // 无限循环直到程序被外部方式终止（例如，用户按Ctrl+C）
             {
                 log.Info("测量任务: " + DateTime.Now); // 执行你的任务
-                if (IsAuto)
+                if (IsCycle)
                     OpenTestRun();
                 else
                 {
-                    if (IsStart)
+                    if (IsSingle)
                         OpenTestRun();
                 }
 
@@ -314,19 +313,18 @@ namespace CMMAuto
         private void MeasurePrg()
         {
             log.Info("测量任务: " + DateTime.Now); // 执行你的任务
-            if (IsAuto)
+            if (IsCycle)
                 OpenTestRun();
             else
             {
-                if (IsStart)
+                if (IsSingle)
                     OpenTestRun();
             }
         }
 
         private void OpenTestRun()
         {
-            if (txtOther.BackColor == System.Drawing.Color.LimeGreen ||
-                 txtExit.BackColor == System.Drawing.Color.LimeGreen)
+            if (txtExit.BackColor == System.Drawing.Color.LimeGreen)
             {
                 //获取文件位置
                 if (_cMMVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
@@ -362,11 +360,8 @@ namespace CMMAuto
                             RecordMeasure("开始", 1);
                             IsTheSame = true;
 
-                            if (!IsAuto)
-                            {
-                                IsStart = false;
-                                IsTheSame = false;
-                            }
+                            //if (!IsCycle)
+                            //    IsSingle = false;
                         }
                         else
                         { log.Error("打开测量程式失败。"); }
@@ -385,51 +380,62 @@ namespace CMMAuto
             }
             else
             {
-                //RecordMeasure("开始", 0);
-                log.Error("运行中不能打开程式或者程式已经打开。");
-                if (_cMMVisionHelp.CheckCmmRunState(_fullFileName) == 3)
+                //RecordMeasure("开始", 0);                
+                if (txtRun.BackColor == System.Drawing.Color.LimeGreen || txtPause.BackColor == System.Drawing.Color.LimeGreen)
                 {
-                    //simulator.SimiuCrtlQ();
-                    if (IsTheSame)
+                    log.Error("运行中不能打开程式。");
+                }
+                else
+                {
+                    if (txtPreOrEnd.BackColor == System.Drawing.Color.LimeGreen)
                     {
-                        //是同一个就关闭
-                        log.Info($"结束运行。。。");
-                        //写入数据库
-                        RecordMeasure("结束", 1);
-                        IsTheSame = false;
-                        //-----判断结束，并退出；
-                        var imageBitmap = ScreenShotHelp.GetImage();
-                        imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
-
-                        if (_cMMVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
+                        if (_cMMVisionHelp.CheckCmmRunState(_fullFileName) == 3)
                         {
-                            NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
-                            Thread.Sleep(1000);
-                            imageBitmap = ScreenShotHelp.GetImage();
-                            imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
-                            if (_cMMVisionHelp.GetCmmClosedPos(_fullFileName, out float x1, out float y1) == 0)
+                            //simulator.SimiuCrtlQ();
+                            if (IsTheSame)
                             {
-                                NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
+                                //是同一个就关闭
+                                log.Info($"结束运行。。。");
+                                //写入数据库
+                                RecordMeasure("结束", 1);
+                                IsTheSame = false;
+                                //-----判断结束，并退出；
+                                var imageBitmap = ScreenShotHelp.GetImage();
+                                imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+
+                                if (_cMMVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
+                                {
+                                    NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
+                                    Thread.Sleep(1000);
+                                    imageBitmap = ScreenShotHelp.GetImage();
+                                    imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+                                    if (_cMMVisionHelp.GetCmmClosedPos(_fullFileName, out float x1, out float y1) == 0)
+                                    {
+                                        NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
+                                    }
+                                    else
+                                    { log.Error("退出获取退出位置失败。"); }
+                                }
+                                else
+                                { log.Error("退出获取文件位置失败。"); }
                             }
                             else
-                            { log.Error("退出获取退出位置失败。"); }
+                            {
+                                simulator.SimiuCrtlQ();
+                                log.Info($"开始运行。。。");
+                                //写入数据库
+                                RecordMeasure("开始", 1);
+                                IsTheSame = true;
+                            }
+
+                            if (!IsCycle)
+                                IsSingle = false;
+
                         }
-                        else
-                        { log.Error("退出获取文件位置失败。"); }
                     }
                     else
                     {
-                        simulator.SimiuCrtlQ();
-                        log.Info($"开始运行。。。");
-                        //写入数据库
-                        RecordMeasure("开始", 1);
-                        IsTheSame = true;
-                    }
-
-                    if (!IsAuto)
-                    {
-                        IsStart = false;
-                        IsTheSame = false;
+                        log.Error("程序没有打开或者其他问题。");
                     }
                 }
             }
@@ -461,8 +467,8 @@ namespace CMMAuto
                 return;
             }
 
-            IsAuto = false;
-            IsStart = true;
+            IsCycle = false;
+            IsSingle = true;
             this.WindowState = FormWindowState.Minimized;
         }
 
@@ -474,7 +480,7 @@ namespace CMMAuto
                 return;
             }
 
-            IsAuto = true;
+            IsCycle = true;
             this.WindowState = FormWindowState.Minimized;
         }
 
