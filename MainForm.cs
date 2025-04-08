@@ -22,13 +22,13 @@ namespace CMMAuto
         private readonly KeyboardSimulatorHelp _simulator = new KeyboardSimulatorHelp();
         private readonly object _lock = new object();
 
-        private static string FullFileName = "";
-        private static bool IsSingle = false;
-        private static bool IsCycle = false;
-        private static bool IsTheSame = false;
+        private static string _fullFileName = "";
+        private static bool _isSingle = false;
+        private static bool _isCycle = false;
+        private static bool _isTheSame = false;
 
         private static readonly ILog Log = LogManager.GetLogger(typeof(MainForm));
-        private SQLiteHelper SQLiteHelpers = null;
+        private SQLiteHelper _sqLiteHelpers = null;
 
         public MainForm()
         {
@@ -44,8 +44,8 @@ namespace CMMAuto
                 Directory.CreateDirectory(sqlBasePath);
 
             string dbAddress = Path.Combine(sqlBasePath, $"CMM-{DateTime.Now.ToString("yyyy")}.db3");
-            SQLiteHelpers = new SQLiteHelper(dbAddress);
-            SQLiteHelpers.Open();
+            _sqLiteHelpers = new SQLiteHelper(dbAddress);
+            _sqLiteHelpers.Open();
         }
 
         private string GetSqliteBasePath()
@@ -72,7 +72,7 @@ namespace CMMAuto
                 Directory.CreateDirectory(basePath);
 
             //var fullFileName = Path.Combine(basePath, $"{DateTime.Now.ToString("yyyyMMddHHmmss")}.{CommonConstant.IMAGE_SUFFIX}");
-            FullFileName = Path.Combine(basePath, $"AutoScreenflash.{CommonConstant.IMAGE_SUFFIX}");
+            _fullFileName = Path.Combine(basePath, $"AutoScreenflash.{CommonConstant.IMAGE_SUFFIX}");
         }
 
         private string GetImageBasePath()
@@ -143,7 +143,7 @@ namespace CMMAuto
         {
             trvTestPrgChoose.Nodes.Clear();
             string sql = "SELECT PrgName FROM MeaSurePrgCfg";
-            DataSet dataSet = SQLiteHelpers.ExecuteDataSet(sql, null);
+            DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, null);
             if (dataSet != null)
             {
                 foreach (DataRow row in dataSet.Tables[0].Rows)
@@ -160,7 +160,7 @@ namespace CMMAuto
             string sql = $@"SELECT PrgName,PrgPath,CMMState,CMMResult,CMMTime,Remark FROM MeaSureData WHERE strftime('%Y-%m-%d %H:%M:%S', CMMTime)  >= '{DateTime.Now.AddMinutes(-10).ToString("yyyy-MM-dd HH:mm:ss")}' order by CMMTime desc ";
             //string sql = $@"SELECT PrgName,PrgPath,CMMState,CMMResult,CMMTime,Remark FROM MeaSureData ";
 
-            DataSet dataSet = SQLiteHelpers.ExecuteDataSet(sql, null);
+            DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, null);
             if (dataSet != null)
             {
                 drvCmmLog.DataSource = dataSet.Tables[0];
@@ -183,13 +183,13 @@ namespace CMMAuto
             try
             {
                 var imageBitmap = ScreenShotHelp.GetImage();
-                imageBitmap.Save(FullFileName, ImageFormat.Jpeg);
+                imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
 
-                if (_cmmVisionHelp.CheckCmmIsClosed(FullFileName) == 0)
+                if (_cmmVisionHelp.CheckCmmIsClosed(_fullFileName) == 0)
                     SetState(4);
                 else
                 {
-                    switch (_cmmVisionHelp.CheckCmmRunState(FullFileName))
+                    switch (_cmmVisionHelp.CheckCmmRunState(_fullFileName))
                     {
                         case 1:
                             SetState(1);
@@ -257,11 +257,11 @@ namespace CMMAuto
         private void MeasurePrg()
         {
             Log.Info("测量任务: " + DateTime.Now); // 执行你的任务
-            if (IsCycle)
+            if (_isCycle)
                 OpenTestRun();
             else
             {
-                if (IsSingle)
+                if (_isSingle)
                     OpenTestRun();
             }
         }
@@ -271,16 +271,16 @@ namespace CMMAuto
             if (txtExit.BackColor == System.Drawing.Color.LimeGreen)
             {
                 //获取文件位置
-                if (_cmmVisionHelp.GetCmmFilePos(FullFileName, out float x, out float y) == 0)
+                if (_cmmVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
                 {
                     //鼠标点击
                     Log.Info($"[Auto][Run] 弹出文件窗口 - Start Button: X: {x}, Y: {y}");
                     //NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
                     _simulator.SimiuCrtlO();
                     var imageBitmap = ScreenShotHelp.GetImage();
-                    imageBitmap.Save(FullFileName, ImageFormat.Jpeg);
+                    imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
 
-                    if (_cmmVisionHelp.GetCmmOpenFilePos(FullFileName, out float x0, out float y0, out float x1, out float y1) == 0)
+                    if (_cmmVisionHelp.GetCmmOpenFilePos(_fullFileName, out float x0, out float y0, out float x1, out float y1) == 0)
                     {
                         Log.Info($"[Auto][Run] 打开量测程式 - Start Button: X: {x0}, Y: {y0}");
                         //NativeWindowHelp.Click(Convert.ToInt32(x0), Convert.ToInt32(y0));
@@ -294,21 +294,21 @@ namespace CMMAuto
                         //判断打开但没有运行状态
                         Thread.Sleep(3000);
                         imageBitmap = ScreenShotHelp.GetImage();
-                        imageBitmap.Save(FullFileName, ImageFormat.Jpeg);
-                        if (_cmmVisionHelp.CheckCmmRunState(FullFileName) == 3)//check是否打开
+                        imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+                        if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 3)//check是否打开
                         {
                             //SendKeys.SendWait("^Q");
                             _simulator.SimiuCrtlQ();
 
                             Thread.Sleep(2000);
                             imageBitmap = ScreenShotHelp.GetImage();
-                            imageBitmap.Save(FullFileName, ImageFormat.Jpeg);
-                            if (_cmmVisionHelp.CheckCmmRunState(FullFileName) == 1 || _cmmVisionHelp.CheckCmmRunState(FullFileName) == 2)//check是否打开
+                            imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+                            if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 1 || _cmmVisionHelp.CheckCmmRunState(_fullFileName) == 2)//check是否打开
                             {
                                 Log.Info($"开始运行。。。");
                                 //写入数据库
                                 RecordMeasure("开始", 1);
-                                IsTheSame = true;
+                                _isTheSame = true;
                             }
                             else
                             { Log.Error("测量程式运行失败。"); }
@@ -342,40 +342,40 @@ namespace CMMAuto
                 {
                     if (txtPreOrEnd.BackColor == System.Drawing.Color.LimeGreen)
                     {
-                        if (_cmmVisionHelp.CheckCmmRunState(FullFileName) == 3)
+                        if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 3)
                         {
                             Thread.Sleep(3000);
                             //simulator.SimiuCrtlQ();
-                            if (IsTheSame)
+                            if (_isTheSame)
                             {
                                 //-----判断结束，并退出；
                                 var imageBitmap = ScreenShotHelp.GetImage();
-                                imageBitmap.Save(FullFileName, ImageFormat.Jpeg);
+                                imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
 
-                                if (_cmmVisionHelp.GetCmmFilePos(FullFileName, out float x, out float y) == 0)
+                                if (_cmmVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
                                 {
                                     NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
                                     Thread.Sleep(1000);
                                     imageBitmap = ScreenShotHelp.GetImage();
-                                    imageBitmap.Save(FullFileName, ImageFormat.Jpeg);
-                                    if (_cmmVisionHelp.GetCmmClosedPos(FullFileName, out float x1, out float y1) == 0)
+                                    imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+                                    if (_cmmVisionHelp.GetCmmClosedPos(_fullFileName, out float x1, out float y1) == 0)
                                     {
                                         NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
 
                                         Thread.Sleep(2000);
                                         imageBitmap = ScreenShotHelp.GetImage();
-                                        imageBitmap.Save(FullFileName, ImageFormat.Jpeg);
+                                        imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
 
-                                        if (_cmmVisionHelp.CheckCmmIsClosed(FullFileName) == 0)
+                                        if (_cmmVisionHelp.CheckCmmIsClosed(_fullFileName) == 0)
                                         {
                                             //是同一个就关闭
                                             Log.Info($"退出成功。。。");
                                             //写入数据库
                                             RecordMeasure("结束", 1);
-                                            IsTheSame = false;
+                                            _isTheSame = false;
 
-                                            if (!IsCycle)
-                                                IsSingle = false;
+                                            if (!_isCycle)
+                                                _isSingle = false;
                                         }
                                         else
                                         { Log.Error("程式退出失败。"); }
@@ -392,13 +392,13 @@ namespace CMMAuto
                                 //判断是否运行成功
                                 Thread.Sleep(2000);
                                 var imageBitmap = ScreenShotHelp.GetImage();
-                                imageBitmap.Save(FullFileName, ImageFormat.Jpeg);
-                                if (_cmmVisionHelp.CheckCmmRunState(FullFileName) == 1 || _cmmVisionHelp.CheckCmmRunState(FullFileName) == 2)
+                                imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+                                if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 1 || _cmmVisionHelp.CheckCmmRunState(_fullFileName) == 2)
                                 {
                                     Log.Info($"开始运行。。。");
                                     //写入数据库
                                     RecordMeasure("开始", 1);
-                                    IsTheSame = true;
+                                    _isTheSame = true;
                                 }
                                 else
                                 { Log.Error("测量程式运行失败。"); }
@@ -439,7 +439,7 @@ namespace CMMAuto
             await Task.Delay(3000);
 
             //获取文件位置
-            if (_cmmVisionHelp.GetCmmFilePos(FullFileName, out float x, out float y) == 0)
+            if (_cmmVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
             {
                 //鼠标点击
                 Log.Info($"[Auto][Run] 弹出文件窗口 - Start Button: X: {x}, Y: {y}");
@@ -447,7 +447,7 @@ namespace CMMAuto
                 _simulator.SimiuCrtlO();
                 await Task.Delay(4000);
 
-                if (_cmmVisionHelp.GetCmmOpenFilePos(FullFileName, out float x0, out float y0, out float x1, out float y1) == 0)
+                if (_cmmVisionHelp.GetCmmOpenFilePos(_fullFileName, out float x0, out float y0, out float x1, out float y1) == 0)
                 {
                     Log.Info($"[Auto][Run] 打开量测程序 - Start Button: X: {x0}, Y: {y0}");
                     //NativeWindowHelp.Click(Convert.ToInt32(x0), Convert.ToInt32(y0));
@@ -461,15 +461,15 @@ namespace CMMAuto
 
                     await Task.Delay(3000);
                     //判断打开但没有运行状态  
-                    if (_cmmVisionHelp.CheckCmmRunState(FullFileName) == 3)
+                    if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 3)
                     {
                         //SendKeys.SendWait("^Q");
                         _simulator.SimiuCrtlQ();
                         //判断是否运行成功
                         await Task.Delay(2000);
                         var imageBitmap = ScreenShotHelp.GetImage();
-                        imageBitmap.Save(FullFileName, ImageFormat.Jpeg);
-                        if (_cmmVisionHelp.CheckCmmRunState(FullFileName) == 1 || _cmmVisionHelp.CheckCmmRunState(FullFileName) == 2)
+                        imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+                        if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 1 || _cmmVisionHelp.CheckCmmRunState(_fullFileName) == 2)
                         {
                             Log.Info($"开始运行。。。");
                             //写入数据库
@@ -537,7 +537,7 @@ namespace CMMAuto
 
         private void btnEnd_Click(object sender, EventArgs e)
         {
-            IsCycle = false;
+            _isCycle = false;
         }
 
         private void btnConnect_Click(object sender, EventArgs e)
@@ -566,8 +566,8 @@ namespace CMMAuto
                 return;
             }
 
-            IsCycle = false;
-            IsSingle = true;
+            _isCycle = false;
+            _isSingle = true;
             this.WindowState = FormWindowState.Minimized;
         }
 
@@ -579,7 +579,7 @@ namespace CMMAuto
                 return;
             }
 
-            IsCycle = true;
+            _isCycle = true;
             this.WindowState = FormWindowState.Minimized;
         }
 
@@ -592,7 +592,7 @@ namespace CMMAuto
             }
 
             // check 是否已经存在
-            if (SQLiteHelpers.QueryOne("MeaSurePrgCfg", "PrgName", txtMeasureName.Text.Trim()) != null)
+            if (_sqLiteHelpers.QueryOne("MeaSurePrgCfg", "PrgName", txtMeasureName.Text.Trim()) != null)
             {
                 MessageBox.Show("该量测节点已经存在！");
                 return;
@@ -603,7 +603,7 @@ namespace CMMAuto
             dic.Add("PrgPath", txtMeasureProgram.Text.Trim());
             dic.Add("CreateDate", DateTime.Now);
 
-            int result = SQLiteHelpers.InsertData("MeaSurePrgCfg", dic);
+            int result = _sqLiteHelpers.InsertData("MeaSurePrgCfg", dic);
             LoadTreeView();
             MessageBox.Show("录入成功！");
         }
@@ -632,7 +632,7 @@ namespace CMMAuto
                     //赋值txt
                     SQLiteParameter[] parameter = new SQLiteParameter[] { new SQLiteParameter("PrgName", e.Node.Text) };
                     string sql = "SELECT PrgName,PrgPath FROM MeaSurePrgCfg WHERE PrgName = @PrgName";
-                    DataSet dataSet = SQLiteHelpers.ExecuteDataSet(sql, parameter);
+                    DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
                     txtMeasureName.Text = e.Node.Text;
                     txtMeasureProgram.Text = dataSet.Tables[0].Rows[0]["PrgPath"].ToString();
                 }
@@ -669,12 +669,12 @@ namespace CMMAuto
             dic.Add("CMMTime", DateTime.Now);
             dic.Add("CreateDate", DateTime.Now);
 
-            SQLiteHelpers.InsertData("MeaSureData", dic);
+            _sqLiteHelpers.InsertData("MeaSureData", dic);
         }
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            SQLiteHelpers.Close();
+            _sqLiteHelpers.Close();
         }
 
         private async void btnTestExit_Click(object sender, EventArgs e)
@@ -688,7 +688,7 @@ namespace CMMAuto
         {
             await Task.Delay(3000);
 
-            if (_cmmVisionHelp.CheckCmmRunState(FullFileName) == 3)
+            if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 3)
             {
                 //log.Info($"结束运行。。。");
                 ////写入数据库
@@ -715,23 +715,23 @@ namespace CMMAuto
                 //{ log.Error("退出获取文件位置失败。"); }
                 //-----判断结束，并退出；
                 var imageBitmap = ScreenShotHelp.GetImage();
-                imageBitmap.Save(FullFileName, ImageFormat.Jpeg);
+                imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
 
-                if (_cmmVisionHelp.GetCmmFilePos(FullFileName, out float x, out float y) == 0)
+                if (_cmmVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
                 {
                     NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
                     await Task.Delay(1000);
                     imageBitmap = ScreenShotHelp.GetImage();
-                    imageBitmap.Save(FullFileName, ImageFormat.Jpeg);
-                    if (_cmmVisionHelp.GetCmmClosedPos(FullFileName, out float x1, out float y1) == 0)
+                    imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+                    if (_cmmVisionHelp.GetCmmClosedPos(_fullFileName, out float x1, out float y1) == 0)
                     {
                         NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
 
                         await Task.Delay(2000);
                         imageBitmap = ScreenShotHelp.GetImage();
-                        imageBitmap.Save(FullFileName, ImageFormat.Jpeg);
+                        imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
 
-                        if (_cmmVisionHelp.CheckCmmIsClosed(FullFileName) == 0)
+                        if (_cmmVisionHelp.CheckCmmIsClosed(_fullFileName) == 0)
                         {
                             //是同一个就关闭
                             Log.Info($"退出成功。。。");
@@ -772,6 +772,46 @@ namespace CMMAuto
             //simulator.PasteText();
         }
 
+        private async void ConnectAgv()
+        {
+            await Task.Run(() =>
+            {
+                try
+                {
+                    //txtAgvConnect.BackColor = _tcpServer.IsConnectionAlive(new TCPServerContext { Port = 1234 }) ? System.Drawing.Color.LimeGreen : System.Drawing.Color.Red;
+                    //lblAGV1.Text = $@"1号小车（{_tcpServer.Ip}）";
+                }
+                catch (Exception ex)
+                {
+                    // 异常时更新UI提示错误
+                    this.BeginInvoke(new Action(() =>
+                    {
+
+                    }));
+                    Log.Error($"连接失败: {ex.Message}");
+                }
+            });
+
+
+            // 服务端测试
+            //var server = new TcpServer(8888);
+            //server.Start();
+            //server.Clients[0].OnClientDisconnected += ex => Console.WriteLine($"Error: {ex.ToString()}");
+
+            // 客户端测试
+            //var client = new TcpClients("127.0.0.1", 8888);
+            //client.OnDataReceived += Console.WriteLine;
+            //await client.ConnectAsync();
+
+            // 测试大数据包（1MB）
+            var bigData = new string('A', 1024 * 1024);
+            //await client.SendAsync(bigData);
+
+            // 测试连续发送
+            //await client.SendAsync("Hello");
+            //await client.SendAsync("World");
+        }
+
         public async Task OpenTestPrgAsync() // 方法标记为async，允许使用await关键字
         {
             Log.Info("异步线程-测量执行线程已开启。");
@@ -779,11 +819,11 @@ namespace CMMAuto
             while (true) // 无限循环直到程序被外部方式终止（例如，用户按Ctrl+C）
             {
                 Log.Info("测量任务: " + DateTime.Now); // 执行你的任务
-                if (IsCycle)
+                if (_isCycle)
                     OpenTestRun();
                 else
                 {
-                    if (IsSingle)
+                    if (_isSingle)
                         OpenTestRun();
                 }
 
