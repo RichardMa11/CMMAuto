@@ -5,6 +5,7 @@ using System.Data.SQLite;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -43,7 +44,7 @@ namespace CMMAuto
             if (!Directory.Exists(sqlBasePath))
                 Directory.CreateDirectory(sqlBasePath);
 
-            string dbAddress = Path.Combine(sqlBasePath, $"CMM-{DateTime.Now.ToString("yyyy")}.db3");
+            string dbAddress = Path.Combine(sqlBasePath, $"CMM-BaseData.db3");
             _sqLiteHelpers = new SQLiteHelper(dbAddress);
             _sqLiteHelpers.Open();
         }
@@ -118,25 +119,27 @@ namespace CMMAuto
                 MessageBox.Show("日志文件未找到", "错误");
                 return "";
             }
-            var logLength = new FileInfo(logPath).Length;
-            var bakPath = logPath + ".bak";
-            File.Copy(logPath, bakPath, true);
+            return ReadFileTail(logPath, encoding: Encoding.GetEncoding("GBK"));
 
-            var bufferSize = 5120 * 5120;
-            var buffer = new byte[bufferSize];
-            if (logLength <= bufferSize)
-            {
-                buffer = File.ReadAllBytes(bakPath);
-            }
-            else
-            {
-                using (FileStream stream = new FileStream(bakPath, FileMode.Open, FileAccess.Read))
-                {
-                    stream.Seek(bufferSize, SeekOrigin.End);
-                    stream.Read(buffer, 0, bufferSize);
-                }
-            }
-            return System.Text.Encoding.Default.GetString(buffer);
+            //var logLength = new FileInfo(logPath).Length;
+            //var bakPath = logPath + ".bak";
+            //File.Copy(logPath, bakPath, true);
+
+            //var bufferSize = 5120 * 5120;
+            //var buffer = new byte[bufferSize];
+            //if (logLength <= bufferSize)
+            //{
+            //    buffer = File.ReadAllBytes(bakPath);
+            //}
+            //else
+            //{
+            //    using (FileStream stream = new FileStream(bakPath, FileMode.Open, FileAccess.Read))
+            //    {
+            //        stream.Seek(bufferSize, SeekOrigin.End);
+            //        stream.Read(buffer, 0, bufferSize);
+            //    }
+            //}
+            //return System.Text.Encoding.Default.GetString(buffer);
         }
 
         private void LoadTreeView()
@@ -816,6 +819,31 @@ namespace CMMAuto
         {
             Log.Info("异步线程-测量执行线程已开启。");
 
+            // 读取最后50KB的日志（使用GBK编码）
+            string logContent1 = ReadFileTail(
+                @"C:\logs\app.log",
+                bufferSize: 50 * 1024,
+                encoding: Encoding.GetEncoding("GBK")
+            );
+
+            // 读取最后1MB日志（异步操作）
+            var logContent = await ReadFileTailAsync(
+                @"C:\logs\app.log",
+                bufferSize: 1024 * 1024,
+                encoding: Encoding.UTF8
+            );
+
+            // 带取消功能的读取
+            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5)); // 5秒超时
+            try
+            {
+                var content = await ReadFileTailAsync("large.log", cancellationToken: cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                Console.WriteLine("读取操作超时取消");
+            }
+
             while (true) // 无限循环直到程序被外部方式终止（例如，用户按Ctrl+C）
             {
                 Log.Info("测量任务: " + DateTime.Now); // 执行你的任务
@@ -830,5 +858,112 @@ namespace CMMAuto
                 await Task.Delay(4000); // 暂停2秒，注意这里使用的是await，使得方法变为异步的，适合在UI或异步环境中使用。
             }
         }
+
+        public string ReadFileTail(string filePath, int bufferSize = 1024 * 15, Encoding encoding = null)
+        {
+            // 参数校验
+            if (!File.Exists(filePath)) throw new FileNotFoundException("文件不存在", filePath);
+            if (bufferSize <= 0) throw new ArgumentException(@"缓冲区大小必须大于0", nameof(bufferSize));
+
+            // 设置编码（默认UTF-8）
+            //encoding ??= Encoding.UTF8;
+            if (encoding == null)
+                encoding = Encoding.UTF8;
+
+            try
+            {
+                using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    long fileLength = stream.Length;
+
+                    // 处理小文件：直接全量读取
+                    if (fileLength <= bufferSize)
+                    {
+                        byte[] fullBuffer = new byte[fileLength];
+                        stream.Read(fullBuffer, 0, (int)fileLength);
+                        return encoding.GetString(fullBuffer);
+                    }
+
+                    // 处理大文件：读取末尾内容
+                    else
+                    {
+                        byte[] buffer = new byte[bufferSize];
+                        // 定位到文件末尾前 bufferSize 字节的位置（需确保不越界）
+                        stream.Seek(-bufferSize, SeekOrigin.End);
+                        int bytesRead = stream.Read(buffer, 0, bufferSize);
+
+                        // 处理实际读取字节数（可能小于bufferSize）
+                        return encoding.GetString(buffer, 0, bytesRead);
+                    }
+                }
+            }
+            catch (IOException ex)
+            {
+                Log.Error($"读取文件失败: {ex.Message + ex.StackTrace}");
+                throw new IOException($"读取文件失败: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<string> ReadFileTailAsync(string filePath, int bufferSize = 1024 * 15, Encoding encoding = null, CancellationToken cancellationToken = default)
+        {
+            // 参数校验
+            if (!File.Exists(filePath)) throw new FileNotFoundException("文件不存在", filePath);
+            if (bufferSize <= 0) throw new ArgumentException(@"缓冲区大小必须大于0", nameof(bufferSize));
+
+            //encoding ??= Encoding.UTF8; // 默认编码
+            if (encoding == null)
+                encoding = Encoding.UTF8;
+
+            try
+            {
+                using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, bufferSize: 4096, // 系统默认页大小
+                    useAsync: true))  // 启用异步IO
+                {
+                    long fileLength = stream.Length;
+
+                    // 小文件直接全量读取
+                    if (fileLength <= bufferSize)
+                    {
+                        byte[] fullBuffer = new byte[fileLength];
+                        await stream.ReadAsync(fullBuffer, 0, (int)fileLength, cancellationToken)
+                                    .ConfigureAwait(false);
+                        return encoding.GetString(fullBuffer);
+                    }
+
+                    // 大文件读取末尾
+                    else
+                    {
+                        byte[] buffer = new byte[bufferSize];
+                        stream.Seek(-bufferSize, SeekOrigin.End); // 定位到末尾前 bufferSize
+
+                        int totalBytesRead = 0;
+                        while (totalBytesRead < bufferSize)
+                        {
+                            int bytesRead = await stream.ReadAsync(
+                                buffer,
+                                totalBytesRead,
+                                bufferSize - totalBytesRead,
+                                cancellationToken
+                            ).ConfigureAwait(false);
+
+                            if (bytesRead == 0) break; // 流结束
+                            totalBytesRead += bytesRead;
+                        }
+
+                        return encoding.GetString(buffer, 0, totalBytesRead);
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                throw; // 取消操作直接抛出
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"读取文件失败: {ex.Message + ex.StackTrace}");
+                throw new IOException($"读取文件失败: {ex.Message}", ex);
+            }
+        }
+
     }
 }

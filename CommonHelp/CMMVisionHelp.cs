@@ -20,7 +20,7 @@ namespace CMMAuto.CommonHelp
                 Height = mat.Height,
                 Channels = mat.Channels()
             };
-            log.Info($"原图信息 width: {imageData.Width}, height: {imageData.Height}, channels: {imageData.Channels}");
+            //log.Info($"原图信息 width: {imageData.Width}, height: {imageData.Height}, channels: {imageData.Channels}");
 
             return imageData;
         }
@@ -35,15 +35,15 @@ namespace CMMAuto.CommonHelp
         {
             try
             {
-                log.Info("确定CMM软件运行状态");
+                //log.Info("确定CMM软件运行状态");
                 var res = CmmVisionInterface.CMMRunOrPauseCheck(GetPicImageData(sourceImagePath));
-                log.Info($"CMM软件运行状态: { res }");
+                //log.Info($"CMM软件运行状态: { res }");
 
                 return res;
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                log.Error($"确定CMM软件运行状态出错：{ex.Message + ex.StackTrace}");
                 return -1;
             }
         }
@@ -62,16 +62,16 @@ namespace CMMAuto.CommonHelp
         {
             try
             {
-                log.Info("获取CMM软件打开程序的位置");
+                //log.Info("获取CMM软件打开程序的位置");
                 var res = CmmVisionInterface.CMMOpenFilePos(GetPicImageData(sourceImagePath), out x0, out y0, out x1, out y1);
-                log.Info($"获取CMM软件打开程序的位置结果: { res }");
-                log.Info($"输出CMM软件打开程序的位置信息: x0: { x0 }, y0: { y0 } x1: { x1 }, y1: { y1 }");
+                //log.Info($"获取CMM软件打开程序的位置结果: { res }");
+                //log.Info($"输出CMM软件打开程序的位置信息: x0: { x0 }, y0: { y0 } x1: { x1 }, y1: { y1 }");
 
                 return res;
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                log.Error($"获取CMM软件【打开】位置信息出错：{ex.Message + ex.StackTrace}");
                 x0 = 0;
                 y0 = 0;
                 x1 = 0;
@@ -91,16 +91,16 @@ namespace CMMAuto.CommonHelp
         {
             try
             {
-                log.Info("获取CMM软件文件图标的位置");
+                //log.Info("获取CMM软件文件图标的位置");
                 var res = CmmVisionInterface.CMMFilePos(GetPicImageData(sourceImagePath), out x, out y);
-                log.Info($"获取CMM软件文件图标的位置结果: { res }");
-                log.Info($"输出CMM软件文件图标信息: x0: { x }, y0: { y }");
+                //log.Info($"获取CMM软件文件图标的位置结果: { res }");
+                //log.Info($"输出CMM软件文件图标信息: x0: { x }, y0: { y }");
 
                 return res;
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                log.Error($"获取CMM软件【文件】位置信息出错：{ex.Message + ex.StackTrace}");
                 x = 0;
                 y = 0; ;
                 return -1;
@@ -116,15 +116,15 @@ namespace CMMAuto.CommonHelp
         {
             try
             {
-                log.Info("确定CMM软件是否关闭");
+                //log.Info("确定CMM软件是否关闭");
                 var res = CmmVisionInterface.CMMFileIsClosed(GetPicImageData(sourceImagePath));
-                log.Info($"CMM软件运行状态: { res }");
+                //log.Info($"CMM软件运行状态: { res }");
 
                 return res;
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                log.Error($"确定CMM软件是否关闭出错：{ex.Message + ex.StackTrace}");
                 return -1;
             }
         }
@@ -140,16 +140,16 @@ namespace CMMAuto.CommonHelp
         {
             try
             {
-                log.Info("获取CMM软件退出图标的位置");
+                //log.Info("获取CMM软件退出图标的位置");
                 var res = CmmVisionInterface.CMMCloseBtnPos(GetPicImageData(sourceImagePath), out x, out y);
-                log.Info($"获取CMM软件退出图标的位置结果: { res }");
-                log.Info($"输出CMM软件退出图标信息: x0: { x }, y0: { y }");
+                //log.Info($"获取CMM软件退出图标的位置结果: { res }");
+                //log.Info($"输出CMM软件退出图标信息: x0: { x }, y0: { y }");
 
                 return res;
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                log.Error($"获取CMM软件【退出】位置信息出错：{ex.Message + ex.StackTrace}");
                 x = 0;
                 y = 0; ;
                 return -1;

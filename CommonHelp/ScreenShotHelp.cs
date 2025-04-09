@@ -38,7 +38,7 @@ namespace CMMAuto.CommonHelp
                 {
                     graphics.CopyFromScreen(0, 0, 0, 0, bitmap.Size);
                     var cropped = CropBitmap(bitmap, rect.X, rect.Y, rect.Width, rect.Height);
-                    log.Info($"[Screenshot] - cur screenshot X: {rect.X}, Y: {rect.Y}, Width: {rect.Width}, Height: {rect.Height}");
+                    //log.Info($"[Screenshot] - cur screenshot X: {rect.X}, Y: {rect.Y}, Width: {rect.Width}, Height: {rect.Height}");
                     return cropped;
                 }
             }

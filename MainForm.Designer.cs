@@ -474,6 +474,7 @@ namespace CMMAuto
             this.btnTestExit.TabIndex = 7;
             this.btnTestExit.Text = "测试退出";
             this.btnTestExit.UseVisualStyleBackColor = true;
+            this.btnTestExit.Visible = false;
             this.btnTestExit.Click += new System.EventHandler(this.btnTestExit_Click);
             // 
             // btnEnd
@@ -491,6 +492,7 @@ namespace CMMAuto
             this.btnEnd.TabIndex = 6;
             this.btnEnd.Text = "退  出";
             this.btnEnd.UseVisualStyleBackColor = true;
+            this.btnEnd.Visible = false;
             this.btnEnd.Click += new System.EventHandler(this.btnEnd_Click);
             // 
             // btnManual
@@ -543,6 +545,7 @@ namespace CMMAuto
             this.btnOpenFile.TabIndex = 0;
             this.btnOpenFile.Text = "测试打开";
             this.btnOpenFile.UseVisualStyleBackColor = true;
+            this.btnOpenFile.Visible = false;
             this.btnOpenFile.Click += new System.EventHandler(this.btnOpenFile_Click);
             // 
             // btnSaveImg
@@ -560,6 +563,7 @@ namespace CMMAuto
             this.btnSaveImg.TabIndex = 1;
             this.btnSaveImg.Text = "截屏并读取";
             this.btnSaveImg.UseVisualStyleBackColor = true;
+            this.btnSaveImg.Visible = false;
             this.btnSaveImg.Click += new System.EventHandler(this.btnSaveImg_Click);
             // 
             // panelState
