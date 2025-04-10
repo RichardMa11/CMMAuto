@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "使用说明", "使用说�
 		readme.md = readme.md
 	EndProjectSection
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SetupCMMAuto", "SetupCMMAuto\SetupCMMAuto\SetupCMMAuto.vdproj", "{F2D0E9EE-F7BB-4DC8-B2A5-409BBBA750BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{D7396BBF-451D-4BCA-A089-E5958D4DE29E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D7396BBF-451D-4BCA-A089-E5958D4DE29E}.Release|x64.ActiveCfg = Release|x64
 		{D7396BBF-451D-4BCA-A089-E5958D4DE29E}.Release|x64.Build.0 = Release|x64
+		{F2D0E9EE-F7BB-4DC8-B2A5-409BBBA750BF}.Debug|Any CPU.ActiveCfg = Debug
+		{F2D0E9EE-F7BB-4DC8-B2A5-409BBBA750BF}.Debug|x64.ActiveCfg = Debug
+		{F2D0E9EE-F7BB-4DC8-B2A5-409BBBA750BF}.Release|Any CPU.ActiveCfg = Release
+		{F2D0E9EE-F7BB-4DC8-B2A5-409BBBA750BF}.Release|x64.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
