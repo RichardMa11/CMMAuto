@@ -8,12 +8,14 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms;
 using CMMAuto.Common;
 using CMMAuto.CommonHelp;
 using CMMAuto.Config;
 using log4net;
 using log4net.Appender;
+using Panuon.UI.Silver;
 
 namespace CMMAuto
 {
@@ -116,7 +118,7 @@ namespace CMMAuto
             var logPath = appender.File;
             if (!File.Exists(logPath))
             {
-                MessageBox.Show("日志文件未找到", "错误");
+                MessageBoxX.Show("日志文件未找到！", "提示");
                 return "";
             }
             return ReadFileTail(logPath, encoding: Encoding.GetEncoding("GBK"));
@@ -429,7 +431,7 @@ namespace CMMAuto
 
             if (string.IsNullOrEmpty(txtMeasureProgram.Text))
             {
-                MessageBox.Show("量测程式不能为空！");
+                MessageBoxX.Show("量测程式不能为空！", "提示");
                 return;
             }
 
@@ -540,7 +542,7 @@ namespace CMMAuto
 
         private void btnEnd_Click(object sender, EventArgs e)
         {
-            _isCycle = false;
+            _isSingle = false;
         }
 
         private void btnConnect_Click(object sender, EventArgs e)
@@ -565,7 +567,7 @@ namespace CMMAuto
         {
             if (string.IsNullOrEmpty(txtMeasureProgram.Text))
             {
-                MessageBox.Show("量测程序不能为空！");
+                MessageBoxX.Show("量测程序不能为空！", "提示");
                 return;
             }
 
@@ -578,7 +580,7 @@ namespace CMMAuto
         {
             if (string.IsNullOrEmpty(txtMeasureProgram.Text))
             {
-                MessageBox.Show("量测程序不能为空！");
+                MessageBoxX.Show("量测程序不能为空！", "提示");
                 return;
             }
 
@@ -590,14 +592,14 @@ namespace CMMAuto
         {
             if (string.IsNullOrEmpty(txtMeasureName.Text.Trim()) || string.IsNullOrEmpty(txtMeasureProgram.Text.Trim()))
             {
-                MessageBox.Show("量测程序和节点不能为空！");
+                MessageBoxX.Show("量测程序和节点不能为空！", "提示");
                 return;
             }
 
             // check 是否已经存在
             if (_sqLiteHelpers.QueryOne("MeaSurePrgCfg", "PrgName", txtMeasureName.Text.Trim()) != null)
             {
-                MessageBox.Show("该量测节点已经存在！");
+                MessageBoxX.Show("该量测节点已经存在！", "提示");
                 return;
             }
 
@@ -608,7 +610,7 @@ namespace CMMAuto
 
             int result = _sqLiteHelpers.InsertData("MeaSurePrgCfg", dic);
             LoadTreeView();
-            MessageBox.Show("录入成功！");
+            MessageBoxX.Show("录入成功！", "提示");
         }
 
         private void btnClearInfo_Click(object sender, EventArgs e)
@@ -678,6 +680,7 @@ namespace CMMAuto
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             _sqLiteHelpers.Close();
+            Log.Info($"CMMAuto被关闭！！！");
         }
 
         private async void btnTestExit_Click(object sender, EventArgs e)
@@ -965,5 +968,14 @@ namespace CMMAuto
             }
         }
 
+        //FormClosing是在窗体即将关闭但还未关闭时触发，这时候还可以取消关闭操作，比如弹出确认对话框，用户点击取消，那么窗体就不会关闭。
+        //而FormClosed是在窗体已经关闭之后触发，这时候窗体已经不可见了，只能执行一些清理工作，比如释放资源或者记录日志，但无法阻止关闭。
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            var result = MessageBoxX.Show("是否退出？", "提示", null, MessageBoxButton.YesNo);
+
+            if (result == MessageBoxResult.No)
+                e.Cancel = true; // 阻止关闭
+        }
     }
 }

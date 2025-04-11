@@ -71,6 +71,11 @@
     <Reference Include="OpenCvSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
       <HintPath>packages\OpenCvSharp4.4.10.0.20241108\lib\netstandard2.0\OpenCvSharp.dll</HintPath>
     </Reference>
+    <Reference Include="Panuon.UI.Silver, Version=1.1.3.4, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>dll\Panuon.UI.Silver.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
@@ -192,7 +197,10 @@
     <Content Include="dll\glog.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="dll\KENDLL.dll" />
     <Content Include="dll\log4net.dll" />
+    <Content Include="dll\Panuon.UI.Silver.dll" />
+    <Content Include="dll\System.Data.SQLite.dll" />
     <Content Include="Resources\icon\cmmico.ico" />
     <Content Include="Resources\icon\cmmico.png" />
     <Content Include="statePic\error.png">

@@ -378,9 +378,13 @@ namespace CMMAuto
             // 
             // grpAgvOperate
             // 
+            this.grpAgvOperate.Controls.Add(this.btnTestExit);
             this.grpAgvOperate.Controls.Add(this.btnSend);
+            this.grpAgvOperate.Controls.Add(this.btnAutoRun);
             this.grpAgvOperate.Controls.Add(this.btnDisconnect);
             this.grpAgvOperate.Controls.Add(this.btnConnect);
+            this.grpAgvOperate.Controls.Add(this.btnOpenFile);
+            this.grpAgvOperate.Controls.Add(this.btnSaveImg);
             this.grpAgvOperate.Dock = System.Windows.Forms.DockStyle.Fill;
             this.grpAgvOperate.Location = new System.Drawing.Point(0, 0);
             this.grpAgvOperate.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -443,12 +447,8 @@ namespace CMMAuto
             // 
             // grpCmmOperate
             // 
-            this.grpCmmOperate.Controls.Add(this.btnTestExit);
             this.grpCmmOperate.Controls.Add(this.btnEnd);
             this.grpCmmOperate.Controls.Add(this.btnManual);
-            this.grpCmmOperate.Controls.Add(this.btnAutoRun);
-            this.grpCmmOperate.Controls.Add(this.btnOpenFile);
-            this.grpCmmOperate.Controls.Add(this.btnSaveImg);
             this.grpCmmOperate.Dock = System.Windows.Forms.DockStyle.Top;
             this.grpCmmOperate.Location = new System.Drawing.Point(0, 0);
             this.grpCmmOperate.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -467,7 +467,7 @@ namespace CMMAuto
             this.btnTestExit.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
             this.btnTestExit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnTestExit.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnTestExit.Location = new System.Drawing.Point(194, 125);
+            this.btnTestExit.Location = new System.Drawing.Point(194, 198);
             this.btnTestExit.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnTestExit.Name = "btnTestExit";
             this.btnTestExit.Size = new System.Drawing.Size(96, 42);
@@ -485,14 +485,13 @@ namespace CMMAuto
             this.btnEnd.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
             this.btnEnd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnEnd.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnEnd.Location = new System.Drawing.Point(52, 125);
+            this.btnEnd.Location = new System.Drawing.Point(52, 74);
             this.btnEnd.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnEnd.Name = "btnEnd";
             this.btnEnd.Size = new System.Drawing.Size(96, 42);
             this.btnEnd.TabIndex = 6;
-            this.btnEnd.Text = "退  出";
+            this.btnEnd.Text = "手动退出";
             this.btnEnd.UseVisualStyleBackColor = true;
-            this.btnEnd.Visible = false;
             this.btnEnd.Click += new System.EventHandler(this.btnEnd_Click);
             // 
             // btnManual
@@ -508,7 +507,7 @@ namespace CMMAuto
             this.btnManual.Name = "btnManual";
             this.btnManual.Size = new System.Drawing.Size(96, 42);
             this.btnManual.TabIndex = 5;
-            this.btnManual.Text = "单次测量";
+            this.btnManual.Text = "开始量测";
             this.btnManual.UseVisualStyleBackColor = true;
             this.btnManual.Click += new System.EventHandler(this.btnManual_Click);
             // 
@@ -520,13 +519,14 @@ namespace CMMAuto
             this.btnAutoRun.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
             this.btnAutoRun.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAutoRun.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnAutoRun.Location = new System.Drawing.Point(52, 74);
+            this.btnAutoRun.Location = new System.Drawing.Point(52, 198);
             this.btnAutoRun.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnAutoRun.Name = "btnAutoRun";
             this.btnAutoRun.Size = new System.Drawing.Size(96, 42);
             this.btnAutoRun.TabIndex = 4;
             this.btnAutoRun.Text = "循环测量";
             this.btnAutoRun.UseVisualStyleBackColor = true;
+            this.btnAutoRun.Visible = false;
             this.btnAutoRun.Click += new System.EventHandler(this.btnAutoRun_Click);
             // 
             // btnOpenFile
@@ -538,7 +538,7 @@ namespace CMMAuto
             this.btnOpenFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnOpenFile.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.btnOpenFile.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnOpenFile.Location = new System.Drawing.Point(52, 23);
+            this.btnOpenFile.Location = new System.Drawing.Point(52, 241);
             this.btnOpenFile.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnOpenFile.Name = "btnOpenFile";
             this.btnOpenFile.Size = new System.Drawing.Size(96, 42);
@@ -556,7 +556,7 @@ namespace CMMAuto
             this.btnSaveImg.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
             this.btnSaveImg.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSaveImg.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnSaveImg.Location = new System.Drawing.Point(194, 23);
+            this.btnSaveImg.Location = new System.Drawing.Point(194, 241);
             this.btnSaveImg.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnSaveImg.Name = "btnSaveImg";
             this.btnSaveImg.Size = new System.Drawing.Size(96, 42);
@@ -853,6 +853,7 @@ namespace CMMAuto
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "AutoPCD";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.panelMiddle.ResumeLayout(false);
