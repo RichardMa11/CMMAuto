@@ -59,6 +59,10 @@
     <ApplicationIcon>cmmico.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EasyModbus, Version=5.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>dll\EasyModbus.dll</HintPath>
+    </Reference>
     <Reference Include="KENDLL">
       <HintPath>dll\KENDLL.dll</HintPath>
     </Reference>
@@ -141,13 +145,22 @@
     <Compile Include="CommonHelp\KeyboardSimulatorHelp.cs" />
     <Compile Include="CommonHelp\NativeWindowHelp.cs" />
     <Compile Include="CommonHelp\CMMVisionHelp.cs" />
+    <Compile Include="CommonHelp\SocketHelper.cs" />
     <Compile Include="CommonHelp\SQLiteHelper.cs" />
     <Compile Include="CommonHelp\UtilHelp.cs" />
     <Compile Include="CommonHelp\LogHelp.cs" />
     <Compile Include="CommonHelp\ScreenShotHelp.cs" />
     <Compile Include="Common\CommonConstant.cs" />
     <Compile Include="Config\AppSettings.cs" />
+    <Compile Include="Const\EnumFaultCode.cs" />
+    <Compile Include="Const\EnumFunction.cs" />
+    <Compile Include="Const\EnumProtocol.cs" />
+    <Compile Include="Const\EnumSocketStatus.cs" />
+    <Compile Include="Const\EnumTransmitWay.cs" />
     <Compile Include="Enums\CalibrateTypeEnum.cs" />
+    <Compile Include="Extension\ConvertExtension.cs" />
+    <Compile Include="Extension\DistinguishExtension.cs" />
+    <Compile Include="Extension\RegexExtension.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -155,8 +168,17 @@
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Model\ImageData.cs" />
+    <Compile Include="Model\MessageTransmit.cs" />
+    <Compile Include="Model\NetworkConnection.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Protocol\Common\BaseMessage.cs" />
+    <Compile Include="Protocol\Common\IReceivedMessage.cs" />
+    <Compile Include="Protocol\Tcp\BaseTcpMessage.cs" />
+    <Compile Include="Protocol\Tcp\TcpReadMessage.cs" />
+    <Compile Include="Protocol\Tcp\TcpReceivedMessage.cs" />
+    <Compile Include="Protocol\Tcp\TcpWriteMultipleMessage.cs" />
+    <Compile Include="Protocol\Tcp\TcpWriteSingleMessage.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -194,6 +216,7 @@
     <Content Include="dll\CMMMiddlewareImg.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="dll\EasyModbus.dll" />
     <Content Include="dll\glog.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

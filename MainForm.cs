@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing.Imaging;
@@ -13,6 +14,9 @@ using System.Windows.Forms;
 using CMMAuto.Common;
 using CMMAuto.CommonHelp;
 using CMMAuto.Config;
+using CMMAuto.Model;
+using EasyModbus;
+using KENDLL.Common;
 using log4net;
 using log4net.Appender;
 using Panuon.UI.Silver;
@@ -24,6 +28,7 @@ namespace CMMAuto
         private readonly CMMVisionHelp _cmmVisionHelp = new CMMVisionHelp();
         private readonly KeyboardSimulatorHelp _simulator = new KeyboardSimulatorHelp();
         private readonly object _lock = new object();
+        private ModbusUitl _modbusUitl;
 
         private static string _fullFileName = "";
         private static bool _isSingle = false;
@@ -976,6 +981,72 @@ namespace CMMAuto
 
             if (result == MessageBoxResult.No)
                 e.Cancel = true; // 阻止关闭
+        }
+
+
+        public void ConnPlc()
+        {
+            _modbusUitl = ModbusUitl.getInstanceConn("127.0.0.1", 8888);
+        }
+
+        public void ReadPlc()
+        {
+            _modbusUitl.ReadHoldingRegisters(262, 1);
+        }
+
+        public void WritePlc()
+        {
+            int[] productCode = ModbusClient.ConvertStringToRegisters("你好呀");
+            _modbusUitl.WriteMultipleRegisters(262, productCode); // 告知PLC终止任务//25个字符  占13位地址
+            _modbusUitl.WriteMultipleRegisters(262, new int[] { 200 }); // 告知PLC终止任务
+            _modbusUitl.WriteMultipleRegisters(262, new int[] { 0 });//操作指令初始化
+        }
+
+        /// <summary>
+        /// 寄存器读取
+        /// </summary>
+        public async void ReadRegister()
+        {
+            try
+            {
+                if (SocketHelper.Instance.Connected == false)
+                {
+                    //_option.SocketStatus = EnumSocketStatus.Connecting;
+                    await SocketHelper.Instance.Connect(Connection);
+                }
+
+                //BaseMessage message = new TcpReadMessage(_option.Slave, _option.Function.Key, _option.Address, _option.Count);
+
+                //MessageTransmit transmit = new MessageTransmit(_option.Protocol.Key, EnumTransmitWay.Request, _option.Address, message.Message);
+                //SocketHelper.Instance.Send(transmit);
+            }
+            catch (Exception ex)
+            {
+                //Growl.Warning(exception.Message);
+                Log.Error($"和PLC交互失败: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 属性修改事件
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// 网络连接配置
+        /// </summary>
+        private NetworkConnection _connection = new NetworkConnection("127.0.0.1", 502);
+        /// <summary>
+        /// 网络连接配置
+        /// </summary>
+        public NetworkConnection Connection
+        {
+            get => _connection;
+            set
+            {
+                _connection = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Connection)));
+            }
         }
     }
 }
