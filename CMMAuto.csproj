@@ -161,6 +161,12 @@
     <Compile Include="Extension\ConvertExtension.cs" />
     <Compile Include="Extension\DistinguishExtension.cs" />
     <Compile Include="Extension\RegexExtension.cs" />
+    <Compile Include="FrmConfig.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmConfig.Designer.cs">
+      <DependentUpon>FrmConfig.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -179,6 +185,9 @@
     <Compile Include="Protocol\Tcp\TcpReceivedMessage.cs" />
     <Compile Include="Protocol\Tcp\TcpWriteMultipleMessage.cs" />
     <Compile Include="Protocol\Tcp\TcpWriteSingleMessage.cs" />
+    <EmbeddedResource Include="FrmConfig.resx">
+      <DependentUpon>FrmConfig.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -226,6 +235,7 @@
     <Content Include="dll\System.Data.SQLite.dll" />
     <Content Include="Resources\icon\cmmico.ico" />
     <Content Include="Resources\icon\cmmico.png" />
+    <Content Include="Resources\icon\edit.ico" />
     <Content Include="statePic\error.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

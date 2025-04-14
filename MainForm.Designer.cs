@@ -58,26 +58,19 @@ namespace CMMAuto
             this.panelOperate = new System.Windows.Forms.Panel();
             this.panelAgvOperate = new System.Windows.Forms.Panel();
             this.grpAgvOperate = new System.Windows.Forms.GroupBox();
-            this.btnSend = new System.Windows.Forms.Button();
-            this.btnDisconnect = new System.Windows.Forms.Button();
-            this.btnConnect = new System.Windows.Forms.Button();
-            this.grpCmmOperate = new System.Windows.Forms.GroupBox();
             this.btnTestExit = new System.Windows.Forms.Button();
-            this.btnEnd = new System.Windows.Forms.Button();
-            this.btnManual = new System.Windows.Forms.Button();
+            this.btnSend = new System.Windows.Forms.Button();
             this.btnAutoRun = new System.Windows.Forms.Button();
+            this.btnConfigPlcAddress = new System.Windows.Forms.Button();
+            this.btnConnect = new System.Windows.Forms.Button();
             this.btnOpenFile = new System.Windows.Forms.Button();
             this.btnSaveImg = new System.Windows.Forms.Button();
+            this.grpCmmOperate = new System.Windows.Forms.GroupBox();
+            this.btnEnd = new System.Windows.Forms.Button();
+            this.btnManual = new System.Windows.Forms.Button();
             this.panelState = new System.Windows.Forms.Panel();
             this.panelAgvState = new System.Windows.Forms.Panel();
             this.grpAgvConnection = new System.Windows.Forms.GroupBox();
-            this.txtHeartBeat = new System.Windows.Forms.TextBox();
-            this.label8 = new System.Windows.Forms.Label();
-            this.lblCommInfo = new System.Windows.Forms.Label();
-            this.txtAgvDisconnect = new System.Windows.Forms.TextBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.txtAgvConnect = new System.Windows.Forms.TextBox();
-            this.label6 = new System.Windows.Forms.Label();
             this.grpCmmState = new System.Windows.Forms.GroupBox();
             this.label10 = new System.Windows.Forms.Label();
             this.txtPreOrEnd = new System.Windows.Forms.TextBox();
@@ -94,6 +87,13 @@ namespace CMMAuto
             this.trvTestPrgChoose = new System.Windows.Forms.TreeView();
             this.grpTestPrgChoose = new System.Windows.Forms.GroupBox();
             this.panelLeft = new System.Windows.Forms.Panel();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.txtIp = new System.Windows.Forms.TextBox();
+            this.txtPort = new System.Windows.Forms.TextBox();
+            this.txtSlaveId = new System.Windows.Forms.TextBox();
+            this.lblCommInfo = new System.Windows.Forms.Label();
             this.panelMiddle.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panelCmmlog.SuspendLayout();
@@ -380,8 +380,8 @@ namespace CMMAuto
             // 
             this.grpAgvOperate.Controls.Add(this.btnTestExit);
             this.grpAgvOperate.Controls.Add(this.btnSend);
+            this.grpAgvOperate.Controls.Add(this.btnConfigPlcAddress);
             this.grpAgvOperate.Controls.Add(this.btnAutoRun);
-            this.grpAgvOperate.Controls.Add(this.btnDisconnect);
             this.grpAgvOperate.Controls.Add(this.btnConnect);
             this.grpAgvOperate.Controls.Add(this.btnOpenFile);
             this.grpAgvOperate.Controls.Add(this.btnSaveImg);
@@ -393,71 +393,7 @@ namespace CMMAuto
             this.grpAgvOperate.Size = new System.Drawing.Size(344, 293);
             this.grpAgvOperate.TabIndex = 4;
             this.grpAgvOperate.TabStop = false;
-            this.grpAgvOperate.Text = "AGV操作";
-            // 
-            // btnSend
-            // 
-            this.btnSend.BackColor = System.Drawing.Color.LightBlue;
-            this.btnSend.FlatAppearance.BorderSize = 0;
-            this.btnSend.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
-            this.btnSend.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
-            this.btnSend.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSend.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnSend.Location = new System.Drawing.Point(52, 76);
-            this.btnSend.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btnSend.Name = "btnSend";
-            this.btnSend.Size = new System.Drawing.Size(96, 42);
-            this.btnSend.TabIndex = 3;
-            this.btnSend.Text = "发送信息";
-            this.btnSend.UseVisualStyleBackColor = true;
-            // 
-            // btnDisconnect
-            // 
-            this.btnDisconnect.BackColor = System.Drawing.Color.LightBlue;
-            this.btnDisconnect.FlatAppearance.BorderSize = 0;
-            this.btnDisconnect.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
-            this.btnDisconnect.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
-            this.btnDisconnect.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnDisconnect.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnDisconnect.Location = new System.Drawing.Point(194, 26);
-            this.btnDisconnect.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btnDisconnect.Name = "btnDisconnect";
-            this.btnDisconnect.Size = new System.Drawing.Size(96, 42);
-            this.btnDisconnect.TabIndex = 2;
-            this.btnDisconnect.Text = "断开连接";
-            this.btnDisconnect.UseVisualStyleBackColor = true;
-            this.btnDisconnect.Click += new System.EventHandler(this.btnDisconnect_Click);
-            // 
-            // btnConnect
-            // 
-            this.btnConnect.BackColor = System.Drawing.Color.LightBlue;
-            this.btnConnect.FlatAppearance.BorderSize = 0;
-            this.btnConnect.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
-            this.btnConnect.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
-            this.btnConnect.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnConnect.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnConnect.Location = new System.Drawing.Point(52, 26);
-            this.btnConnect.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btnConnect.Name = "btnConnect";
-            this.btnConnect.Size = new System.Drawing.Size(96, 42);
-            this.btnConnect.TabIndex = 1;
-            this.btnConnect.Text = "开始连接";
-            this.btnConnect.UseVisualStyleBackColor = true;
-            this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
-            // 
-            // grpCmmOperate
-            // 
-            this.grpCmmOperate.Controls.Add(this.btnEnd);
-            this.grpCmmOperate.Controls.Add(this.btnManual);
-            this.grpCmmOperate.Dock = System.Windows.Forms.DockStyle.Top;
-            this.grpCmmOperate.Location = new System.Drawing.Point(0, 0);
-            this.grpCmmOperate.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.grpCmmOperate.Name = "grpCmmOperate";
-            this.grpCmmOperate.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.grpCmmOperate.Size = new System.Drawing.Size(344, 180);
-            this.grpCmmOperate.TabIndex = 1;
-            this.grpCmmOperate.TabStop = false;
-            this.grpCmmOperate.Text = "CMM操作";
+            this.grpAgvOperate.Text = "PLC操作";
             // 
             // btnTestExit
             // 
@@ -477,39 +413,21 @@ namespace CMMAuto
             this.btnTestExit.Visible = false;
             this.btnTestExit.Click += new System.EventHandler(this.btnTestExit_Click);
             // 
-            // btnEnd
+            // btnSend
             // 
-            this.btnEnd.BackColor = System.Drawing.Color.LightBlue;
-            this.btnEnd.FlatAppearance.BorderSize = 0;
-            this.btnEnd.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
-            this.btnEnd.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
-            this.btnEnd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnEnd.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnEnd.Location = new System.Drawing.Point(52, 74);
-            this.btnEnd.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btnEnd.Name = "btnEnd";
-            this.btnEnd.Size = new System.Drawing.Size(96, 42);
-            this.btnEnd.TabIndex = 6;
-            this.btnEnd.Text = "手动退出";
-            this.btnEnd.UseVisualStyleBackColor = true;
-            this.btnEnd.Click += new System.EventHandler(this.btnEnd_Click);
-            // 
-            // btnManual
-            // 
-            this.btnManual.BackColor = System.Drawing.Color.LightBlue;
-            this.btnManual.FlatAppearance.BorderSize = 0;
-            this.btnManual.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
-            this.btnManual.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
-            this.btnManual.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnManual.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnManual.Location = new System.Drawing.Point(194, 74);
-            this.btnManual.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btnManual.Name = "btnManual";
-            this.btnManual.Size = new System.Drawing.Size(96, 42);
-            this.btnManual.TabIndex = 5;
-            this.btnManual.Text = "开始量测";
-            this.btnManual.UseVisualStyleBackColor = true;
-            this.btnManual.Click += new System.EventHandler(this.btnManual_Click);
+            this.btnSend.BackColor = System.Drawing.Color.LightBlue;
+            this.btnSend.FlatAppearance.BorderSize = 0;
+            this.btnSend.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
+            this.btnSend.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
+            this.btnSend.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSend.ForeColor = System.Drawing.Color.DarkBlue;
+            this.btnSend.Location = new System.Drawing.Point(52, 76);
+            this.btnSend.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnSend.Name = "btnSend";
+            this.btnSend.Size = new System.Drawing.Size(96, 42);
+            this.btnSend.TabIndex = 3;
+            this.btnSend.Text = "发送信息";
+            this.btnSend.UseVisualStyleBackColor = true;
             // 
             // btnAutoRun
             // 
@@ -528,6 +446,40 @@ namespace CMMAuto
             this.btnAutoRun.UseVisualStyleBackColor = true;
             this.btnAutoRun.Visible = false;
             this.btnAutoRun.Click += new System.EventHandler(this.btnAutoRun_Click);
+            // 
+            // btnConfigPlcAddress
+            // 
+            this.btnConfigPlcAddress.BackColor = System.Drawing.Color.LightBlue;
+            this.btnConfigPlcAddress.FlatAppearance.BorderSize = 0;
+            this.btnConfigPlcAddress.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
+            this.btnConfigPlcAddress.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
+            this.btnConfigPlcAddress.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnConfigPlcAddress.ForeColor = System.Drawing.Color.DarkBlue;
+            this.btnConfigPlcAddress.Location = new System.Drawing.Point(194, 26);
+            this.btnConfigPlcAddress.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnConfigPlcAddress.Name = "btnConfigPlcAddress";
+            this.btnConfigPlcAddress.Size = new System.Drawing.Size(96, 42);
+            this.btnConfigPlcAddress.TabIndex = 2;
+            this.btnConfigPlcAddress.Text = "配置PLC地址";
+            this.btnConfigPlcAddress.UseVisualStyleBackColor = true;
+            this.btnConfigPlcAddress.Click += new System.EventHandler(this.btnConfigPlcAddress_Click);
+            // 
+            // btnConnect
+            // 
+            this.btnConnect.BackColor = System.Drawing.Color.LightBlue;
+            this.btnConnect.FlatAppearance.BorderSize = 0;
+            this.btnConnect.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
+            this.btnConnect.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
+            this.btnConnect.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnConnect.ForeColor = System.Drawing.Color.DarkBlue;
+            this.btnConnect.Location = new System.Drawing.Point(52, 26);
+            this.btnConnect.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnConnect.Name = "btnConnect";
+            this.btnConnect.Size = new System.Drawing.Size(96, 42);
+            this.btnConnect.TabIndex = 1;
+            this.btnConnect.Text = "开始连接";
+            this.btnConnect.UseVisualStyleBackColor = true;
+            this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
             // 
             // btnOpenFile
             // 
@@ -566,6 +518,54 @@ namespace CMMAuto
             this.btnSaveImg.Visible = false;
             this.btnSaveImg.Click += new System.EventHandler(this.btnSaveImg_Click);
             // 
+            // grpCmmOperate
+            // 
+            this.grpCmmOperate.Controls.Add(this.btnEnd);
+            this.grpCmmOperate.Controls.Add(this.btnManual);
+            this.grpCmmOperate.Dock = System.Windows.Forms.DockStyle.Top;
+            this.grpCmmOperate.Location = new System.Drawing.Point(0, 0);
+            this.grpCmmOperate.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.grpCmmOperate.Name = "grpCmmOperate";
+            this.grpCmmOperate.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.grpCmmOperate.Size = new System.Drawing.Size(344, 180);
+            this.grpCmmOperate.TabIndex = 1;
+            this.grpCmmOperate.TabStop = false;
+            this.grpCmmOperate.Text = "CMM操作";
+            // 
+            // btnEnd
+            // 
+            this.btnEnd.BackColor = System.Drawing.Color.LightBlue;
+            this.btnEnd.FlatAppearance.BorderSize = 0;
+            this.btnEnd.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
+            this.btnEnd.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
+            this.btnEnd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnEnd.ForeColor = System.Drawing.Color.DarkBlue;
+            this.btnEnd.Location = new System.Drawing.Point(52, 74);
+            this.btnEnd.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnEnd.Name = "btnEnd";
+            this.btnEnd.Size = new System.Drawing.Size(96, 42);
+            this.btnEnd.TabIndex = 6;
+            this.btnEnd.Text = "手动退出";
+            this.btnEnd.UseVisualStyleBackColor = true;
+            this.btnEnd.Click += new System.EventHandler(this.btnEnd_Click);
+            // 
+            // btnManual
+            // 
+            this.btnManual.BackColor = System.Drawing.Color.LightBlue;
+            this.btnManual.FlatAppearance.BorderSize = 0;
+            this.btnManual.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
+            this.btnManual.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
+            this.btnManual.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnManual.ForeColor = System.Drawing.Color.DarkBlue;
+            this.btnManual.Location = new System.Drawing.Point(194, 74);
+            this.btnManual.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnManual.Name = "btnManual";
+            this.btnManual.Size = new System.Drawing.Size(96, 42);
+            this.btnManual.TabIndex = 5;
+            this.btnManual.Text = "开始量测";
+            this.btnManual.UseVisualStyleBackColor = true;
+            this.btnManual.Click += new System.EventHandler(this.btnManual_Click);
+            // 
             // panelState
             // 
             this.panelState.Controls.Add(this.panelAgvState);
@@ -587,13 +587,13 @@ namespace CMMAuto
             // 
             // grpAgvConnection
             // 
-            this.grpAgvConnection.Controls.Add(this.txtHeartBeat);
+            this.grpAgvConnection.Controls.Add(this.txtSlaveId);
+            this.grpAgvConnection.Controls.Add(this.txtPort);
+            this.grpAgvConnection.Controls.Add(this.txtIp);
             this.grpAgvConnection.Controls.Add(this.label8);
-            this.grpAgvConnection.Controls.Add(this.lblCommInfo);
-            this.grpAgvConnection.Controls.Add(this.txtAgvDisconnect);
             this.grpAgvConnection.Controls.Add(this.label7);
-            this.grpAgvConnection.Controls.Add(this.txtAgvConnect);
             this.grpAgvConnection.Controls.Add(this.label6);
+            this.grpAgvConnection.Controls.Add(this.lblCommInfo);
             this.grpAgvConnection.Dock = System.Windows.Forms.DockStyle.Fill;
             this.grpAgvConnection.Location = new System.Drawing.Point(0, 0);
             this.grpAgvConnection.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -602,77 +602,7 @@ namespace CMMAuto
             this.grpAgvConnection.Size = new System.Drawing.Size(344, 187);
             this.grpAgvConnection.TabIndex = 3;
             this.grpAgvConnection.TabStop = false;
-            this.grpAgvConnection.Text = "AGV通讯";
-            // 
-            // txtHeartBeat
-            // 
-            this.txtHeartBeat.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtHeartBeat.Location = new System.Drawing.Point(105, 96);
-            this.txtHeartBeat.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.txtHeartBeat.Name = "txtHeartBeat";
-            this.txtHeartBeat.Size = new System.Drawing.Size(21, 16);
-            this.txtHeartBeat.TabIndex = 10;
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.ForeColor = System.Drawing.Color.DarkBlue;
-            this.label8.Location = new System.Drawing.Point(64, 96);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(32, 17);
-            this.label8.TabIndex = 9;
-            this.label8.Text = "心跳";
-            // 
-            // lblCommInfo
-            // 
-            this.lblCommInfo.AutoSize = true;
-            this.lblCommInfo.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lblCommInfo.ForeColor = System.Drawing.Color.Red;
-            this.lblCommInfo.Location = new System.Drawing.Point(118, 148);
-            this.lblCommInfo.Name = "lblCommInfo";
-            this.lblCommInfo.Size = new System.Drawing.Size(103, 16);
-            this.lblCommInfo.TabIndex = 8;
-            this.lblCommInfo.Text = "AGV通讯中断";
-            this.lblCommInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // txtAgvDisconnect
-            // 
-            this.txtAgvDisconnect.BackColor = System.Drawing.Color.Red;
-            this.txtAgvDisconnect.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtAgvDisconnect.Location = new System.Drawing.Point(200, 45);
-            this.txtAgvDisconnect.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.txtAgvDisconnect.Name = "txtAgvDisconnect";
-            this.txtAgvDisconnect.Size = new System.Drawing.Size(21, 16);
-            this.txtAgvDisconnect.TabIndex = 7;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.ForeColor = System.Drawing.Color.DarkBlue;
-            this.label7.Location = new System.Drawing.Point(159, 45);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(32, 17);
-            this.label7.TabIndex = 6;
-            this.label7.Text = "断开";
-            // 
-            // txtAgvConnect
-            // 
-            this.txtAgvConnect.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtAgvConnect.Location = new System.Drawing.Point(105, 45);
-            this.txtAgvConnect.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.txtAgvConnect.Name = "txtAgvConnect";
-            this.txtAgvConnect.Size = new System.Drawing.Size(21, 16);
-            this.txtAgvConnect.TabIndex = 5;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.ForeColor = System.Drawing.Color.DarkBlue;
-            this.label6.Location = new System.Drawing.Point(64, 45);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(32, 17);
-            this.label6.TabIndex = 4;
-            this.label6.Text = "连接";
+            this.grpAgvConnection.Text = "PLC通讯";
             // 
             // grpCmmState
             // 
@@ -838,6 +768,80 @@ namespace CMMAuto
             this.panelLeft.Size = new System.Drawing.Size(350, 825);
             this.panelLeft.TabIndex = 5;
             // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.ForeColor = System.Drawing.Color.Gray;
+            this.label6.Location = new System.Drawing.Point(32, 40);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(31, 17);
+            this.label6.TabIndex = 9;
+            this.label6.Text = "IP：";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.ForeColor = System.Drawing.Color.Gray;
+            this.label7.Location = new System.Drawing.Point(32, 77);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(44, 17);
+            this.label7.TabIndex = 10;
+            this.label7.Text = "Port：";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.ForeColor = System.Drawing.Color.Gray;
+            this.label8.Location = new System.Drawing.Point(32, 114);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(67, 17);
+            this.label8.TabIndex = 11;
+            this.label8.Text = "Slave ID：";
+            // 
+            // txtIp
+            // 
+            this.txtIp.Location = new System.Drawing.Point(105, 37);
+            this.txtIp.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtIp.Name = "txtIp";
+            this.txtIp.Size = new System.Drawing.Size(116, 23);
+            this.txtIp.TabIndex = 12;
+            this.txtIp.Text = "127.0.1.1";
+            this.txtIp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // txtPort
+            // 
+            this.txtPort.Location = new System.Drawing.Point(105, 74);
+            this.txtPort.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtPort.Name = "txtPort";
+            this.txtPort.Size = new System.Drawing.Size(55, 23);
+            this.txtPort.TabIndex = 13;
+            this.txtPort.Text = "502";
+            this.txtPort.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.txtPort.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtPort_KeyPress);
+            // 
+            // txtSlaveId
+            // 
+            this.txtSlaveId.Enabled = false;
+            this.txtSlaveId.Location = new System.Drawing.Point(105, 111);
+            this.txtSlaveId.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtSlaveId.Name = "txtSlaveId";
+            this.txtSlaveId.Size = new System.Drawing.Size(55, 23);
+            this.txtSlaveId.TabIndex = 14;
+            this.txtSlaveId.Text = "1";
+            this.txtSlaveId.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // lblCommInfo
+            // 
+            this.lblCommInfo.AutoSize = true;
+            this.lblCommInfo.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.lblCommInfo.ForeColor = System.Drawing.Color.Red;
+            this.lblCommInfo.Location = new System.Drawing.Point(32, 151);
+            this.lblCommInfo.Name = "lblCommInfo";
+            this.lblCommInfo.Size = new System.Drawing.Size(178, 16);
+            this.lblCommInfo.TabIndex = 8;
+            this.lblCommInfo.Text = "注：修改完要重启软件";
+            this.lblCommInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
@@ -912,13 +916,6 @@ namespace CMMAuto
         private System.Windows.Forms.Panel panelLeft;
         private System.Windows.Forms.Panel panelOperate;
         private System.Windows.Forms.GroupBox grpAgvConnection;
-        private System.Windows.Forms.TextBox txtHeartBeat;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Label lblCommInfo;
-        private System.Windows.Forms.TextBox txtAgvDisconnect;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.TextBox txtAgvConnect;
-        private System.Windows.Forms.Label label6;
         private System.Windows.Forms.GroupBox grpCmmOperate;
         private System.Windows.Forms.Button btnTestExit;
         private System.Windows.Forms.Button btnEnd;
@@ -928,7 +925,7 @@ namespace CMMAuto
         private System.Windows.Forms.Button btnSaveImg;
         private System.Windows.Forms.GroupBox grpAgvOperate;
         private System.Windows.Forms.Button btnSend;
-        private System.Windows.Forms.Button btnDisconnect;
+        private System.Windows.Forms.Button btnConfigPlcAddress;
         private System.Windows.Forms.Button btnConnect;
         private System.Windows.Forms.Panel panelState;
         private System.Windows.Forms.Panel panelAgvState;
@@ -941,6 +938,13 @@ namespace CMMAuto
         private System.Windows.Forms.Panel panelCmmlog;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.TextBox txtPreOrEnd;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox txtSlaveId;
+        private System.Windows.Forms.TextBox txtPort;
+        private System.Windows.Forms.TextBox txtIp;
+        private System.Windows.Forms.Label lblCommInfo;
     }
 }
 

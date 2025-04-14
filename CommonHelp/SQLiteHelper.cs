@@ -685,6 +685,15 @@ namespace CMMAuto.CommonHelp
                                               Remark TEXT,
                                               CreateDate INTEGER DEFAULT CURRENT_TIMESTAMP)-- 默认值为当前时间";
                         cmd.ExecuteNonQuery();
+
+                        //PLC配置表                        
+                        cmd.CommandText = @"  CREATE TABLE IF NOT EXISTS PLCCfg(id INTEGER PRIMARY KEY AUTOINCREMENT, --自动增长的主键
+                                              Name TEXT NOT NULL UNIQUE, --不能为空且唯一
+                                              Address TEXT NOT NULL, --不能为空
+                                              Count TEXT NOT NULL, --不能为空
+                                              Remark TEXT,
+                                              CreateDate INTEGER DEFAULT CURRENT_TIMESTAMP)-- 默认值为当前时间";
+                        cmd.ExecuteNonQuery();
                         return true;
                     }
                 }

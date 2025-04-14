@@ -14,7 +14,10 @@ using System.Windows.Forms;
 using CMMAuto.Common;
 using CMMAuto.CommonHelp;
 using CMMAuto.Config;
+using CMMAuto.Extension;
 using CMMAuto.Model;
+using CMMAuto.Protocol.Common;
+using CMMAuto.Protocol.Tcp;
 using EasyModbus;
 using KENDLL.Common;
 using log4net;
@@ -167,8 +170,9 @@ namespace CMMAuto
         private void LoadMeasureData()
         {
             drvCmmLog.DataSource = null;
-            string sql = $@"SELECT PrgName,PrgPath,CMMState,CMMResult,CMMTime,Remark FROM MeaSureData WHERE strftime('%Y-%m-%d %H:%M:%S', CMMTime)  >= '{DateTime.Now.AddMinutes(-10).ToString("yyyy-MM-dd HH:mm:ss")}' order by CMMTime desc ";
+            //string sql = $@"SELECT PrgName,PrgPath,CMMState,CMMResult,CMMTime,Remark FROM MeaSureData WHERE strftime('%Y-%m-%d %H:%M:%S', CMMTime)  >= '{DateTime.Now.AddMinutes(-10).ToString("yyyy-MM-dd HH:mm:ss")}' order by CMMTime desc ";
             //string sql = $@"SELECT PrgName,PrgPath,CMMState,CMMResult,CMMTime,Remark FROM MeaSureData ";
+            string sql = $@"SELECT * FROM MeaSurePrgCfg ";
 
             DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, null);
             if (dataSet != null)
@@ -552,20 +556,7 @@ namespace CMMAuto
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
-            txtAgvConnect.BackColor = System.Drawing.Color.LimeGreen;
-            txtAgvDisconnect.BackColor = System.Drawing.Color.White;
-            txtHeartBeat.BackColor = System.Drawing.Color.LimeGreen;
-            lblCommInfo.Text = "AGV连接正常";
-            lblCommInfo.ForeColor = System.Drawing.Color.LimeGreen;
-        }
-
-        private void btnDisconnect_Click(object sender, EventArgs e)
-        {
-            txtAgvConnect.BackColor = System.Drawing.Color.White;
-            txtAgvDisconnect.BackColor = System.Drawing.Color.Red;
-            txtHeartBeat.BackColor = System.Drawing.Color.White;
-            lblCommInfo.Text = "AGV通讯中断";
-            lblCommInfo.ForeColor = System.Drawing.Color.Red;
+            ConnPlc();
         }
 
         private void btnManual_Click(object sender, EventArgs e)
@@ -608,10 +599,12 @@ namespace CMMAuto
                 return;
             }
 
-            Dictionary<string, object> dic = new Dictionary<string, object>();
-            dic.Add("PrgName", txtMeasureName.Text.Trim());
-            dic.Add("PrgPath", txtMeasureProgram.Text.Trim());
-            dic.Add("CreateDate", DateTime.Now);
+            Dictionary<string, object> dic = new Dictionary<string, object>
+            {
+                {"PrgName", txtMeasureName.Text.Trim()},
+                {"PrgPath", txtMeasureProgram.Text.Trim()},
+                {"CreateDate", DateTime.Now}
+            };
 
             int result = _sqLiteHelpers.InsertData("MeaSurePrgCfg", dic);
             LoadTreeView();
@@ -986,7 +979,19 @@ namespace CMMAuto
 
         public void ConnPlc()
         {
-            _modbusUitl = ModbusUitl.getInstanceConn("127.0.0.1", 8888);
+            if (string.IsNullOrEmpty(txtIp.Text.Trim()))
+            {
+                MessageBoxX.Show("PLC 的IP地址不能为空！", "提示");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(txtPort.Text.Trim()))
+            {
+                MessageBoxX.Show("PLC 的端口号不能为空！", "提示");
+                return;
+            }
+
+            _modbusUitl = ModbusUitl.getInstanceConn(txtIp.Text.Trim(), txtPort.Text.Trim().StrToInt());
         }
 
         public void ReadPlc()
@@ -1015,7 +1020,7 @@ namespace CMMAuto
                     await SocketHelper.Instance.Connect(Connection);
                 }
 
-                //BaseMessage message = new TcpReadMessage(_option.Slave, _option.Function.Key, _option.Address, _option.Count);
+                //BaseMessage message = new TcpReadMessage(txtSlaveId.Text, _option.Function.Key, _option.Address, _option.Count);
 
                 //MessageTransmit transmit = new MessageTransmit(_option.Protocol.Key, EnumTransmitWay.Request, _option.Address, message.Message);
                 //SocketHelper.Instance.Send(transmit);
@@ -1047,6 +1052,32 @@ namespace CMMAuto
                 _connection = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Connection)));
             }
+        }
+
+        private void txtPort_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == '\b') return; // 允许退格键
+            int len = txtPort.Text.Length;
+            if (len < 1 && e.KeyChar == '0')
+            { // 禁止首位输入0
+                e.Handled = true;
+            }
+            else if (!char.IsDigit(e.KeyChar))
+            { // 仅允许数字
+                e.Handled = true;
+            }
+        }
+
+        private FrmConfig _frmConfig;
+        private void btnConfigPlcAddress_Click(object sender, EventArgs e)
+        {
+            if (_frmConfig == null || _frmConfig.IsDisposed)
+            {
+                _frmConfig = new FrmConfig(_sqLiteHelpers);
+                _frmConfig.FormClosed += (s, args) => { _frmConfig = null; };
+            }
+            _frmConfig.Show();
+            _frmConfig.BringToFront();  // 激活并置顶窗体
         }
     }
 }

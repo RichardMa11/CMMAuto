@@ -135,5 +135,10 @@ namespace CMMAuto.Extension
             Array.Copy(source, startIndex, result, 0, length);
             return result;
         }
+
+        public static int StrToInt(this string text)
+        {
+            return int.TryParse(text, out var result) ? result : new int();
+        }
     }
 }
