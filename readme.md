@@ -8,11 +8,11 @@
   
 # 功能截图  
 主页面  
-![image](https://github.com/RichardMa11/SmartTuningSystem/blob/master/%E6%95%88%E6%9E%9C%E5%9B%BE/%E6%9E%B6%E6%9E%84.png)  
+![image](https://github.com/RichardMa11/CMMAuto/blob/master/%E6%95%88%E6%9E%9C%E5%9B%BE/%E4%B8%BB%E7%95%8C%E9%9D%A2.png)  
 辅助界面  
-![image](https://github.com/RichardMa11/SmartTuningSystem/blob/master/%E6%95%88%E6%9E%9C%E5%9B%BE/%E6%9E%B6%E6%9E%84.png)  
+![image](https://github.com/RichardMa11/CMMAuto/blob/master/%E6%95%88%E6%9E%9C%E5%9B%BE/%E5%85%B6%E4%BB%96.png)  
 辅助界面  
-![image](https://github.com/RichardMa11/SmartTuningSystem/blob/master/%E6%95%88%E6%9E%9C%E5%9B%BE/%E6%9E%B6%E6%9E%84.png)  
+![image](https://github.com/RichardMa11/CMMAuto/blob/master/%E6%95%88%E6%9E%9C%E5%9B%BE/%E5%85%B6%E4%BB%961.png)  
   
 # 更新日志  
 
