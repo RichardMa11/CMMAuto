@@ -978,6 +978,15 @@ namespace CMMAuto
 
             if (result == MessageBoxResult.No)
                 e.Cancel = true; // 阻止关闭
+
+            //if (!isClosingByAnimation && e.CloseReason != CloseReason.ApplicationExitCall)
+            //{
+            //    e.Cancel = true;  // 阻止直接关闭
+
+            //    var result = MessageBoxX.Show("是否退出？", "提示", null, MessageBoxButton.YesNo);
+            //    if (result == MessageBoxResult.Yes)
+            //        CloseWindow();     // 启动动画
+            //}
         }
 
         private void LoadPlcTxt()
@@ -1296,5 +1305,53 @@ namespace CMMAuto
 
             return dt;
         }
+
+        #region 关闭窗体动画
+
+        // 可选：声明动画完成事件
+        public event EventHandler AnimationCompleted;
+        private System.Windows.Forms.Timer closeTimer;
+        private DateTime animationStart;
+        private double initialHeight;
+        private double initialWidth;
+        private bool isClosingByAnimation = false;
+
+        private void CloseWindow()
+        {
+            // 初始化定时器
+            closeTimer = new System.Windows.Forms.Timer();
+            closeTimer.Interval = 15; // 约60FPS
+            initialHeight = this.Height;
+            initialWidth = this.Width;
+            animationStart = DateTime.Now;
+
+            closeTimer.Tick += (s, e) =>
+            {
+                // 计算动画进度（0到1之间）
+                double progress = (DateTime.Now - animationStart).TotalMilliseconds / 1000.0;
+
+                if (progress >= 1.0)
+                {
+                    // 动画完成
+                    closeTimer.Stop();
+                    isClosingByAnimation = true;
+                    this.Close();
+                    AnimationCompleted?.Invoke(this, EventArgs.Empty);
+                    return;
+                }
+
+                // 更新窗口尺寸
+                this.Height = (int)Math.Max(initialHeight * (1 - progress), 0);
+                this.Width = (int)Math.Max(initialWidth * (1 - progress), 0);
+
+                // （可选）保持窗口居中缩放
+                this.Left += (int)(initialWidth * progress / 2);
+                this.Top += (int)(initialHeight * progress / 2);
+            };
+
+            closeTimer.Start();
+        }
+
+        #endregion
     }
 }
