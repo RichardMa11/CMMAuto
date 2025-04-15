@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.SQLite;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -110,6 +111,8 @@ namespace CMMAuto
             LoadLogTxt();
             LoadTreeView();
             LoadMeasureData();
+            LoadPlcTxt();
+            PoolPlc();
         }
 
         private void LoadLogTxt()
@@ -275,7 +278,7 @@ namespace CMMAuto
                 OpenTestRun();
             else
             {
-                if (_isSingle)
+                if (_isSingle && chkIsConnPLC.Checked)
                     OpenTestRun();
             }
         }
@@ -336,13 +339,13 @@ namespace CMMAuto
                     else
                     {
                         //RecordMeasure("开始", 0);
-                        Log.Error("获取打开测量程式位置失败。");
+                        Log.Error("获取【打开测量程式】位置失败。");
                     }
                 }
                 else
                 {
                     //RecordMeasure("开始", 0);
-                    Log.Error("获取文件位置失败。");
+                    Log.Error("获取【文件】位置失败。");
                 }
             }
             else
@@ -386,6 +389,7 @@ namespace CMMAuto
                                             Log.Info($"退出成功。。。");
                                             //写入数据库
                                             RecordMeasure("结束", 1);
+                                            SetEnd();
                                             _isTheSame = false;
 
                                             if (!_isCycle)
@@ -395,10 +399,10 @@ namespace CMMAuto
                                         { Log.Error("程式退出失败。"); }
                                     }
                                     else
-                                    { Log.Error("退出获取退出位置失败。"); }
+                                    { Log.Error("退出获取【退出】位置失败。"); }
                                 }
                                 else
-                                { Log.Error("退出获取文件位置失败。"); }
+                                { Log.Error("退出获取【文件】位置失败。"); }
                             }
                             else
                             {
@@ -976,22 +980,51 @@ namespace CMMAuto
                 e.Cancel = true; // 阻止关闭
         }
 
+        private void LoadPlcTxt()
+        {
+            SQLiteParameter[] parameter = new SQLiteParameter[] { new SQLiteParameter("Key", "PLCIp") };
+            string sql = "SELECT * FROM Cfg WHERE Key=@Key";
+            DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
+            //var ip = dataSet.Tables[0].Rows.Count == 0 ? txtIp.Text.Trim() : dataSet.Tables[0].Rows[0]["Value"].ToString();
+            if (dataSet.Tables[0].Rows.Count != 0)
+                txtIp.Text = dataSet.Tables[0].Rows[0]["Value"].ToString();
+
+            parameter = new SQLiteParameter[] { new SQLiteParameter("Key", "PLCPort") };
+            dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
+            //var port = dataSet.Tables[0].Rows.Count == 0 ? txtPort.Text.Trim() : dataSet.Tables[0].Rows[0]["Value"].ToString();
+            if (dataSet.Tables[0].Rows.Count != 0)
+                txtPort.Text = dataSet.Tables[0].Rows[0]["Value"].ToString();
+
+            ConnPlc();
+        }
 
         public void ConnPlc()
         {
-            if (string.IsNullOrEmpty(txtIp.Text.Trim()))
+            try
             {
-                MessageBoxX.Show("PLC 的IP地址不能为空！", "提示");
-                return;
-            }
+                if (string.IsNullOrEmpty(txtIp.Text.Trim()))
+                {
+                    MessageBoxX.Show("PLC 的IP地址不能为空！", "提示");
+                    return;
+                }
 
-            if (string.IsNullOrEmpty(txtPort.Text.Trim()))
+                if (string.IsNullOrEmpty(txtPort.Text.Trim()))
+                {
+                    MessageBoxX.Show("PLC 的端口号不能为空！", "提示");
+                    return;
+                }
+
+                _modbusUitl = ModbusUitl.getInstanceConn(txtIp.Text.Trim(), txtPort.Text.Trim().StrToInt());
+
+                if (MessageBoxX.Show($"连接PLC成功", "提示") == MessageBoxResult.OK)
+                    btnSavePLC_Click(null, null);
+
+            }
+            catch (Exception ex)
             {
-                MessageBoxX.Show("PLC 的端口号不能为空！", "提示");
-                return;
+                MessageBoxX.Show($"连接PLC失败: {ex.Message}", "提示");
+                Log.Error($"连接PLC失败: {ex.Message}");
             }
-
-            _modbusUitl = ModbusUitl.getInstanceConn(txtIp.Text.Trim(), txtPort.Text.Trim().StrToInt());
         }
 
         public void ReadPlc()
@@ -1078,6 +1111,190 @@ namespace CMMAuto
             }
             _frmConfig.Show();
             _frmConfig.BringToFront();  // 激活并置顶窗体
+        }
+
+        private void btnSend_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_modbusUitl != null)
+                {
+                    int[] productCode = ModbusClient.ConvertStringToRegisters("你好呀");
+                    _modbusUitl.WriteMultipleRegisters(100, productCode);
+                    //_modbusUitl.WriteMultipleRegisters(100, new int[] { 200 }); // 告知PLC终止任务
+                    //var t = _modbusUitl.ReadHoldingRegisters(100, 0);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBoxX.Show($"读取LC失败: {ex.Message}", "提示");
+                Log.Error($"读取LC失败: {ex.Message}");
+            }
+        }
+
+        private void btnSavePLC_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(txtIp.Text.Trim()))
+            {
+                MessageBoxX.Show("PLC 的IP地址不能为空！", "提示");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(txtPort.Text.Trim()))
+            {
+                MessageBoxX.Show("PLC 的端口号不能为空！", "提示");
+                return;
+            }
+
+            List<Dictionary<string, object>> data = new List<Dictionary<string, object>>
+            {
+                new Dictionary<string, object>
+                {
+                    {"Key", "PLCIp"}, {"Value", txtIp.Text.Trim()}, {"CreateDate", DateTime.Now}
+                },
+                new Dictionary<string, object>
+                {
+                    {"Key", "PLCPort"}, {"Value", txtPort.Text.Trim()}, {"CreateDate", DateTime.Now}
+                }
+            };
+
+            SQLiteParameter[] parameter = new SQLiteParameter[] { new SQLiteParameter("Key", "PLCIp") };
+            _sqLiteHelpers.Delete("Cfg", "Key=@Key", parameter);
+
+            parameter = new SQLiteParameter[] { new SQLiteParameter("Key", "PLCPort") };
+            _sqLiteHelpers.Delete("Cfg", "Key=@Key", parameter);
+
+            foreach (var dic in data)
+            {
+                _sqLiteHelpers.InsertData("Cfg", dic);
+            }
+
+            MessageBoxX.Show($"保存PLCIp成功", "提示");
+        }
+
+        private void PoolPlc()
+        {
+            var pollingService = new PollingService(
+                pollingInterval: TimeSpan.FromSeconds(3),
+                checkAction: async () =>
+                {
+                    //bool isConnected = await CheckNetworkConnection();
+                    await Task.Run(CheckPlc);
+                    GetProduct();
+                    _isSingle = GetStart();
+                    if (GetStart())
+                        _isTheSame = false;
+
+                    return true; // 始终继续轮询
+                }
+            );
+
+            // 订阅错误事件
+            pollingService.OnError += ex =>
+                Log.Error($"Polling error: {ex.Message}");
+
+            // 启动轮询
+            pollingService.Start();
+
+            // 停止轮询（如点击停止按钮时调用）
+            // pollingService.Stop();
+        }
+
+        private void CheckPlc()
+        {
+            if (GetPlcAddressInfo("Load_Live").Rows.Count == 0)
+                return;
+
+            if (_modbusUitl != null)
+                this.BeginInvoke(new Action(() =>
+                {
+                    txtPlcConnect.BackColor = _modbusUitl.ReadHoldingRegisters
+                        (GetPlcAddressInfo("Load_Live").Rows[0]["Address"].ToString().StrToInt(),
+                        GetPlcAddressInfo("Load_Live").Rows[0]["Count"].ToString().StrToInt()).StrToInt() == 0 ?
+                        Color.Red : Color.LimeGreen;
+                }));
+        }
+
+        private bool GetStart()
+        {
+            if (GetPlcAddressInfo("Load_Start").Rows.Count == 0)
+                return false;
+
+            if (_modbusUitl != null)
+                return _modbusUitl.ReadHoldingRegisters
+                (GetPlcAddressInfo("Load_Start").Rows[0]["Address"].ToString().StrToInt(),
+                    GetPlcAddressInfo("Load_Start").Rows[0]["Count"].ToString().StrToInt()).StrToInt() != 0;
+
+            return false;
+        }
+
+        private void GetProduct()
+        {
+            if (GetPlcAddressInfo("Load_PartID").Rows.Count == 0)
+                return;
+
+            if (_modbusUitl == null) return;
+
+            var id = _modbusUitl.ReadHoldingRegisters
+            (GetPlcAddressInfo("Load_PartID").Rows[0]["Address"].ToString().StrToInt(),
+                GetPlcAddressInfo("Load_PartID").Rows[0]["Count"].ToString().StrToInt());
+
+            SQLiteParameter[] parameter = new SQLiteParameter[] { new SQLiteParameter("PrgName", id) };
+            string sql = "SELECT PrgName,PrgPath FROM MeaSurePrgCfg WHERE PrgName = @PrgName";
+            DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
+            txtMeasureName.Text = id;
+            txtMeasureProgram.Text = dataSet.Tables[0].Rows[0]["PrgPath"].ToString();
+
+            if (!_isSingle)
+                SetReady();
+        }
+
+        private void SetEnd()
+        {
+            if (GetPlcAddressInfo("CMM_MeasureCompleted").Rows.Count == 0)
+                return;
+
+            if (_modbusUitl != null)
+                _modbusUitl.WriteMultipleRegisters
+                (GetPlcAddressInfo("CMM_MeasureCompleted").Rows[0]["Address"].ToString().StrToInt(),
+                    new int[] { GetPlcAddressInfo("CMM_MeasureCompleted").Rows[0]["Count"].ToString().StrToInt() }
+                    );
+        }
+
+        private void SetReady()
+        {
+            if (GetPlcAddressInfo("CMM_Ready").Rows.Count == 0)
+                return;
+
+            if (_modbusUitl != null)
+                _modbusUitl.WriteMultipleRegisters
+                (GetPlcAddressInfo("CMM_Ready").Rows[0]["Address"].ToString().StrToInt(),
+                    new int[] { GetPlcAddressInfo("CMM_Ready").Rows[0]["Count"].ToString().StrToInt() }
+                );
+        }
+
+        private void SetError()
+        {
+            if (GetPlcAddressInfo("CMM_Alarm").Rows.Count == 0)
+                return;
+
+            if (_modbusUitl != null)
+                _modbusUitl.WriteMultipleRegisters
+                (GetPlcAddressInfo("CMM_Alarm").Rows[0]["Address"].ToString().StrToInt(),
+                    new int[] { GetPlcAddressInfo("CMM_Alarm").Rows[0]["Count"].ToString().StrToInt() }
+                );
+        }
+
+        private DataTable GetPlcAddressInfo(string name)
+        {
+            DataTable dt = new DataTable();
+            SQLiteParameter[] parameter = new SQLiteParameter[] { new SQLiteParameter("Name", name) };
+            string sql = "SELECT * FROM PLCCfg WHERE Name=@Name";
+            DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
+            if (dataSet.Tables[0].Rows.Count != 0)
+                dt = dataSet.Tables[0];
+
+            return dt;
         }
     }
 }

@@ -145,6 +145,7 @@
     <Compile Include="CommonHelp\KeyboardSimulatorHelp.cs" />
     <Compile Include="CommonHelp\NativeWindowHelp.cs" />
     <Compile Include="CommonHelp\CMMVisionHelp.cs" />
+    <Compile Include="CommonHelp\PollingService.cs" />
     <Compile Include="CommonHelp\SocketHelper.cs" />
     <Compile Include="CommonHelp\SQLiteHelper.cs" />
     <Compile Include="CommonHelp\UtilHelp.cs" />

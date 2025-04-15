@@ -666,7 +666,7 @@ namespace CMMAuto.CommonHelp
                     conn.Open();
                     using (var cmd = new SQLiteCommand(conn))
                     {
-                        //配置表                        
+                        //程式配置表                        
                         cmd.CommandText = @"  CREATE TABLE IF NOT EXISTS MeaSurePrgCfg(id INTEGER PRIMARY KEY AUTOINCREMENT, --自动增长的主键
                                               PrgName TEXT NOT NULL UNIQUE, --不能为空且唯一
                                               PrgPath TEXT NOT NULL, --不能为空
@@ -691,6 +691,14 @@ namespace CMMAuto.CommonHelp
                                               Name TEXT NOT NULL UNIQUE, --不能为空且唯一
                                               Address TEXT NOT NULL, --不能为空
                                               Count TEXT NOT NULL, --不能为空
+                                              Remark TEXT,
+                                              CreateDate INTEGER DEFAULT CURRENT_TIMESTAMP)-- 默认值为当前时间";
+                        cmd.ExecuteNonQuery();
+
+                        //基础配置表                        
+                        cmd.CommandText = @"  CREATE TABLE IF NOT EXISTS Cfg(id INTEGER PRIMARY KEY AUTOINCREMENT, --自动增长的主键
+                                              Key TEXT NOT NULL UNIQUE, --不能为空且唯一
+                                              Value TEXT NOT NULL, --不能为空
                                               Remark TEXT,
                                               CreateDate INTEGER DEFAULT CURRENT_TIMESTAMP)-- 默认值为当前时间";
                         cmd.ExecuteNonQuery();

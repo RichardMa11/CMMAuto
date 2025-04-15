@@ -58,10 +58,11 @@ namespace CMMAuto
             this.panelOperate = new System.Windows.Forms.Panel();
             this.panelAgvOperate = new System.Windows.Forms.Panel();
             this.grpAgvOperate = new System.Windows.Forms.GroupBox();
+            this.btnSavePLC = new System.Windows.Forms.Button();
             this.btnTestExit = new System.Windows.Forms.Button();
             this.btnSend = new System.Windows.Forms.Button();
-            this.btnAutoRun = new System.Windows.Forms.Button();
             this.btnConfigPlcAddress = new System.Windows.Forms.Button();
+            this.btnAutoRun = new System.Windows.Forms.Button();
             this.btnConnect = new System.Windows.Forms.Button();
             this.btnOpenFile = new System.Windows.Forms.Button();
             this.btnSaveImg = new System.Windows.Forms.Button();
@@ -71,6 +72,15 @@ namespace CMMAuto
             this.panelState = new System.Windows.Forms.Panel();
             this.panelAgvState = new System.Windows.Forms.Panel();
             this.grpAgvConnection = new System.Windows.Forms.GroupBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.txtPlcConnect = new System.Windows.Forms.TextBox();
+            this.txtSlaveId = new System.Windows.Forms.TextBox();
+            this.txtPort = new System.Windows.Forms.TextBox();
+            this.txtIp = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.lblCommInfo = new System.Windows.Forms.Label();
             this.grpCmmState = new System.Windows.Forms.GroupBox();
             this.label10 = new System.Windows.Forms.Label();
             this.txtPreOrEnd = new System.Windows.Forms.TextBox();
@@ -87,13 +97,7 @@ namespace CMMAuto
             this.trvTestPrgChoose = new System.Windows.Forms.TreeView();
             this.grpTestPrgChoose = new System.Windows.Forms.GroupBox();
             this.panelLeft = new System.Windows.Forms.Panel();
-            this.label6 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
-            this.txtIp = new System.Windows.Forms.TextBox();
-            this.txtPort = new System.Windows.Forms.TextBox();
-            this.txtSlaveId = new System.Windows.Forms.TextBox();
-            this.lblCommInfo = new System.Windows.Forms.Label();
+            this.chkIsConnPLC = new System.Windows.Forms.CheckBox();
             this.panelMiddle.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panelCmmlog.SuspendLayout();
@@ -378,6 +382,7 @@ namespace CMMAuto
             // 
             // grpAgvOperate
             // 
+            this.grpAgvOperate.Controls.Add(this.btnSavePLC);
             this.grpAgvOperate.Controls.Add(this.btnTestExit);
             this.grpAgvOperate.Controls.Add(this.btnSend);
             this.grpAgvOperate.Controls.Add(this.btnConfigPlcAddress);
@@ -394,6 +399,23 @@ namespace CMMAuto
             this.grpAgvOperate.TabIndex = 4;
             this.grpAgvOperate.TabStop = false;
             this.grpAgvOperate.Text = "PLC操作";
+            // 
+            // btnSavePLC
+            // 
+            this.btnSavePLC.BackColor = System.Drawing.Color.LightBlue;
+            this.btnSavePLC.FlatAppearance.BorderSize = 0;
+            this.btnSavePLC.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
+            this.btnSavePLC.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
+            this.btnSavePLC.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSavePLC.ForeColor = System.Drawing.Color.DarkBlue;
+            this.btnSavePLC.Location = new System.Drawing.Point(194, 76);
+            this.btnSavePLC.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnSavePLC.Name = "btnSavePLC";
+            this.btnSavePLC.Size = new System.Drawing.Size(96, 42);
+            this.btnSavePLC.TabIndex = 8;
+            this.btnSavePLC.Text = "保存PLCIP";
+            this.btnSavePLC.UseVisualStyleBackColor = true;
+            this.btnSavePLC.Click += new System.EventHandler(this.btnSavePLC_Click);
             // 
             // btnTestExit
             // 
@@ -426,8 +448,26 @@ namespace CMMAuto
             this.btnSend.Name = "btnSend";
             this.btnSend.Size = new System.Drawing.Size(96, 42);
             this.btnSend.TabIndex = 3;
-            this.btnSend.Text = "发送信息";
+            this.btnSend.Text = "读  取";
             this.btnSend.UseVisualStyleBackColor = true;
+            this.btnSend.Click += new System.EventHandler(this.btnSend_Click);
+            // 
+            // btnConfigPlcAddress
+            // 
+            this.btnConfigPlcAddress.BackColor = System.Drawing.Color.LightBlue;
+            this.btnConfigPlcAddress.FlatAppearance.BorderSize = 0;
+            this.btnConfigPlcAddress.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
+            this.btnConfigPlcAddress.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
+            this.btnConfigPlcAddress.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnConfigPlcAddress.ForeColor = System.Drawing.Color.DarkBlue;
+            this.btnConfigPlcAddress.Location = new System.Drawing.Point(194, 26);
+            this.btnConfigPlcAddress.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnConfigPlcAddress.Name = "btnConfigPlcAddress";
+            this.btnConfigPlcAddress.Size = new System.Drawing.Size(96, 42);
+            this.btnConfigPlcAddress.TabIndex = 2;
+            this.btnConfigPlcAddress.Text = "配置PLC地址";
+            this.btnConfigPlcAddress.UseVisualStyleBackColor = true;
+            this.btnConfigPlcAddress.Click += new System.EventHandler(this.btnConfigPlcAddress_Click);
             // 
             // btnAutoRun
             // 
@@ -446,23 +486,6 @@ namespace CMMAuto
             this.btnAutoRun.UseVisualStyleBackColor = true;
             this.btnAutoRun.Visible = false;
             this.btnAutoRun.Click += new System.EventHandler(this.btnAutoRun_Click);
-            // 
-            // btnConfigPlcAddress
-            // 
-            this.btnConfigPlcAddress.BackColor = System.Drawing.Color.LightBlue;
-            this.btnConfigPlcAddress.FlatAppearance.BorderSize = 0;
-            this.btnConfigPlcAddress.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
-            this.btnConfigPlcAddress.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
-            this.btnConfigPlcAddress.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnConfigPlcAddress.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnConfigPlcAddress.Location = new System.Drawing.Point(194, 26);
-            this.btnConfigPlcAddress.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btnConfigPlcAddress.Name = "btnConfigPlcAddress";
-            this.btnConfigPlcAddress.Size = new System.Drawing.Size(96, 42);
-            this.btnConfigPlcAddress.TabIndex = 2;
-            this.btnConfigPlcAddress.Text = "配置PLC地址";
-            this.btnConfigPlcAddress.UseVisualStyleBackColor = true;
-            this.btnConfigPlcAddress.Click += new System.EventHandler(this.btnConfigPlcAddress_Click);
             // 
             // btnConnect
             // 
@@ -587,6 +610,9 @@ namespace CMMAuto
             // 
             // grpAgvConnection
             // 
+            this.grpAgvConnection.Controls.Add(this.chkIsConnPLC);
+            this.grpAgvConnection.Controls.Add(this.label11);
+            this.grpAgvConnection.Controls.Add(this.txtPlcConnect);
             this.grpAgvConnection.Controls.Add(this.txtSlaveId);
             this.grpAgvConnection.Controls.Add(this.txtPort);
             this.grpAgvConnection.Controls.Add(this.txtIp);
@@ -603,6 +629,100 @@ namespace CMMAuto
             this.grpAgvConnection.TabIndex = 3;
             this.grpAgvConnection.TabStop = false;
             this.grpAgvConnection.Text = "PLC通讯";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.ForeColor = System.Drawing.Color.DarkBlue;
+            this.label11.Location = new System.Drawing.Point(165, 114);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(32, 17);
+            this.label11.TabIndex = 16;
+            this.label11.Text = "连接";
+            // 
+            // txtPlcConnect
+            // 
+            this.txtPlcConnect.BackColor = System.Drawing.Color.Red;
+            this.txtPlcConnect.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtPlcConnect.Location = new System.Drawing.Point(200, 114);
+            this.txtPlcConnect.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtPlcConnect.Name = "txtPlcConnect";
+            this.txtPlcConnect.Size = new System.Drawing.Size(21, 16);
+            this.txtPlcConnect.TabIndex = 15;
+            // 
+            // txtSlaveId
+            // 
+            this.txtSlaveId.Enabled = false;
+            this.txtSlaveId.Location = new System.Drawing.Point(105, 111);
+            this.txtSlaveId.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtSlaveId.Name = "txtSlaveId";
+            this.txtSlaveId.Size = new System.Drawing.Size(55, 23);
+            this.txtSlaveId.TabIndex = 14;
+            this.txtSlaveId.Text = "1";
+            this.txtSlaveId.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // txtPort
+            // 
+            this.txtPort.Location = new System.Drawing.Point(105, 74);
+            this.txtPort.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtPort.Name = "txtPort";
+            this.txtPort.Size = new System.Drawing.Size(55, 23);
+            this.txtPort.TabIndex = 13;
+            this.txtPort.Text = "502";
+            this.txtPort.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.txtPort.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtPort_KeyPress);
+            // 
+            // txtIp
+            // 
+            this.txtIp.Location = new System.Drawing.Point(105, 37);
+            this.txtIp.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtIp.Name = "txtIp";
+            this.txtIp.Size = new System.Drawing.Size(116, 23);
+            this.txtIp.TabIndex = 12;
+            this.txtIp.Text = "127.0.1.1";
+            this.txtIp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.ForeColor = System.Drawing.Color.Gray;
+            this.label8.Location = new System.Drawing.Point(32, 114);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(67, 17);
+            this.label8.TabIndex = 11;
+            this.label8.Text = "Slave ID：";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.ForeColor = System.Drawing.Color.Gray;
+            this.label7.Location = new System.Drawing.Point(32, 77);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(44, 17);
+            this.label7.TabIndex = 10;
+            this.label7.Text = "Port：";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.ForeColor = System.Drawing.Color.Gray;
+            this.label6.Location = new System.Drawing.Point(32, 40);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(31, 17);
+            this.label6.TabIndex = 9;
+            this.label6.Text = "IP：";
+            // 
+            // lblCommInfo
+            // 
+            this.lblCommInfo.AutoSize = true;
+            this.lblCommInfo.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.lblCommInfo.ForeColor = System.Drawing.Color.Red;
+            this.lblCommInfo.Location = new System.Drawing.Point(32, 151);
+            this.lblCommInfo.Name = "lblCommInfo";
+            this.lblCommInfo.Size = new System.Drawing.Size(229, 16);
+            this.lblCommInfo.TabIndex = 8;
+            this.lblCommInfo.Text = "注：修改完要重新连接并保存";
+            this.lblCommInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // grpCmmState
             // 
@@ -768,79 +888,19 @@ namespace CMMAuto
             this.panelLeft.Size = new System.Drawing.Size(350, 825);
             this.panelLeft.TabIndex = 5;
             // 
-            // label6
+            // chkIsConnPLC
             // 
-            this.label6.AutoSize = true;
-            this.label6.ForeColor = System.Drawing.Color.Gray;
-            this.label6.Location = new System.Drawing.Point(32, 40);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(31, 17);
-            this.label6.TabIndex = 9;
-            this.label6.Text = "IP：";
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.ForeColor = System.Drawing.Color.Gray;
-            this.label7.Location = new System.Drawing.Point(32, 77);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(44, 17);
-            this.label7.TabIndex = 10;
-            this.label7.Text = "Port：";
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.ForeColor = System.Drawing.Color.Gray;
-            this.label8.Location = new System.Drawing.Point(32, 114);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(67, 17);
-            this.label8.TabIndex = 11;
-            this.label8.Text = "Slave ID：";
-            // 
-            // txtIp
-            // 
-            this.txtIp.Location = new System.Drawing.Point(105, 37);
-            this.txtIp.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.txtIp.Name = "txtIp";
-            this.txtIp.Size = new System.Drawing.Size(116, 23);
-            this.txtIp.TabIndex = 12;
-            this.txtIp.Text = "127.0.1.1";
-            this.txtIp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // txtPort
-            // 
-            this.txtPort.Location = new System.Drawing.Point(105, 74);
-            this.txtPort.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.txtPort.Name = "txtPort";
-            this.txtPort.Size = new System.Drawing.Size(55, 23);
-            this.txtPort.TabIndex = 13;
-            this.txtPort.Text = "502";
-            this.txtPort.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.txtPort.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtPort_KeyPress);
-            // 
-            // txtSlaveId
-            // 
-            this.txtSlaveId.Enabled = false;
-            this.txtSlaveId.Location = new System.Drawing.Point(105, 111);
-            this.txtSlaveId.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.txtSlaveId.Name = "txtSlaveId";
-            this.txtSlaveId.Size = new System.Drawing.Size(55, 23);
-            this.txtSlaveId.TabIndex = 14;
-            this.txtSlaveId.Text = "1";
-            this.txtSlaveId.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // lblCommInfo
-            // 
-            this.lblCommInfo.AutoSize = true;
-            this.lblCommInfo.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lblCommInfo.ForeColor = System.Drawing.Color.Red;
-            this.lblCommInfo.Location = new System.Drawing.Point(32, 151);
-            this.lblCommInfo.Name = "lblCommInfo";
-            this.lblCommInfo.Size = new System.Drawing.Size(178, 16);
-            this.lblCommInfo.TabIndex = 8;
-            this.lblCommInfo.Text = "注：修改完要重启软件";
-            this.lblCommInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.chkIsConnPLC.AutoSize = true;
+            this.chkIsConnPLC.Checked = true;
+            this.chkIsConnPLC.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkIsConnPLC.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.chkIsConnPLC.ForeColor = System.Drawing.Color.DarkBlue;
+            this.chkIsConnPLC.Location = new System.Drawing.Point(172, 75);
+            this.chkIsConnPLC.Name = "chkIsConnPLC";
+            this.chkIsConnPLC.Size = new System.Drawing.Size(49, 21);
+            this.chkIsConnPLC.TabIndex = 17;
+            this.chkIsConnPLC.Text = "联机";
+            this.chkIsConnPLC.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
@@ -945,6 +1005,10 @@ namespace CMMAuto
         private System.Windows.Forms.TextBox txtPort;
         private System.Windows.Forms.TextBox txtIp;
         private System.Windows.Forms.Label lblCommInfo;
+        private System.Windows.Forms.Button btnSavePLC;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.TextBox txtPlcConnect;
+        private System.Windows.Forms.CheckBox chkIsConnPLC;
     }
 }
 
