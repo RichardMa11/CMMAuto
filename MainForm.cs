@@ -17,8 +17,6 @@ using CMMAuto.CommonHelp;
 using CMMAuto.Config;
 using CMMAuto.Extension;
 using CMMAuto.Model;
-using CMMAuto.Protocol.Common;
-using CMMAuto.Protocol.Tcp;
 using EasyModbus;
 using KENDLL.Common;
 using log4net;
@@ -32,7 +30,6 @@ namespace CMMAuto
         private readonly CMMVisionHelp _cmmVisionHelp = new CMMVisionHelp();
         private readonly KeyboardSimulatorHelp _simulator = new KeyboardSimulatorHelp();
         private readonly object _lock = new object();
-        private ModbusUitl _modbusUitl;
 
         private static string _fullFileName = "";
         private static bool _isSingle = false;
@@ -41,6 +38,8 @@ namespace CMMAuto
 
         private static readonly ILog Log = LogManager.GetLogger(typeof(MainForm));
         private SQLiteHelper _sqLiteHelpers = null;
+        private FrmConfig _frmConfig;
+        private ModbusUitl _modbusUitl;
 
         public MainForm()
         {
@@ -113,6 +112,53 @@ namespace CMMAuto
             LoadMeasureData();
             LoadPlcTxt();
             PoolPlc();
+        }
+
+        private void LoadPlcTxt()
+        {
+            SQLiteParameter[] parameter = new SQLiteParameter[] { new SQLiteParameter("Key", "PLCIp") };
+            string sql = "SELECT * FROM Cfg WHERE Key=@Key";
+            DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
+            //var ip = dataSet.Tables[0].Rows.Count == 0 ? txtIp.Text.Trim() : dataSet.Tables[0].Rows[0]["Value"].ToString();
+            if (dataSet.Tables[0].Rows.Count != 0)
+                txtIp.Text = dataSet.Tables[0].Rows[0]["Value"].ToString();
+
+            parameter = new SQLiteParameter[] { new SQLiteParameter("Key", "PLCPort") };
+            dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
+            //var port = dataSet.Tables[0].Rows.Count == 0 ? txtPort.Text.Trim() : dataSet.Tables[0].Rows[0]["Value"].ToString();
+            if (dataSet.Tables[0].Rows.Count != 0)
+                txtPort.Text = dataSet.Tables[0].Rows[0]["Value"].ToString();
+
+            ConnPlc();
+        }
+
+        public void ConnPlc()
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(txtIp.Text.Trim()))
+                {
+                    MessageBoxX.Show("PLC 的IP地址不能为空！", "提示");
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(txtPort.Text.Trim()))
+                {
+                    MessageBoxX.Show("PLC 的端口号不能为空！", "提示");
+                    return;
+                }
+
+                _modbusUitl = ModbusUitl.getInstanceConn(txtIp.Text.Trim(), txtPort.Text.Trim().StrToInt());
+
+                if (MessageBoxX.Show($"连接PLC成功", "提示") == MessageBoxResult.OK)
+                    btnSavePLC_Click(null, null);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBoxX.Show($"连接PLC失败: {ex.Message}", "提示");
+                Log.Error($"连接PLC失败: {ex.Message}");
+            }
         }
 
         private void LoadLogTxt()
@@ -668,15 +714,36 @@ namespace CMMAuto
 
         private void RecordMeasure(string state, int result)
         {
-            Dictionary<string, object> dic = new Dictionary<string, object>();
-            dic.Add("PrgName", txtMeasureName.Text.Trim());
-            dic.Add("PrgPath", txtMeasureProgram.Text.Trim());
-            dic.Add("CMMState", state);
-            dic.Add("CMMResult", result);
-            dic.Add("CMMTime", DateTime.Now);
-            dic.Add("CreateDate", DateTime.Now);
+            Dictionary<string, object> dic = new Dictionary<string, object>
+            {
+                {"PrgName", txtMeasureName.Text.Trim()},
+                {"PrgPath", txtMeasureProgram.Text.Trim()},
+                {"CMMState", state},
+                {"CMMResult", result},
+                {"CMMTime", DateTime.Now},
+                {"CreateDate", DateTime.Now}
+            };
 
             _sqLiteHelpers.InsertData("MeaSureData", dic);
+        }
+
+        //FormClosing是在窗体即将关闭但还未关闭时触发，这时候还可以取消关闭操作，比如弹出确认对话框，用户点击取消，那么窗体就不会关闭。
+        //而FormClosed是在窗体已经关闭之后触发，这时候窗体已经不可见了，只能执行一些清理工作，比如释放资源或者记录日志，但无法阻止关闭。
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            var result = MessageBoxX.Show("是否退出？", "提示", null, MessageBoxButton.YesNo);
+
+            if (result == MessageBoxResult.No)
+                e.Cancel = true; // 阻止关闭
+
+            //if (!isClosingByAnimation && e.CloseReason != CloseReason.ApplicationExitCall)
+            //{
+            //    e.Cancel = true;  // 阻止直接关闭
+
+            //    var result = MessageBoxX.Show("是否退出？", "提示", null, MessageBoxButton.YesNo);
+            //    if (result == MessageBoxResult.Yes)
+            //        CloseWindow();     // 启动动画
+            //}
         }
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -970,72 +1037,6 @@ namespace CMMAuto
             }
         }
 
-        //FormClosing是在窗体即将关闭但还未关闭时触发，这时候还可以取消关闭操作，比如弹出确认对话框，用户点击取消，那么窗体就不会关闭。
-        //而FormClosed是在窗体已经关闭之后触发，这时候窗体已经不可见了，只能执行一些清理工作，比如释放资源或者记录日志，但无法阻止关闭。
-        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            var result = MessageBoxX.Show("是否退出？", "提示", null, MessageBoxButton.YesNo);
-
-            if (result == MessageBoxResult.No)
-                e.Cancel = true; // 阻止关闭
-
-            //if (!isClosingByAnimation && e.CloseReason != CloseReason.ApplicationExitCall)
-            //{
-            //    e.Cancel = true;  // 阻止直接关闭
-
-            //    var result = MessageBoxX.Show("是否退出？", "提示", null, MessageBoxButton.YesNo);
-            //    if (result == MessageBoxResult.Yes)
-            //        CloseWindow();     // 启动动画
-            //}
-        }
-
-        private void LoadPlcTxt()
-        {
-            SQLiteParameter[] parameter = new SQLiteParameter[] { new SQLiteParameter("Key", "PLCIp") };
-            string sql = "SELECT * FROM Cfg WHERE Key=@Key";
-            DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
-            //var ip = dataSet.Tables[0].Rows.Count == 0 ? txtIp.Text.Trim() : dataSet.Tables[0].Rows[0]["Value"].ToString();
-            if (dataSet.Tables[0].Rows.Count != 0)
-                txtIp.Text = dataSet.Tables[0].Rows[0]["Value"].ToString();
-
-            parameter = new SQLiteParameter[] { new SQLiteParameter("Key", "PLCPort") };
-            dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
-            //var port = dataSet.Tables[0].Rows.Count == 0 ? txtPort.Text.Trim() : dataSet.Tables[0].Rows[0]["Value"].ToString();
-            if (dataSet.Tables[0].Rows.Count != 0)
-                txtPort.Text = dataSet.Tables[0].Rows[0]["Value"].ToString();
-
-            ConnPlc();
-        }
-
-        public void ConnPlc()
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(txtIp.Text.Trim()))
-                {
-                    MessageBoxX.Show("PLC 的IP地址不能为空！", "提示");
-                    return;
-                }
-
-                if (string.IsNullOrEmpty(txtPort.Text.Trim()))
-                {
-                    MessageBoxX.Show("PLC 的端口号不能为空！", "提示");
-                    return;
-                }
-
-                _modbusUitl = ModbusUitl.getInstanceConn(txtIp.Text.Trim(), txtPort.Text.Trim().StrToInt());
-
-                if (MessageBoxX.Show($"连接PLC成功", "提示") == MessageBoxResult.OK)
-                    btnSavePLC_Click(null, null);
-
-            }
-            catch (Exception ex)
-            {
-                MessageBoxX.Show($"连接PLC失败: {ex.Message}", "提示");
-                Log.Error($"连接PLC失败: {ex.Message}");
-            }
-        }
-
         public void ReadPlc()
         {
             _modbusUitl.ReadHoldingRegisters(262, 1);
@@ -1083,6 +1084,7 @@ namespace CMMAuto
         /// 网络连接配置
         /// </summary>
         private NetworkConnection _connection = new NetworkConnection("127.0.0.1", 502);
+
         /// <summary>
         /// 网络连接配置
         /// </summary>
@@ -1110,7 +1112,6 @@ namespace CMMAuto
             }
         }
 
-        private FrmConfig _frmConfig;
         private void btnConfigPlcAddress_Click(object sender, EventArgs e)
         {
             if (_frmConfig == null || _frmConfig.IsDisposed)
@@ -1209,6 +1210,8 @@ namespace CMMAuto
             // pollingService.Stop();
         }
 
+        #region 与PLC交互
+
         private void CheckPlc()
         {
             if (GetPlcAddressInfo("Load_Live").Rows.Count == 0)
@@ -1305,6 +1308,8 @@ namespace CMMAuto
 
             return dt;
         }
+
+        #endregion
 
         #region 关闭窗体动画
 
