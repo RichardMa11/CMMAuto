@@ -1129,16 +1129,29 @@ namespace CMMAuto
             {
                 if (_modbusUitl != null)
                 {
-                    int[] productCode = ModbusClient.ConvertStringToRegisters("你好呀");
-                    _modbusUitl.WriteMultipleRegisters(100, productCode);
-                    //_modbusUitl.WriteMultipleRegisters(100, new int[] { 200 }); // 告知PLC终止任务
-                    //var t = _modbusUitl.ReadHoldingRegisters(100, 0);
+                    if (GetPlcAddressInfo("TEST").Rows.Count != 0)
+                    {
+                        _modbusUitl.WriteMultipleRegisters(GetPlcAddressInfo("TEST").Rows[0]["Address"].ToString().StrToInt(),
+                            ModbusClient.ConvertStringToRegisters(txtMeasureName.Text.Trim()));
+
+                        txtMeasureProgram.Text = _modbusUitl.ReadHoldingRegistersConverString
+                            (GetPlcAddressInfo("TEST").Rows[0]["Address"].ToString().StrToInt(),
+                            GetPlcAddressInfo("TEST").Rows[0]["Count"].ToString().StrToInt(),
+                            txtMeasureName.Text.Trim().Length + 1).Replace("\0", "");
+
+                        //_modbusUitl.WriteMultipleRegisters(100, new int[] { 200 }); // 告知PLC终止任务
+                        //var t = _modbusUitl.ReadHoldingRegisters(100, 1);
+                    }
+                    else
+                    {
+                        MessageBoxX.Show("PLC信号地址【TEST】没有配置", "提示");
+                    }
                 }
             }
             catch (Exception ex)
             {
-                MessageBoxX.Show($"读取LC失败: {ex.Message}", "提示");
-                Log.Error($"读取LC失败: {ex.Message}");
+                MessageBoxX.Show($"读取PLC失败: {ex.Message}", "提示");
+                Log.Error($"读取PLC失败: {ex.Message}");
             }
         }
 
