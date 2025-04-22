@@ -12,17 +12,25 @@ namespace CMMAuto.CommonHelp
 
         public ImageData GetPicImageData(string sourceImagePath)
         {
-            var mat = Cv2.ImRead(sourceImagePath, ImreadModes.Color);
-            var imageData = new ImageData
+            try
             {
-                Image = mat.Data,
-                Width = mat.Width,
-                Height = mat.Height,
-                Channels = mat.Channels()
-            };
-            //log.Info($"原图信息 width: {imageData.Width}, height: {imageData.Height}, channels: {imageData.Channels}");
+                var mat = Cv2.ImRead(sourceImagePath, ImreadModes.Color);
+                var imageData = new ImageData
+                {
+                    Image = mat.Data,
+                    Width = mat.Width,
+                    Height = mat.Height,
+                    Channels = mat.Channels()
+                };
+                //log.Info($"原图信息 width: {imageData.Width}, height: {imageData.Height}, channels: {imageData.Channels}");
 
-            return imageData;
+                return imageData;
+            }
+            catch (Exception ex)
+            {
+                log.Error($"GetPicImageData出错：{ex.Message + ex.StackTrace}");
+                throw;
+            }
         }
 
         /// <summary>

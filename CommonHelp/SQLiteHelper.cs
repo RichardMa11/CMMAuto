@@ -669,6 +669,7 @@ namespace CMMAuto.CommonHelp
                         //程式配置表                        
                         cmd.CommandText = @"  CREATE TABLE IF NOT EXISTS MeaSurePrgCfg(id INTEGER PRIMARY KEY AUTOINCREMENT, --自动增长的主键
                                               PrgName TEXT NOT NULL UNIQUE, --不能为空且唯一
+                                              Type TEXT NOT NULL UNIQUE, --不能为空且唯一
                                               PrgPath TEXT NOT NULL, --不能为空
                                               Remark TEXT,
                                               CreateDate INTEGER DEFAULT CURRENT_TIMESTAMP)-- 默认值为当前时间";

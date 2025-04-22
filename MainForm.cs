@@ -232,17 +232,25 @@ namespace CMMAuto
 
         private void timerlog_Tick(object sender, EventArgs e)
         {
-            LoadLogTxt();
+            this.BeginInvoke(new Action(LoadLogTxt));
             lock (_lock)
             {
-                GetCmmState();
-                LoadMeasureData();
-                MeasurePrg();
+                this.BeginInvoke(new Action(GetCmmState));
+                this.BeginInvoke(new Action(LoadMeasureData));
+                this.BeginInvoke(new Action(MeasurePrg));
             }
         }
 
+
+        private delegate void GetCmmStateDelegate();
         private void GetCmmState()
         {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new GetCmmStateDelegate(GetCmmState));
+                return;
+            }
+            // 具体操作代码
             try
             {
                 var imageBitmap = ScreenShotHelp.GetImage();
@@ -317,8 +325,16 @@ namespace CMMAuto
             }
         }
 
+
+        private delegate void MeasurePrgDelegate();
         private void MeasurePrg()
         {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new MeasurePrgDelegate(MeasurePrg));
+                return;
+            }
+            // 具体操作代码
             Log.Info("测量任务: " + DateTime.Now); // 执行你的任务
             if (_isCycle)
                 OpenTestRun();
@@ -636,9 +652,11 @@ namespace CMMAuto
 
         private void btnInputTestPrg_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(txtMeasureName.Text.Trim()) || string.IsNullOrEmpty(txtMeasureProgram.Text.Trim()))
+            if (string.IsNullOrEmpty(txtMeasureName.Text.Trim())
+                || string.IsNullOrEmpty(txtMeasureProgram.Text.Trim())
+                || string.IsNullOrEmpty(txtTypeKey.Text.Trim()))
             {
-                MessageBoxX.Show("量测程序和节点不能为空！", "提示");
+                MessageBoxX.Show("量测程序、节点以及类型码不能为空！", "提示");
                 return;
             }
 
@@ -649,10 +667,18 @@ namespace CMMAuto
                 return;
             }
 
+            // check 是否已经存在
+            if (_sqLiteHelpers.QueryOne("MeaSurePrgCfg", "Type", txtTypeKey.Text.Trim()) != null)
+            {
+                MessageBoxX.Show("该类型码已经存在！", "提示");
+                return;
+            }
+
             Dictionary<string, object> dic = new Dictionary<string, object>
             {
                 {"PrgName", txtMeasureName.Text.Trim()},
                 {"PrgPath", txtMeasureProgram.Text.Trim()},
+                {"Type", txtTypeKey.Text.Trim()},
                 {"CreateDate", DateTime.Now}
             };
 
@@ -670,6 +696,7 @@ namespace CMMAuto
         {
             txtMeasureProgram.Text = "";
             txtMeasureName.Text = "";
+            txtTypeKey.Text = "";
             LoadTreeView();
         }
 
@@ -684,10 +711,12 @@ namespace CMMAuto
 
                     //赋值txt
                     SQLiteParameter[] parameter = new SQLiteParameter[] { new SQLiteParameter("PrgName", e.Node.Text) };
-                    string sql = "SELECT PrgName,PrgPath FROM MeaSurePrgCfg WHERE PrgName = @PrgName";
+                    string sql = "SELECT PrgName,PrgPath,Type FROM MeaSurePrgCfg WHERE PrgName = @PrgName";
                     DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
                     txtMeasureName.Text = e.Node.Text;
                     txtMeasureProgram.Text = dataSet.Tables[0].Rows[0]["PrgPath"].ToString();
+                    txtTypeKey.Text = dataSet.Tables[0].Rows[0]["Type"].ToString();
+                    txtType.Text = dataSet.Tables[0].Rows[0]["Type"].ToString();
                 }
                 else
                 {
@@ -1202,8 +1231,9 @@ namespace CMMAuto
                 checkAction: async () =>
                 {
                     //bool isConnected = await CheckNetworkConnection();
-                    await Task.Run(CheckPlc);
-                    GetProduct();
+                    await Task.Run(GetPlcHeart);
+                    await Task.Run(GetProductType);
+                    await Task.Run(GetProductId);
                     _isSingle = GetStart();
                     if (GetStart())
                         _isTheSame = false;
@@ -1225,7 +1255,9 @@ namespace CMMAuto
 
         #region 与PLC交互
 
-        private void CheckPlc()
+        #region GET
+
+        private void GetPlcHeart()
         {
             if (GetPlcAddressInfo("Load_Live").Rows.Count == 0)
                 return;
@@ -1253,26 +1285,66 @@ namespace CMMAuto
             return false;
         }
 
-        private void GetProduct()
+        private void GetProductType()
+        {
+            if (GetPlcAddressInfo("Load_PartType").Rows.Count == 0)
+                return;
+
+            if (_modbusUitl == null) return;
+
+            var type = _modbusUitl.ReadHoldingRegisters
+            (GetPlcAddressInfo("Load_PartType").Rows[0]["Address"].ToString().StrToInt(),
+                GetPlcAddressInfo("Load_PartType").Rows[0]["Count"].ToString().StrToInt());
+
+            SQLiteParameter[] parameter = new SQLiteParameter[] { new SQLiteParameter("Type", type) };
+            string sql = "SELECT PrgName,PrgPath,Type FROM MeaSurePrgCfg WHERE Type = @Type";
+            DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
+            txtTypeKey.Text = type;
+            txtType.Text = type;
+            if (dataSet.Tables[0].Rows.Count == 0)
+            {
+                Log.Error("类型码程式没有维护，无法启动！！！");
+            }
+            else
+            {
+                txtMeasureName.Text = dataSet.Tables[0].Rows[0]["PrgName"].ToString();
+                txtMeasureProgram.Text = dataSet.Tables[0].Rows[0]["PrgPath"].ToString();
+
+                if (!_isSingle)
+                    SetReady();
+                else
+                    Log.Error("运行中！！！");
+            }
+        }
+
+        private void GetProductId()
         {
             if (GetPlcAddressInfo("Load_PartID").Rows.Count == 0)
                 return;
 
             if (_modbusUitl == null) return;
 
-            var id = _modbusUitl.ReadHoldingRegisters
+            txtWorkPiece.Text = _modbusUitl.ReadHoldingRegisters
             (GetPlcAddressInfo("Load_PartID").Rows[0]["Address"].ToString().StrToInt(),
                 GetPlcAddressInfo("Load_PartID").Rows[0]["Count"].ToString().StrToInt());
-
-            SQLiteParameter[] parameter = new SQLiteParameter[] { new SQLiteParameter("PrgName", id) };
-            string sql = "SELECT PrgName,PrgPath FROM MeaSurePrgCfg WHERE PrgName = @PrgName";
-            DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
-            txtMeasureName.Text = id;
-            txtMeasureProgram.Text = dataSet.Tables[0].Rows[0]["PrgPath"].ToString();
-
-            if (!_isSingle)
-                SetReady();
         }
+
+        private bool GetStop()
+        {
+            if (GetPlcAddressInfo("Load_EStop").Rows.Count == 0)
+                return false;
+
+            if (_modbusUitl != null)
+                return _modbusUitl.ReadHoldingRegisters
+                (GetPlcAddressInfo("Load_EStop").Rows[0]["Address"].ToString().StrToInt(),
+                    GetPlcAddressInfo("Load_EStop").Rows[0]["Count"].ToString().StrToInt()).StrToInt() != 0;
+
+            return false;
+        }
+
+        #endregion
+
+        #region SET
 
         private void SetEnd()
         {
@@ -1309,6 +1381,68 @@ namespace CMMAuto
                     new int[] { GetPlcAddressInfo("CMM_Alarm").Rows[0]["Count"].ToString().StrToInt() }
                 );
         }
+
+        private void SetBusy()
+        {
+            if (GetPlcAddressInfo("CMM_Busy").Rows.Count == 0)
+                return;
+
+            if (_modbusUitl != null)
+                _modbusUitl.WriteMultipleRegisters
+                (GetPlcAddressInfo("CMM_Busy").Rows[0]["Address"].ToString().StrToInt(),
+                    new int[] { GetPlcAddressInfo("CMM_Busy").Rows[0]["Count"].ToString().StrToInt() }
+                );
+        }
+
+        private void SetConnectPlc()
+        {
+            if (GetPlcAddressInfo("CMM_Auto").Rows.Count == 0)
+                return;
+
+            if (_modbusUitl != null)
+                _modbusUitl.WriteMultipleRegisters
+                (GetPlcAddressInfo("CMM_Auto").Rows[0]["Address"].ToString().StrToInt(),
+                    new int[] { GetPlcAddressInfo("CMM_Auto").Rows[0]["Count"].ToString().StrToInt() }
+                );
+        }
+
+        private void SetType()
+        {
+            if (GetPlcAddressInfo("CMM_AckParType").Rows.Count == 0)
+                return;
+
+            if (_modbusUitl != null)
+                _modbusUitl.WriteMultipleRegisters
+                (GetPlcAddressInfo("CMM_AckParType").Rows[0]["Address"].ToString().StrToInt(),
+                    new int[] { GetPlcAddressInfo("CMM_AckParType").Rows[0]["Count"].ToString().StrToInt() }
+                );
+        }
+
+        private void SetId()
+        {
+            if (GetPlcAddressInfo("CMM_AckPartID").Rows.Count == 0)
+                return;
+
+            if (_modbusUitl != null)
+                _modbusUitl.WriteMultipleRegisters
+                (GetPlcAddressInfo("CMM_AckPartID").Rows[0]["Address"].ToString().StrToInt(),
+                    new int[] { GetPlcAddressInfo("CMM_AckPartID").Rows[0]["Count"].ToString().StrToInt() }
+                );
+        }
+
+        private void SetSafetyPos()
+        {
+            if (GetPlcAddressInfo("CMM_SafetyPos").Rows.Count == 0)
+                return;
+
+            if (_modbusUitl != null)
+                _modbusUitl.WriteMultipleRegisters
+                (GetPlcAddressInfo("CMM_SafetyPos").Rows[0]["Address"].ToString().StrToInt(),
+                    new int[] { GetPlcAddressInfo("CMM_SafetyPos").Rows[0]["Count"].ToString().StrToInt() }
+                );
+        }
+
+        #endregion
 
         private DataTable GetPlcAddressInfo(string name)
         {

@@ -72,6 +72,7 @@ namespace CMMAuto
             this.panelState = new System.Windows.Forms.Panel();
             this.panelAgvState = new System.Windows.Forms.Panel();
             this.grpAgvConnection = new System.Windows.Forms.GroupBox();
+            this.chkIsConnPLC = new System.Windows.Forms.CheckBox();
             this.label11 = new System.Windows.Forms.Label();
             this.txtPlcConnect = new System.Windows.Forms.TextBox();
             this.txtSlaveId = new System.Windows.Forms.TextBox();
@@ -97,7 +98,12 @@ namespace CMMAuto
             this.trvTestPrgChoose = new System.Windows.Forms.TreeView();
             this.grpTestPrgChoose = new System.Windows.Forms.GroupBox();
             this.panelLeft = new System.Windows.Forms.Panel();
-            this.chkIsConnPLC = new System.Windows.Forms.CheckBox();
+            this.txtType = new System.Windows.Forms.TextBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.txtWorkPiece = new System.Windows.Forms.TextBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.txtTypeKey = new System.Windows.Forms.TextBox();
             this.panelMiddle.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panelCmmlog.SuspendLayout();
@@ -154,9 +160,9 @@ namespace CMMAuto
             // 
             this.grpCmmlog.Controls.Add(this.drvCmmLog);
             this.grpCmmlog.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.grpCmmlog.Location = new System.Drawing.Point(0, 162);
+            this.grpCmmlog.Location = new System.Drawing.Point(0, 240);
             this.grpCmmlog.Name = "grpCmmlog";
-            this.grpCmmlog.Size = new System.Drawing.Size(687, 367);
+            this.grpCmmlog.Size = new System.Drawing.Size(687, 289);
             this.grpCmmlog.TabIndex = 2;
             this.grpCmmlog.TabStop = false;
             this.grpCmmlog.Text = "测量记录";
@@ -204,11 +210,13 @@ namespace CMMAuto
             dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             this.drvCmmLog.RowsDefaultCellStyle = dataGridViewCellStyle5;
             this.drvCmmLog.RowTemplate.Height = 23;
-            this.drvCmmLog.Size = new System.Drawing.Size(681, 345);
+            this.drvCmmLog.Size = new System.Drawing.Size(681, 267);
             this.drvCmmLog.TabIndex = 0;
             // 
             // grpCmmInfo
             // 
+            this.grpCmmInfo.Controls.Add(this.label14);
+            this.grpCmmInfo.Controls.Add(this.txtTypeKey);
             this.grpCmmInfo.Controls.Add(this.btnCmmTestLogQuery);
             this.grpCmmInfo.Controls.Add(this.btnClearInfo);
             this.grpCmmInfo.Controls.Add(this.btnInputTestPrg);
@@ -221,7 +229,7 @@ namespace CMMAuto
             this.grpCmmInfo.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.grpCmmInfo.Name = "grpCmmInfo";
             this.grpCmmInfo.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.grpCmmInfo.Size = new System.Drawing.Size(687, 162);
+            this.grpCmmInfo.Size = new System.Drawing.Size(687, 240);
             this.grpCmmInfo.TabIndex = 0;
             this.grpCmmInfo.TabStop = false;
             this.grpCmmInfo.Text = "程式信息";
@@ -235,7 +243,7 @@ namespace CMMAuto
             this.btnCmmTestLogQuery.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCmmTestLogQuery.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.btnCmmTestLogQuery.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnCmmTestLogQuery.Location = new System.Drawing.Point(454, 107);
+            this.btnCmmTestLogQuery.Location = new System.Drawing.Point(454, 173);
             this.btnCmmTestLogQuery.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnCmmTestLogQuery.Name = "btnCmmTestLogQuery";
             this.btnCmmTestLogQuery.Size = new System.Drawing.Size(96, 42);
@@ -253,7 +261,7 @@ namespace CMMAuto
             this.btnClearInfo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClearInfo.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.btnClearInfo.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnClearInfo.Location = new System.Drawing.Point(301, 107);
+            this.btnClearInfo.Location = new System.Drawing.Point(301, 173);
             this.btnClearInfo.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnClearInfo.Name = "btnClearInfo";
             this.btnClearInfo.Size = new System.Drawing.Size(96, 42);
@@ -271,7 +279,7 @@ namespace CMMAuto
             this.btnInputTestPrg.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnInputTestPrg.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.btnInputTestPrg.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnInputTestPrg.Location = new System.Drawing.Point(148, 107);
+            this.btnInputTestPrg.Location = new System.Drawing.Point(148, 173);
             this.btnInputTestPrg.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnInputTestPrg.Name = "btnInputTestPrg";
             this.btnInputTestPrg.Size = new System.Drawing.Size(96, 42);
@@ -284,7 +292,7 @@ namespace CMMAuto
             // 
             this.label9.AutoSize = true;
             this.label9.ForeColor = System.Drawing.Color.Gray;
-            this.label9.Location = new System.Drawing.Point(14, 30);
+            this.label9.Location = new System.Drawing.Point(14, 81);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(68, 17);
             this.label9.TabIndex = 5;
@@ -292,7 +300,7 @@ namespace CMMAuto
             // 
             // txtMeasureName
             // 
-            this.txtMeasureName.Location = new System.Drawing.Point(112, 27);
+            this.txtMeasureName.Location = new System.Drawing.Point(112, 78);
             this.txtMeasureName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtMeasureName.Name = "txtMeasureName";
             this.txtMeasureName.Size = new System.Drawing.Size(492, 23);
@@ -302,7 +310,7 @@ namespace CMMAuto
             // 
             this.label1.AutoSize = true;
             this.label1.ForeColor = System.Drawing.Color.Gray;
-            this.label1.Location = new System.Drawing.Point(14, 70);
+            this.label1.Location = new System.Drawing.Point(14, 121);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(68, 17);
             this.label1.TabIndex = 3;
@@ -310,7 +318,7 @@ namespace CMMAuto
             // 
             // txtMeasureProgram
             // 
-            this.txtMeasureProgram.Location = new System.Drawing.Point(112, 67);
+            this.txtMeasureProgram.Location = new System.Drawing.Point(112, 118);
             this.txtMeasureProgram.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtMeasureProgram.Name = "txtMeasureProgram";
             this.txtMeasureProgram.Size = new System.Drawing.Size(492, 23);
@@ -365,17 +373,17 @@ namespace CMMAuto
             this.panelOperate.Controls.Add(this.panelAgvOperate);
             this.panelOperate.Controls.Add(this.grpCmmOperate);
             this.panelOperate.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelOperate.Location = new System.Drawing.Point(3, 349);
+            this.panelOperate.Location = new System.Drawing.Point(3, 442);
             this.panelOperate.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.panelOperate.Name = "panelOperate";
-            this.panelOperate.Size = new System.Drawing.Size(344, 473);
+            this.panelOperate.Size = new System.Drawing.Size(344, 380);
             this.panelOperate.TabIndex = 5;
             // 
             // panelAgvOperate
             // 
             this.panelAgvOperate.Controls.Add(this.grpAgvOperate);
             this.panelAgvOperate.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelAgvOperate.Location = new System.Drawing.Point(0, 180);
+            this.panelAgvOperate.Location = new System.Drawing.Point(0, 87);
             this.panelAgvOperate.Name = "panelAgvOperate";
             this.panelAgvOperate.Size = new System.Drawing.Size(344, 293);
             this.panelAgvOperate.TabIndex = 5;
@@ -550,7 +558,7 @@ namespace CMMAuto
             this.grpCmmOperate.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.grpCmmOperate.Name = "grpCmmOperate";
             this.grpCmmOperate.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.grpCmmOperate.Size = new System.Drawing.Size(344, 180);
+            this.grpCmmOperate.Size = new System.Drawing.Size(344, 87);
             this.grpCmmOperate.TabIndex = 1;
             this.grpCmmOperate.TabStop = false;
             this.grpCmmOperate.Text = "CMM操作";
@@ -563,7 +571,7 @@ namespace CMMAuto
             this.btnEnd.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
             this.btnEnd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnEnd.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnEnd.Location = new System.Drawing.Point(52, 74);
+            this.btnEnd.Location = new System.Drawing.Point(52, 28);
             this.btnEnd.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnEnd.Name = "btnEnd";
             this.btnEnd.Size = new System.Drawing.Size(96, 42);
@@ -580,7 +588,7 @@ namespace CMMAuto
             this.btnManual.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
             this.btnManual.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnManual.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnManual.Location = new System.Drawing.Point(194, 74);
+            this.btnManual.Location = new System.Drawing.Point(194, 28);
             this.btnManual.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnManual.Name = "btnManual";
             this.btnManual.Size = new System.Drawing.Size(96, 42);
@@ -596,16 +604,16 @@ namespace CMMAuto
             this.panelState.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelState.Location = new System.Drawing.Point(3, 19);
             this.panelState.Name = "panelState";
-            this.panelState.Size = new System.Drawing.Size(344, 330);
+            this.panelState.Size = new System.Drawing.Size(344, 423);
             this.panelState.TabIndex = 6;
             // 
             // panelAgvState
             // 
             this.panelAgvState.Controls.Add(this.grpAgvConnection);
             this.panelAgvState.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelAgvState.Location = new System.Drawing.Point(0, 143);
+            this.panelAgvState.Location = new System.Drawing.Point(0, 221);
             this.panelAgvState.Name = "panelAgvState";
-            this.panelAgvState.Size = new System.Drawing.Size(344, 187);
+            this.panelAgvState.Size = new System.Drawing.Size(344, 202);
             this.panelAgvState.TabIndex = 4;
             // 
             // grpAgvConnection
@@ -625,10 +633,24 @@ namespace CMMAuto
             this.grpAgvConnection.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.grpAgvConnection.Name = "grpAgvConnection";
             this.grpAgvConnection.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.grpAgvConnection.Size = new System.Drawing.Size(344, 187);
+            this.grpAgvConnection.Size = new System.Drawing.Size(344, 202);
             this.grpAgvConnection.TabIndex = 3;
             this.grpAgvConnection.TabStop = false;
             this.grpAgvConnection.Text = "PLC通讯";
+            // 
+            // chkIsConnPLC
+            // 
+            this.chkIsConnPLC.AutoSize = true;
+            this.chkIsConnPLC.Checked = true;
+            this.chkIsConnPLC.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkIsConnPLC.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.chkIsConnPLC.ForeColor = System.Drawing.Color.DarkBlue;
+            this.chkIsConnPLC.Location = new System.Drawing.Point(172, 75);
+            this.chkIsConnPLC.Name = "chkIsConnPLC";
+            this.chkIsConnPLC.Size = new System.Drawing.Size(49, 21);
+            this.chkIsConnPLC.TabIndex = 17;
+            this.chkIsConnPLC.Text = "联机";
+            this.chkIsConnPLC.UseVisualStyleBackColor = true;
             // 
             // label11
             // 
@@ -717,7 +739,7 @@ namespace CMMAuto
             this.lblCommInfo.AutoSize = true;
             this.lblCommInfo.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.lblCommInfo.ForeColor = System.Drawing.Color.Red;
-            this.lblCommInfo.Location = new System.Drawing.Point(32, 151);
+            this.lblCommInfo.Location = new System.Drawing.Point(32, 160);
             this.lblCommInfo.Name = "lblCommInfo";
             this.lblCommInfo.Size = new System.Drawing.Size(229, 16);
             this.lblCommInfo.TabIndex = 8;
@@ -726,6 +748,10 @@ namespace CMMAuto
             // 
             // grpCmmState
             // 
+            this.grpCmmState.Controls.Add(this.txtWorkPiece);
+            this.grpCmmState.Controls.Add(this.label13);
+            this.grpCmmState.Controls.Add(this.txtType);
+            this.grpCmmState.Controls.Add(this.label12);
             this.grpCmmState.Controls.Add(this.label10);
             this.grpCmmState.Controls.Add(this.txtPreOrEnd);
             this.grpCmmState.Controls.Add(this.label5);
@@ -741,7 +767,7 @@ namespace CMMAuto
             this.grpCmmState.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.grpCmmState.Name = "grpCmmState";
             this.grpCmmState.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.grpCmmState.Size = new System.Drawing.Size(344, 143);
+            this.grpCmmState.Size = new System.Drawing.Size(344, 221);
             this.grpCmmState.TabIndex = 0;
             this.grpCmmState.TabStop = false;
             this.grpCmmState.Text = "CMM软件状态";
@@ -888,19 +914,64 @@ namespace CMMAuto
             this.panelLeft.Size = new System.Drawing.Size(350, 825);
             this.panelLeft.TabIndex = 5;
             // 
-            // chkIsConnPLC
+            // txtType
             // 
-            this.chkIsConnPLC.AutoSize = true;
-            this.chkIsConnPLC.Checked = true;
-            this.chkIsConnPLC.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkIsConnPLC.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.chkIsConnPLC.ForeColor = System.Drawing.Color.DarkBlue;
-            this.chkIsConnPLC.Location = new System.Drawing.Point(172, 75);
-            this.chkIsConnPLC.Name = "chkIsConnPLC";
-            this.chkIsConnPLC.Size = new System.Drawing.Size(49, 21);
-            this.chkIsConnPLC.TabIndex = 17;
-            this.chkIsConnPLC.Text = "联机";
-            this.chkIsConnPLC.UseVisualStyleBackColor = true;
+            this.txtType.Enabled = false;
+            this.txtType.Location = new System.Drawing.Point(105, 136);
+            this.txtType.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtType.Name = "txtType";
+            this.txtType.Size = new System.Drawing.Size(116, 23);
+            this.txtType.TabIndex = 14;
+            this.txtType.Text = "ABCD";
+            this.txtType.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.ForeColor = System.Drawing.Color.Gray;
+            this.label12.Location = new System.Drawing.Point(32, 139);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(56, 17);
+            this.label12.TabIndex = 13;
+            this.label12.Text = "类型码：";
+            // 
+            // txtWorkPiece
+            // 
+            this.txtWorkPiece.Location = new System.Drawing.Point(105, 177);
+            this.txtWorkPiece.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtWorkPiece.Name = "txtWorkPiece";
+            this.txtWorkPiece.Size = new System.Drawing.Size(116, 23);
+            this.txtWorkPiece.TabIndex = 16;
+            this.txtWorkPiece.Text = "ABCD00001";
+            this.txtWorkPiece.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.ForeColor = System.Drawing.Color.Gray;
+            this.label13.Location = new System.Drawing.Point(32, 180);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(56, 17);
+            this.label13.TabIndex = 15;
+            this.label13.Text = "工件码：";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.ForeColor = System.Drawing.Color.Gray;
+            this.label14.Location = new System.Drawing.Point(14, 37);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(56, 17);
+            this.label14.TabIndex = 10;
+            this.label14.Text = "类型码：";
+            // 
+            // txtTypeKey
+            // 
+            this.txtTypeKey.Location = new System.Drawing.Point(112, 34);
+            this.txtTypeKey.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtTypeKey.Name = "txtTypeKey";
+            this.txtTypeKey.Size = new System.Drawing.Size(492, 23);
+            this.txtTypeKey.TabIndex = 9;
             // 
             // MainForm
             // 
@@ -1009,6 +1080,12 @@ namespace CMMAuto
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.TextBox txtPlcConnect;
         private System.Windows.Forms.CheckBox chkIsConnPLC;
+        private System.Windows.Forms.TextBox txtWorkPiece;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.TextBox txtType;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.TextBox txtTypeKey;
     }
 }
 
