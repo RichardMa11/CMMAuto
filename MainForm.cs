@@ -29,17 +29,22 @@ namespace CMMAuto
     {
         private readonly CMMVisionHelp _cmmVisionHelp = new CMMVisionHelp();
         private readonly KeyboardSimulatorHelp _simulator = new KeyboardSimulatorHelp();
-        private readonly object _lock = new object();
 
         private static string _fullFileName = "";
-        private static bool _isSingle = false;
+        private static bool _isStart = false;
         private static bool _isCycle = false;
         private static bool _isTheSame = false;
+        private static bool _isStop = false;
 
         private static readonly ILog Log = LogManager.GetLogger(typeof(MainForm));
         private SQLiteHelper _sqLiteHelpers = null;
         private FrmConfig _frmConfig;
         private ModbusUitl _modbusUitl;
+
+        private delegate void GetCmmStateDelegate();
+        private delegate void MeasurePrgDelegate();
+        private delegate void LogTxtDelegate();
+        private delegate void MeasureDelegate();
 
         public MainForm()
         {
@@ -107,11 +112,30 @@ namespace CMMAuto
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            LoadLogTxt();
+            //LoadLogTxt();
             LoadTreeView();
-            LoadMeasureData();
+            //LoadMeasureData();
             LoadPlcTxt();
-            PoolPlc();
+
+            PoolUi();
+            PoolMeasure();
+            //PoolGetPlc();
+            //PoolSetPlc();
+        }
+
+        private void LoadTreeView()
+        {
+            trvTestPrgChoose.Nodes.Clear();
+            string sql = "SELECT PrgName FROM MeaSurePrgCfg";
+            DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, null);
+            if (dataSet != null)
+            {
+                foreach (DataRow row in dataSet.Tables[0].Rows)
+                {
+                    TreeNode node = new TreeNode(row["PrgName"].ToString()); // 使用ToString方法获取显示文本
+                    trvTestPrgChoose.Nodes.Add(node); // 添加到TreeView中
+                }
+            }
         }
 
         private void LoadPlcTxt()
@@ -161,8 +185,35 @@ namespace CMMAuto
             }
         }
 
+        private void PoolUi()
+        {
+            var pollingService = new PollingService(
+                pollingInterval: TimeSpan.FromSeconds(1),
+                checkAction: async () =>
+                {
+                    await Task.Run(LoadLogTxt);
+                    await Task.Run(LoadMeasureData);
+
+                    return true; // 始终继续轮询
+                }
+            );
+
+            // 订阅错误事件
+            pollingService.OnError += ex =>
+                Log.Error($"PoolUi error: {ex.Message}");
+
+            // 启动轮询
+            pollingService.Start();
+        }
+
         private void LoadLogTxt()
         {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new LogTxtDelegate(LoadLogTxt));
+                return;
+            }
+            // 具体操作代码
             this.txtLog.ScrollBars = ScrollBars.Vertical;
             this.txtLog.Text = SyncLog();
             this.txtLog.Select(this.txtLog.TextLength, 0);
@@ -201,23 +252,14 @@ namespace CMMAuto
             //return System.Text.Encoding.Default.GetString(buffer);
         }
 
-        private void LoadTreeView()
-        {
-            trvTestPrgChoose.Nodes.Clear();
-            string sql = "SELECT PrgName FROM MeaSurePrgCfg";
-            DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, null);
-            if (dataSet != null)
-            {
-                foreach (DataRow row in dataSet.Tables[0].Rows)
-                {
-                    TreeNode node = new TreeNode(row["PrgName"].ToString()); // 使用ToString方法获取显示文本
-                    trvTestPrgChoose.Nodes.Add(node); // 添加到TreeView中
-                }
-            }
-        }
-
         private void LoadMeasureData()
         {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new MeasureDelegate(LoadMeasureData));
+                return;
+            }
+            //Log.Info("UI " + DateTime.Now.ToString("O")); // 执行你的任务
             drvCmmLog.DataSource = null;
             //string sql = $@"SELECT PrgName,PrgPath,CMMState,CMMResult,CMMTime,Remark FROM MeaSureData WHERE strftime('%Y-%m-%d %H:%M:%S', CMMTime)  >= '{DateTime.Now.AddMinutes(-10).ToString("yyyy-MM-dd HH:mm:ss")}' order by CMMTime desc ";
             //string sql = $@"SELECT PrgName,PrgPath,CMMState,CMMResult,CMMTime,Remark FROM MeaSureData ";
@@ -230,19 +272,32 @@ namespace CMMAuto
             }
         }
 
-        private void timerlog_Tick(object sender, EventArgs e)
+        private void PoolMeasure()
         {
-            this.BeginInvoke(new Action(LoadLogTxt));
-            lock (_lock)
-            {
-                this.BeginInvoke(new Action(GetCmmState));
-                this.BeginInvoke(new Action(LoadMeasureData));
-                this.BeginInvoke(new Action(MeasurePrg));
-            }
+            var pollingService = new PollingService(
+                pollingInterval: TimeSpan.FromSeconds(1),
+                checkAction: async () =>
+                {
+                    await Task.Run(GetCmmState);
+                    await Task.Run(MeasurePrg);
+                    //lock (_lock)
+                    //{
+                    //    this.BeginInvoke(new Action(GetCmmState));
+                    //    this.BeginInvoke(new Action(MeasurePrg));
+                    //}
+
+                    return true; // 始终继续轮询
+                }
+            );
+
+            // 订阅错误事件
+            pollingService.OnError += ex =>
+                Log.Error($"PoolMeasure error: {ex.Message}");
+
+            // 启动轮询
+            pollingService.Start();
         }
 
-
-        private delegate void GetCmmStateDelegate();
         private void GetCmmState()
         {
             if (this.InvokeRequired)
@@ -325,8 +380,6 @@ namespace CMMAuto
             }
         }
 
-
-        private delegate void MeasurePrgDelegate();
         private void MeasurePrg()
         {
             if (this.InvokeRequired)
@@ -340,8 +393,10 @@ namespace CMMAuto
                 OpenTestRun();
             else
             {
-                if (_isSingle && chkIsConnPLC.Checked)
-                    OpenTestRun();
+                if (!_isStart || !chkIsConnPLC.Checked) return;
+                SetId();
+                SetType();
+                OpenTestRun();
             }
         }
 
@@ -390,24 +445,24 @@ namespace CMMAuto
                                 _isTheSame = true;
                             }
                             else
-                            { Log.Error("测量程式运行失败。"); }
+                            { Log.Error("测量程式运行失败。"); SetError(); }
 
                             //if (!IsCycle)
                             //    IsSingle = false;
                         }
                         else
-                        { Log.Error("打开测量程式失败。"); }
+                        { Log.Error("打开测量程式失败。"); SetError(); }
                     }
                     else
                     {
                         //RecordMeasure("开始", 0);
-                        Log.Error("获取【打开测量程式】位置失败。");
+                        Log.Error("获取【打开测量程式】位置失败。"); SetError();
                     }
                 }
                 else
                 {
                     //RecordMeasure("开始", 0);
-                    Log.Error("获取【文件】位置失败。");
+                    Log.Error("获取【文件】位置失败。"); SetError();
                 }
             }
             else
@@ -416,6 +471,7 @@ namespace CMMAuto
                 if (txtRun.BackColor == System.Drawing.Color.LimeGreen || txtPause.BackColor == System.Drawing.Color.LimeGreen)
                 {
                     Log.Error("运行中不能打开程式。");
+                    SetError();
                 }
                 else
                 {
@@ -455,16 +511,16 @@ namespace CMMAuto
                                             _isTheSame = false;
 
                                             if (!_isCycle)
-                                                _isSingle = false;
+                                                _isStart = false;
                                         }
                                         else
-                                        { Log.Error("程式退出失败。"); }
+                                        { Log.Error("程式退出失败。"); SetError(); }
                                     }
                                     else
-                                    { Log.Error("退出获取【退出】位置失败。"); }
+                                    { Log.Error("退出获取【退出】位置失败。"); SetError(); }
                                 }
                                 else
-                                { Log.Error("退出获取【文件】位置失败。"); }
+                                { Log.Error("退出获取【文件】位置失败。"); SetError(); }
                             }
                             else
                             {
@@ -481,16 +537,76 @@ namespace CMMAuto
                                     _isTheSame = true;
                                 }
                                 else
-                                { Log.Error("测量程式运行失败。"); }
+                                { Log.Error("测量程式运行失败。"); SetError(); }
                             }
                         }
                     }
                     else
                     {
-                        Log.Error("程序没有打开或者其他问题。");
+                        Log.Error("程序没有打开或者其他问题。"); SetError();
                     }
                 }
             }
+        }
+
+        private void PoolGetPlc()
+        {
+            var pollingService = new PollingService(
+                pollingInterval: TimeSpan.FromSeconds(3),
+                checkAction: async () =>
+                {
+                    //bool isConnected = await CheckNetworkConnection();
+                    await Task.Run(GetPlcHeart);
+                    _isStop = await Task.Run(GetStop);
+                    await Task.Run(GetProductType);
+                    await Task.Run(GetProductId);
+                    _isStart = await Task.Run(GetStart);
+                    if (_isStart)
+                        _isTheSame = false;
+
+                    return true; // 始终继续轮询
+                }
+            );
+
+            // 订阅错误事件
+            pollingService.OnError += ex =>
+                Log.Error($"PoolGetPlc error: {ex.Message}");
+
+            // 启动轮询
+            pollingService.Start();
+
+            // 停止轮询（如点击停止按钮时调用）
+            // pollingService.Stop();
+        }
+
+        private void PoolSetPlc()
+        {
+            var pollingService = new PollingService(
+                pollingInterval: TimeSpan.FromSeconds(3),
+                checkAction: async () =>
+                {
+                    await Task.Run(SetConnectPlc);
+                    if (_isStart)
+                        await Task.Run(SetBusy);
+                    else
+                        await Task.Run(SetReady);
+
+                    if (chkIsConnPLC.Checked)
+                        await Task.Run(SetAuto);
+
+                    return true; // 始终继续轮询
+                }
+            );
+
+            // 订阅错误事件
+            pollingService.OnError += ex =>
+                Log.Error($"PoolSetPlc error: {ex.Message}");
+
+            // 启动轮询
+            pollingService.Start();
+
+            // 停止轮询（如点击停止按钮时调用）
+            // pollingService.Stop();
         }
 
         private async void btnOpenFile_Click(object sender, EventArgs e)
@@ -617,7 +733,7 @@ namespace CMMAuto
 
         private void btnEnd_Click(object sender, EventArgs e)
         {
-            _isSingle = false;
+            _isStart = false;
         }
 
         private void btnConnect_Click(object sender, EventArgs e)
@@ -634,7 +750,7 @@ namespace CMMAuto
             }
 
             _isCycle = false;
-            _isSingle = true;
+            _isStart = true;
             this.WindowState = FormWindowState.Minimized;
         }
 
@@ -952,7 +1068,7 @@ namespace CMMAuto
                     OpenTestRun();
                 else
                 {
-                    if (_isSingle)
+                    if (_isStart)
                         OpenTestRun();
                 }
 
@@ -1224,35 +1340,6 @@ namespace CMMAuto
             MessageBoxX.Show($"保存PLCIp成功", "提示");
         }
 
-        private void PoolPlc()
-        {
-            var pollingService = new PollingService(
-                pollingInterval: TimeSpan.FromSeconds(3),
-                checkAction: async () =>
-                {
-                    //bool isConnected = await CheckNetworkConnection();
-                    await Task.Run(GetPlcHeart);
-                    await Task.Run(GetProductType);
-                    await Task.Run(GetProductId);
-                    _isSingle = GetStart();
-                    if (GetStart())
-                        _isTheSame = false;
-
-                    return true; // 始终继续轮询
-                }
-            );
-
-            // 订阅错误事件
-            pollingService.OnError += ex =>
-                Log.Error($"Polling error: {ex.Message}");
-
-            // 启动轮询
-            pollingService.Start();
-
-            // 停止轮询（如点击停止按钮时调用）
-            // pollingService.Stop();
-        }
-
         #region 与PLC交互
 
         #region GET
@@ -1292,25 +1379,28 @@ namespace CMMAuto
 
             if (_modbusUitl == null) return;
 
-            var type = _modbusUitl.ReadHoldingRegisters
+            var type = _modbusUitl.ReadHoldingRegistersConverString
             (GetPlcAddressInfo("Load_PartType").Rows[0]["Address"].ToString().StrToInt(),
-                GetPlcAddressInfo("Load_PartType").Rows[0]["Count"].ToString().StrToInt());
+                GetPlcAddressInfo("Load_PartType").Rows[0]["Count"].ToString().StrToInt(), 10);
 
             SQLiteParameter[] parameter = new SQLiteParameter[] { new SQLiteParameter("Type", type) };
             string sql = "SELECT PrgName,PrgPath,Type FROM MeaSurePrgCfg WHERE Type = @Type";
             DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
-            txtTypeKey.Text = type;
-            txtType.Text = type;
             if (dataSet.Tables[0].Rows.Count == 0)
             {
-                Log.Error("类型码程式没有维护，无法启动！！！");
+                Log.Error($"类型码:{type}的程式没有维护，无法启动！！！");
             }
             else
             {
-                txtMeasureName.Text = dataSet.Tables[0].Rows[0]["PrgName"].ToString();
-                txtMeasureProgram.Text = dataSet.Tables[0].Rows[0]["PrgPath"].ToString();
+                this.BeginInvoke(new Action(() =>
+                {
+                    txtTypeKey.Text = type;
+                    txtType.Text = type;
+                    txtMeasureName.Text = dataSet.Tables[0].Rows[0]["PrgName"].ToString();
+                    txtMeasureProgram.Text = dataSet.Tables[0].Rows[0]["PrgPath"].ToString();
+                }));
 
-                if (!_isSingle)
+                if (!_isStart)
                     SetReady();
                 else
                     Log.Error("运行中！！！");
@@ -1324,9 +1414,12 @@ namespace CMMAuto
 
             if (_modbusUitl == null) return;
 
-            txtWorkPiece.Text = _modbusUitl.ReadHoldingRegisters
-            (GetPlcAddressInfo("Load_PartID").Rows[0]["Address"].ToString().StrToInt(),
-                GetPlcAddressInfo("Load_PartID").Rows[0]["Count"].ToString().StrToInt());
+            this.BeginInvoke(new Action(() =>
+            {
+                txtWorkPiece.Text = _modbusUitl.ReadHoldingRegistersConverString
+                (GetPlcAddressInfo("Load_PartID").Rows[0]["Address"].ToString().StrToInt(),
+                    GetPlcAddressInfo("Load_PartID").Rows[0]["Count"].ToString().StrToInt(), 10);
+            }));
         }
 
         private bool GetStop()
@@ -1354,7 +1447,7 @@ namespace CMMAuto
             if (_modbusUitl != null)
                 _modbusUitl.WriteMultipleRegisters
                 (GetPlcAddressInfo("CMM_MeasureCompleted").Rows[0]["Address"].ToString().StrToInt(),
-                    new int[] { GetPlcAddressInfo("CMM_MeasureCompleted").Rows[0]["Count"].ToString().StrToInt() }
+                    new int[] { 1 }
                     );
         }
 
@@ -1366,7 +1459,7 @@ namespace CMMAuto
             if (_modbusUitl != null)
                 _modbusUitl.WriteMultipleRegisters
                 (GetPlcAddressInfo("CMM_Ready").Rows[0]["Address"].ToString().StrToInt(),
-                    new int[] { GetPlcAddressInfo("CMM_Ready").Rows[0]["Count"].ToString().StrToInt() }
+                    new int[] { 1 }
                 );
         }
 
@@ -1378,7 +1471,7 @@ namespace CMMAuto
             if (_modbusUitl != null)
                 _modbusUitl.WriteMultipleRegisters
                 (GetPlcAddressInfo("CMM_Alarm").Rows[0]["Address"].ToString().StrToInt(),
-                    new int[] { GetPlcAddressInfo("CMM_Alarm").Rows[0]["Count"].ToString().StrToInt() }
+                    new int[] { 1 }
                 );
         }
 
@@ -1390,7 +1483,7 @@ namespace CMMAuto
             if (_modbusUitl != null)
                 _modbusUitl.WriteMultipleRegisters
                 (GetPlcAddressInfo("CMM_Busy").Rows[0]["Address"].ToString().StrToInt(),
-                    new int[] { GetPlcAddressInfo("CMM_Busy").Rows[0]["Count"].ToString().StrToInt() }
+                    new int[] { 1 }
                 );
         }
 
@@ -1402,7 +1495,7 @@ namespace CMMAuto
             if (_modbusUitl != null)
                 _modbusUitl.WriteMultipleRegisters
                 (GetPlcAddressInfo("CMM_Auto").Rows[0]["Address"].ToString().StrToInt(),
-                    new int[] { GetPlcAddressInfo("CMM_Auto").Rows[0]["Count"].ToString().StrToInt() }
+                    new int[] { 1 }
                 );
         }
 
@@ -1414,7 +1507,7 @@ namespace CMMAuto
             if (_modbusUitl != null)
                 _modbusUitl.WriteMultipleRegisters
                 (GetPlcAddressInfo("CMM_AckParType").Rows[0]["Address"].ToString().StrToInt(),
-                    new int[] { GetPlcAddressInfo("CMM_AckParType").Rows[0]["Count"].ToString().StrToInt() }
+                    ModbusClient.ConvertStringToRegisters(txtType.Text.Trim())
                 );
         }
 
@@ -1426,7 +1519,7 @@ namespace CMMAuto
             if (_modbusUitl != null)
                 _modbusUitl.WriteMultipleRegisters
                 (GetPlcAddressInfo("CMM_AckPartID").Rows[0]["Address"].ToString().StrToInt(),
-                    new int[] { GetPlcAddressInfo("CMM_AckPartID").Rows[0]["Count"].ToString().StrToInt() }
+                    ModbusClient.ConvertStringToRegisters(txtWorkPiece.Text.Trim())
                 );
         }
 
@@ -1438,7 +1531,19 @@ namespace CMMAuto
             if (_modbusUitl != null)
                 _modbusUitl.WriteMultipleRegisters
                 (GetPlcAddressInfo("CMM_SafetyPos").Rows[0]["Address"].ToString().StrToInt(),
-                    new int[] { GetPlcAddressInfo("CMM_SafetyPos").Rows[0]["Count"].ToString().StrToInt() }
+                    new int[] { 1 }
+                );
+        }
+
+        private void SetAuto()
+        {
+            if (GetPlcAddressInfo("CMM_Auto").Rows.Count == 0)
+                return;
+
+            if (_modbusUitl != null)
+                _modbusUitl.WriteMultipleRegisters
+                (GetPlcAddressInfo("CMM_Auto").Rows[0]["Address"].ToString().StrToInt(),
+                    new int[] { 1 }
                 );
         }
 

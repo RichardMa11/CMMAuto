@@ -31,7 +31,6 @@ namespace CMMAuto
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -44,6 +43,8 @@ namespace CMMAuto
             this.grpCmmlog = new System.Windows.Forms.GroupBox();
             this.drvCmmLog = new System.Windows.Forms.DataGridView();
             this.grpCmmInfo = new System.Windows.Forms.GroupBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.txtTypeKey = new System.Windows.Forms.TextBox();
             this.btnCmmTestLogQuery = new System.Windows.Forms.Button();
             this.btnClearInfo = new System.Windows.Forms.Button();
             this.btnInputTestPrg = new System.Windows.Forms.Button();
@@ -83,6 +84,10 @@ namespace CMMAuto
             this.label6 = new System.Windows.Forms.Label();
             this.lblCommInfo = new System.Windows.Forms.Label();
             this.grpCmmState = new System.Windows.Forms.GroupBox();
+            this.txtWorkPiece = new System.Windows.Forms.TextBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.txtType = new System.Windows.Forms.TextBox();
+            this.label12 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.txtPreOrEnd = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
@@ -94,16 +99,9 @@ namespace CMMAuto
             this.label2 = new System.Windows.Forms.Label();
             this.txtOther = new System.Windows.Forms.TextBox();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.timerlog = new System.Windows.Forms.Timer(this.components);
             this.trvTestPrgChoose = new System.Windows.Forms.TreeView();
             this.grpTestPrgChoose = new System.Windows.Forms.GroupBox();
             this.panelLeft = new System.Windows.Forms.Panel();
-            this.txtType = new System.Windows.Forms.TextBox();
-            this.label12 = new System.Windows.Forms.Label();
-            this.txtWorkPiece = new System.Windows.Forms.TextBox();
-            this.label13 = new System.Windows.Forms.Label();
-            this.label14 = new System.Windows.Forms.Label();
-            this.txtTypeKey = new System.Windows.Forms.TextBox();
             this.panelMiddle.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panelCmmlog.SuspendLayout();
@@ -233,6 +231,24 @@ namespace CMMAuto
             this.grpCmmInfo.TabIndex = 0;
             this.grpCmmInfo.TabStop = false;
             this.grpCmmInfo.Text = "程式信息";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.ForeColor = System.Drawing.Color.Gray;
+            this.label14.Location = new System.Drawing.Point(14, 37);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(56, 17);
+            this.label14.TabIndex = 10;
+            this.label14.Text = "类型码：";
+            // 
+            // txtTypeKey
+            // 
+            this.txtTypeKey.Location = new System.Drawing.Point(112, 34);
+            this.txtTypeKey.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtTypeKey.Name = "txtTypeKey";
+            this.txtTypeKey.Size = new System.Drawing.Size(492, 23);
+            this.txtTypeKey.TabIndex = 9;
             // 
             // btnCmmTestLogQuery
             // 
@@ -772,6 +788,47 @@ namespace CMMAuto
             this.grpCmmState.TabStop = false;
             this.grpCmmState.Text = "CMM软件状态";
             // 
+            // txtWorkPiece
+            // 
+            this.txtWorkPiece.Location = new System.Drawing.Point(105, 177);
+            this.txtWorkPiece.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtWorkPiece.Name = "txtWorkPiece";
+            this.txtWorkPiece.Size = new System.Drawing.Size(116, 23);
+            this.txtWorkPiece.TabIndex = 16;
+            this.txtWorkPiece.Text = "ABCD00001";
+            this.txtWorkPiece.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.ForeColor = System.Drawing.Color.Gray;
+            this.label13.Location = new System.Drawing.Point(32, 180);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(56, 17);
+            this.label13.TabIndex = 15;
+            this.label13.Text = "工件码：";
+            // 
+            // txtType
+            // 
+            this.txtType.Enabled = false;
+            this.txtType.Location = new System.Drawing.Point(105, 136);
+            this.txtType.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtType.Name = "txtType";
+            this.txtType.Size = new System.Drawing.Size(116, 23);
+            this.txtType.TabIndex = 14;
+            this.txtType.Text = "ABCD";
+            this.txtType.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.ForeColor = System.Drawing.Color.Gray;
+            this.label12.Location = new System.Drawing.Point(32, 139);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(56, 17);
+            this.label12.TabIndex = 13;
+            this.label12.Text = "类型码：";
+            // 
             // label10
             // 
             this.label10.AutoSize = true;
@@ -874,12 +931,6 @@ namespace CMMAuto
             // 
             this.openFileDialog.FileName = "openFileDialog";
             // 
-            // timerlog
-            // 
-            this.timerlog.Enabled = true;
-            this.timerlog.Interval = 1000;
-            this.timerlog.Tick += new System.EventHandler(this.timerlog_Tick);
-            // 
             // trvTestPrgChoose
             // 
             this.trvTestPrgChoose.BackColor = System.Drawing.Color.Azure;
@@ -913,65 +964,6 @@ namespace CMMAuto
             this.panelLeft.Name = "panelLeft";
             this.panelLeft.Size = new System.Drawing.Size(350, 825);
             this.panelLeft.TabIndex = 5;
-            // 
-            // txtType
-            // 
-            this.txtType.Enabled = false;
-            this.txtType.Location = new System.Drawing.Point(105, 136);
-            this.txtType.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.txtType.Name = "txtType";
-            this.txtType.Size = new System.Drawing.Size(116, 23);
-            this.txtType.TabIndex = 14;
-            this.txtType.Text = "ABCD";
-            this.txtType.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.ForeColor = System.Drawing.Color.Gray;
-            this.label12.Location = new System.Drawing.Point(32, 139);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(56, 17);
-            this.label12.TabIndex = 13;
-            this.label12.Text = "类型码：";
-            // 
-            // txtWorkPiece
-            // 
-            this.txtWorkPiece.Location = new System.Drawing.Point(105, 177);
-            this.txtWorkPiece.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.txtWorkPiece.Name = "txtWorkPiece";
-            this.txtWorkPiece.Size = new System.Drawing.Size(116, 23);
-            this.txtWorkPiece.TabIndex = 16;
-            this.txtWorkPiece.Text = "ABCD00001";
-            this.txtWorkPiece.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.ForeColor = System.Drawing.Color.Gray;
-            this.label13.Location = new System.Drawing.Point(32, 180);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(56, 17);
-            this.label13.TabIndex = 15;
-            this.label13.Text = "工件码：";
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.ForeColor = System.Drawing.Color.Gray;
-            this.label14.Location = new System.Drawing.Point(14, 37);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(56, 17);
-            this.label14.TabIndex = 10;
-            this.label14.Text = "类型码：";
-            // 
-            // txtTypeKey
-            // 
-            this.txtTypeKey.Location = new System.Drawing.Point(112, 34);
-            this.txtTypeKey.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.txtTypeKey.Name = "txtTypeKey";
-            this.txtTypeKey.Size = new System.Drawing.Size(492, 23);
-            this.txtTypeKey.TabIndex = 9;
             // 
             // MainForm
             // 
@@ -1026,7 +1018,6 @@ namespace CMMAuto
         private System.Windows.Forms.GroupBox grpCmmState;
         private System.Windows.Forms.TextBox txtLog;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
-        private System.Windows.Forms.Timer timerlog;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtMeasureProgram;
         private System.Windows.Forms.Label label5;
