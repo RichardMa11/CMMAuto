@@ -196,7 +196,26 @@ namespace CMMAuto
 
                 var result = MessageBoxX.Show($@"已保存 {_configList.Count} 项配置", "提示");
                 if (result == MessageBoxResult.OK)
+                {
+                    //DataSet dataSet = _sqLiteHelpers.ExecuteDataSet("SELECT * FROM PLCCfg", null);
+                    //if (dataSet != null)
+                    //{
+                    //    foreach (DataRow r in dataSet.Tables[0].Rows)
+                    //    {
+                    //        Global.PlcInfos = new List<PlcInfo>
+                    //        {
+                    //            new PlcInfo
+                    //            {
+                    //                PlcName = r["Name"].ToString(),
+                    //                Address = r["Address"].ToString().StrToInt(),
+                    //                Count = r["Count"].ToString().StrToInt()
+                    //            }
+                    //        };
+                    //    }
+                    //}
+
                     this.Close();
+                }
             }
             catch (Exception exception)
             {

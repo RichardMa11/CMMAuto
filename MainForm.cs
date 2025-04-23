@@ -119,8 +119,8 @@ namespace CMMAuto
 
             PoolUi();
             PoolMeasure();
-            //PoolGetPlc();
-            //PoolSetPlc();
+            PoolGetPlc();
+            PoolSetPlc();
         }
 
         private void LoadTreeView()
@@ -153,6 +153,19 @@ namespace CMMAuto
             if (dataSet.Tables[0].Rows.Count != 0)
                 txtPort.Text = dataSet.Tables[0].Rows[0]["Value"].ToString();
 
+            dataSet = _sqLiteHelpers.ExecuteDataSet("SELECT * FROM PLCCfg", null);
+            if (dataSet != null)
+            {
+                foreach (DataRow r in dataSet.Tables[0].Rows)
+                {
+                    Global.PlcInfos.Add(new PlcInfo
+                    {
+                        PlcName = r["Name"].ToString(),
+                        Address = r["Address"].ToString().StrToInt(),
+                        Count = r["Count"].ToString().StrToInt()
+                    });
+                }
+            }
             ConnPlc();
         }
 
@@ -445,24 +458,24 @@ namespace CMMAuto
                                 _isTheSame = true;
                             }
                             else
-                            { Log.Error("测量程式运行失败。"); SetError(); }
+                            { Log.Error("测量程式运行失败。"); SetError(1); }
 
                             //if (!IsCycle)
                             //    IsSingle = false;
                         }
                         else
-                        { Log.Error("打开测量程式失败。"); SetError(); }
+                        { Log.Error("打开测量程式失败。"); SetError(1); }
                     }
                     else
                     {
                         //RecordMeasure("开始", 0);
-                        Log.Error("获取【打开测量程式】位置失败。"); SetError();
+                        Log.Error("获取【打开测量程式】位置失败。"); SetError(1);
                     }
                 }
                 else
                 {
                     //RecordMeasure("开始", 0);
-                    Log.Error("获取【文件】位置失败。"); SetError();
+                    Log.Error("获取【文件】位置失败。"); SetError(1);
                 }
             }
             else
@@ -471,7 +484,7 @@ namespace CMMAuto
                 if (txtRun.BackColor == System.Drawing.Color.LimeGreen || txtPause.BackColor == System.Drawing.Color.LimeGreen)
                 {
                     Log.Error("运行中不能打开程式。");
-                    SetError();
+                    SetError(1);
                 }
                 else
                 {
@@ -507,20 +520,20 @@ namespace CMMAuto
                                             Log.Info($"退出成功。。。");
                                             //写入数据库
                                             RecordMeasure("结束", 1);
-                                            SetEnd();
+                                            SetEnd(1);
                                             _isTheSame = false;
 
                                             if (!_isCycle)
                                                 _isStart = false;
                                         }
                                         else
-                                        { Log.Error("程式退出失败。"); SetError(); }
+                                        { Log.Error("程式退出失败。"); SetError(1); }
                                     }
                                     else
-                                    { Log.Error("退出获取【退出】位置失败。"); SetError(); }
+                                    { Log.Error("退出获取【退出】位置失败。"); SetError(1); }
                                 }
                                 else
-                                { Log.Error("退出获取【文件】位置失败。"); SetError(); }
+                                { Log.Error("退出获取【文件】位置失败。"); SetError(1); }
                             }
                             else
                             {
@@ -537,13 +550,13 @@ namespace CMMAuto
                                     _isTheSame = true;
                                 }
                                 else
-                                { Log.Error("测量程式运行失败。"); SetError(); }
+                                { Log.Error("测量程式运行失败。"); SetError(1); }
                             }
                         }
                     }
                     else
                     {
-                        Log.Error("程序没有打开或者其他问题。"); SetError();
+                        Log.Error("程序没有打开或者其他问题。"); SetError(1);
                     }
                 }
             }
@@ -585,14 +598,22 @@ namespace CMMAuto
                 pollingInterval: TimeSpan.FromSeconds(3),
                 checkAction: async () =>
                 {
-                    await Task.Run(SetConnectPlc);
+                    await Task.Run(() => SetConnectPlc(1));
                     if (_isStart)
-                        await Task.Run(SetBusy);
+                    {
+                        await Task.Run(() => SetBusy(1));
+                        await Task.Run(() => SetReady(0));
+                    }
                     else
-                        await Task.Run(SetReady);
+                    {
+                        await Task.Run(() => SetBusy(0));
+                        await Task.Run(() => SetReady(1));
+                    }
 
                     if (chkIsConnPLC.Checked)
-                        await Task.Run(SetAuto);
+                        await Task.Run(() => SetAuto(1));
+                    else
+                        await Task.Run(() => SetAuto(0));
 
                     return true; // 始终继续轮询
                 }
@@ -1346,70 +1367,73 @@ namespace CMMAuto
 
         private void GetPlcHeart()
         {
-            if (GetPlcAddressInfo("Load_Live").Rows.Count == 0)
+            if (Global.PlcInfos.Count(p => p.PlcName == "Load_Live") == 0)
                 return;
 
             if (_modbusUitl != null)
                 this.BeginInvoke(new Action(() =>
                 {
                     txtPlcConnect.BackColor = _modbusUitl.ReadHoldingRegisters
-                        (GetPlcAddressInfo("Load_Live").Rows[0]["Address"].ToString().StrToInt(),
-                        GetPlcAddressInfo("Load_Live").Rows[0]["Count"].ToString().StrToInt()).StrToInt() == 0 ?
+                        (Global.PlcInfos.First(p => p.PlcName == "Load_Live").Address,
+                        Global.PlcInfos.First(p => p.PlcName == "Load_Live").Count).StrToInt() == 0 ?
                         Color.Red : Color.LimeGreen;
                 }));
         }
 
         private bool GetStart()
         {
-            if (GetPlcAddressInfo("Load_Start").Rows.Count == 0)
+            if (Global.PlcInfos.Count(p => p.PlcName == "Load_Start") == 0)
                 return false;
 
             if (_modbusUitl != null)
                 return _modbusUitl.ReadHoldingRegisters
-                (GetPlcAddressInfo("Load_Start").Rows[0]["Address"].ToString().StrToInt(),
-                    GetPlcAddressInfo("Load_Start").Rows[0]["Count"].ToString().StrToInt()).StrToInt() != 0;
+                (Global.PlcInfos.First(p => p.PlcName == "Load_Start").Address,
+                    Global.PlcInfos.First(p => p.PlcName == "Load_Start").Count).StrToInt() != 0;
 
             return false;
         }
 
         private void GetProductType()
         {
-            if (GetPlcAddressInfo("Load_PartType").Rows.Count == 0)
+            if (Global.PlcInfos.Count(p => p.PlcName == "Load_PartType") == 0)
                 return;
 
             if (_modbusUitl == null) return;
 
             var type = _modbusUitl.ReadHoldingRegistersConverString
-            (GetPlcAddressInfo("Load_PartType").Rows[0]["Address"].ToString().StrToInt(),
-                GetPlcAddressInfo("Load_PartType").Rows[0]["Count"].ToString().StrToInt(), 10);
+            (Global.PlcInfos.First(p => p.PlcName == "Load_PartType").Address,
+                Global.PlcInfos.First(p => p.PlcName == "Load_PartType").Count, 10);
 
-            SQLiteParameter[] parameter = new SQLiteParameter[] { new SQLiteParameter("Type", type) };
-            string sql = "SELECT PrgName,PrgPath,Type FROM MeaSurePrgCfg WHERE Type = @Type";
-            DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
-            if (dataSet.Tables[0].Rows.Count == 0)
+            if (txtTypeKey.Text.Trim() != type)
             {
-                Log.Error($"类型码:{type}的程式没有维护，无法启动！！！");
-            }
-            else
-            {
-                this.BeginInvoke(new Action(() =>
+                SQLiteParameter[] parameter = new SQLiteParameter[] { new SQLiteParameter("Type", type) };
+                string sql = "SELECT PrgName,PrgPath,Type FROM MeaSurePrgCfg WHERE Type = @Type";
+                DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
+                if (dataSet.Tables[0].Rows.Count == 0)
                 {
-                    txtTypeKey.Text = type;
-                    txtType.Text = type;
-                    txtMeasureName.Text = dataSet.Tables[0].Rows[0]["PrgName"].ToString();
-                    txtMeasureProgram.Text = dataSet.Tables[0].Rows[0]["PrgPath"].ToString();
-                }));
-
-                if (!_isStart)
-                    SetReady();
+                    Log.Error($"类型码:{type}的程式没有维护，无法启动！！！");
+                }
                 else
-                    Log.Error("运行中！！！");
+                {
+                    this.BeginInvoke(new Action(() =>
+                    {
+                        txtTypeKey.Text = type;
+                        txtType.Text = type;
+                        txtMeasureName.Text = dataSet.Tables[0].Rows[0]["PrgName"].ToString();
+                        txtMeasureProgram.Text = dataSet.Tables[0].Rows[0]["PrgPath"].ToString();
+                    }));
+
+                    if (!_isStart)
+                        SetReady(1);
+                    else
+                        Log.Error("运行中！！！");
+                }
             }
         }
 
         private void GetProductId()
         {
-            if (GetPlcAddressInfo("Load_PartID").Rows.Count == 0)
+            if (Global.PlcInfos.Count(p => p.PlcName == "Load_PartID") == 0)
                 return;
 
             if (_modbusUitl == null) return;
@@ -1417,20 +1441,20 @@ namespace CMMAuto
             this.BeginInvoke(new Action(() =>
             {
                 txtWorkPiece.Text = _modbusUitl.ReadHoldingRegistersConverString
-                (GetPlcAddressInfo("Load_PartID").Rows[0]["Address"].ToString().StrToInt(),
-                    GetPlcAddressInfo("Load_PartID").Rows[0]["Count"].ToString().StrToInt(), 10);
+                (Global.PlcInfos.First(p => p.PlcName == "Load_PartID").Address,
+                    Global.PlcInfos.First(p => p.PlcName == "Load_PartID").Count, 10);
             }));
         }
 
         private bool GetStop()
         {
-            if (GetPlcAddressInfo("Load_EStop").Rows.Count == 0)
+            if (Global.PlcInfos.Count(p => p.PlcName == "Load_EStop") == 0)
                 return false;
 
             if (_modbusUitl != null)
                 return _modbusUitl.ReadHoldingRegisters
-                (GetPlcAddressInfo("Load_EStop").Rows[0]["Address"].ToString().StrToInt(),
-                    GetPlcAddressInfo("Load_EStop").Rows[0]["Count"].ToString().StrToInt()).StrToInt() != 0;
+                (Global.PlcInfos.First(p => p.PlcName == "Load_EStop").Address,
+                    Global.PlcInfos.First(p => p.PlcName == "Load_EStop").Count).StrToInt() != 0;
 
             return false;
         }
@@ -1438,112 +1462,112 @@ namespace CMMAuto
         #endregion
 
         #region SET
-
-        private void SetEnd()
+        //需要PLC置位
+        private void SetEnd(int value)
         {
-            if (GetPlcAddressInfo("CMM_MeasureCompleted").Rows.Count == 0)
+            if (Global.PlcInfos.Count(p => p.PlcName == "CMM_MeasureCompleted") == 0)
                 return;
 
             if (_modbusUitl != null)
                 _modbusUitl.WriteMultipleRegisters
-                (GetPlcAddressInfo("CMM_MeasureCompleted").Rows[0]["Address"].ToString().StrToInt(),
-                    new int[] { 1 }
+                (Global.PlcInfos.First(p => p.PlcName == "CMM_MeasureCompleted").Address,
+                    new int[] { value }
                     );
         }
 
-        private void SetReady()
+        private void SetReady(int value)
         {
-            if (GetPlcAddressInfo("CMM_Ready").Rows.Count == 0)
+            if (Global.PlcInfos.Count(p => p.PlcName == "CMM_Ready") == 0)
                 return;
 
             if (_modbusUitl != null)
                 _modbusUitl.WriteMultipleRegisters
-                (GetPlcAddressInfo("CMM_Ready").Rows[0]["Address"].ToString().StrToInt(),
-                    new int[] { 1 }
+                (Global.PlcInfos.First(p => p.PlcName == "CMM_Ready").Address,
+                    new int[] { value }
+                );
+        }
+        //需要PLC置位
+        private void SetError(int value)
+        {
+            if (Global.PlcInfos.Count(p => p.PlcName == "CMM_Alarm") == 0)
+                return;
+
+            if (_modbusUitl != null)
+                _modbusUitl.WriteMultipleRegisters
+                (Global.PlcInfos.First(p => p.PlcName == "CMM_Alarm").Address,
+                    new int[] { value }
                 );
         }
 
-        private void SetError()
+        private void SetBusy(int value)
         {
-            if (GetPlcAddressInfo("CMM_Alarm").Rows.Count == 0)
+            if (Global.PlcInfos.Count(p => p.PlcName == "CMM_Busy") == 0)
                 return;
 
             if (_modbusUitl != null)
                 _modbusUitl.WriteMultipleRegisters
-                (GetPlcAddressInfo("CMM_Alarm").Rows[0]["Address"].ToString().StrToInt(),
-                    new int[] { 1 }
+                (Global.PlcInfos.First(p => p.PlcName == "CMM_Busy").Address,
+                    new int[] { value }
                 );
         }
 
-        private void SetBusy()
+        private void SetConnectPlc(int value)
         {
-            if (GetPlcAddressInfo("CMM_Busy").Rows.Count == 0)
+            if (Global.PlcInfos.Count(p => p.PlcName == "CMM_Auto") == 0)
                 return;
 
             if (_modbusUitl != null)
                 _modbusUitl.WriteMultipleRegisters
-                (GetPlcAddressInfo("CMM_Busy").Rows[0]["Address"].ToString().StrToInt(),
-                    new int[] { 1 }
-                );
-        }
-
-        private void SetConnectPlc()
-        {
-            if (GetPlcAddressInfo("CMM_Auto").Rows.Count == 0)
-                return;
-
-            if (_modbusUitl != null)
-                _modbusUitl.WriteMultipleRegisters
-                (GetPlcAddressInfo("CMM_Auto").Rows[0]["Address"].ToString().StrToInt(),
-                    new int[] { 1 }
+                (Global.PlcInfos.First(p => p.PlcName == "CMM_Auto").Address,
+                    new int[] { value }
                 );
         }
 
         private void SetType()
         {
-            if (GetPlcAddressInfo("CMM_AckParType").Rows.Count == 0)
+            if (Global.PlcInfos.Count(p => p.PlcName == "CMM_AckParType") == 0)
                 return;
 
             if (_modbusUitl != null)
                 _modbusUitl.WriteMultipleRegisters
-                (GetPlcAddressInfo("CMM_AckParType").Rows[0]["Address"].ToString().StrToInt(),
+                (Global.PlcInfos.First(p => p.PlcName == "CMM_AckParType").Address,
                     ModbusClient.ConvertStringToRegisters(txtType.Text.Trim())
                 );
         }
 
         private void SetId()
         {
-            if (GetPlcAddressInfo("CMM_AckPartID").Rows.Count == 0)
+            if (Global.PlcInfos.Count(p => p.PlcName == "CMM_AckPartID") == 0)
                 return;
 
             if (_modbusUitl != null)
                 _modbusUitl.WriteMultipleRegisters
-                (GetPlcAddressInfo("CMM_AckPartID").Rows[0]["Address"].ToString().StrToInt(),
+                (Global.PlcInfos.First(p => p.PlcName == "CMM_AckPartID").Address,
                     ModbusClient.ConvertStringToRegisters(txtWorkPiece.Text.Trim())
                 );
         }
 
-        private void SetSafetyPos()
+        private void SetSafetyPos(int value)
         {
-            if (GetPlcAddressInfo("CMM_SafetyPos").Rows.Count == 0)
+            if (Global.PlcInfos.Count(p => p.PlcName == "CMM_SafetyPos") == 0)
                 return;
 
             if (_modbusUitl != null)
                 _modbusUitl.WriteMultipleRegisters
-                (GetPlcAddressInfo("CMM_SafetyPos").Rows[0]["Address"].ToString().StrToInt(),
-                    new int[] { 1 }
+                (Global.PlcInfos.First(p => p.PlcName == "CMM_SafetyPos").Address,
+                    new int[] { value }
                 );
         }
 
-        private void SetAuto()
+        private void SetAuto(int value)
         {
-            if (GetPlcAddressInfo("CMM_Auto").Rows.Count == 0)
+            if (Global.PlcInfos.Count(p => p.PlcName == "CMM_Auto") == 0)
                 return;
 
             if (_modbusUitl != null)
                 _modbusUitl.WriteMultipleRegisters
-                (GetPlcAddressInfo("CMM_Auto").Rows[0]["Address"].ToString().StrToInt(),
-                    new int[] { 1 }
+                (Global.PlcInfos.First(p => p.PlcName == "CMM_Auto").Address,
+                    new int[] { value }
                 );
         }
 

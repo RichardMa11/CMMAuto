@@ -37,6 +37,7 @@ namespace CMMAuto
             this.btnAdd = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.grvConfig = new System.Windows.Forms.DataGridView();
+            this.lblCommInfo = new System.Windows.Forms.Label();
             this.mainPanel.SuspendLayout();
             this.bottomPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.grvConfig)).BeginInit();
@@ -60,6 +61,7 @@ namespace CMMAuto
             // bottomPanel
             // 
             this.bottomPanel.BackColor = System.Drawing.Color.White;
+            this.bottomPanel.Controls.Add(this.lblCommInfo);
             this.bottomPanel.Controls.Add(this.btnAdd);
             this.bottomPanel.Controls.Add(this.btnSave);
             this.bottomPanel.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -129,6 +131,18 @@ namespace CMMAuto
             this.grvConfig.TabIndex = 4;
             this.grvConfig.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.grvConfig_CellValidating);
             // 
+            // lblCommInfo
+            // 
+            this.lblCommInfo.AutoSize = true;
+            this.lblCommInfo.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.lblCommInfo.ForeColor = System.Drawing.Color.Red;
+            this.lblCommInfo.Location = new System.Drawing.Point(273, 19);
+            this.lblCommInfo.Name = "lblCommInfo";
+            this.lblCommInfo.Size = new System.Drawing.Size(212, 16);
+            this.lblCommInfo.TabIndex = 9;
+            this.lblCommInfo.Text = "注：修改保存后要重启软件";
+            this.lblCommInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // FrmConfig
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
@@ -145,6 +159,7 @@ namespace CMMAuto
             this.Text = "PLC信号地址配置";
             this.mainPanel.ResumeLayout(false);
             this.bottomPanel.ResumeLayout(false);
+            this.bottomPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.grvConfig)).EndInit();
             this.ResumeLayout(false);
 
@@ -157,5 +172,6 @@ namespace CMMAuto
         private System.Windows.Forms.Panel bottomPanel;
         private System.Windows.Forms.DataGridView grvConfig;
         private System.Windows.Forms.Button btnAdd;
+        private System.Windows.Forms.Label lblCommInfo;
     }
 }
