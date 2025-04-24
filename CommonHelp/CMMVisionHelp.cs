@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using CMMAuto.Model;
 using log4net;
@@ -9,6 +10,7 @@ namespace CMMAuto.CommonHelp
     public class CMMVisionHelp
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(CMMVisionHelp));
+        private readonly object _lock = new object();
 
         public ImageData GetPicImageData(string sourceImagePath)
         {
@@ -39,15 +41,23 @@ namespace CMMAuto.CommonHelp
         /// <param name="sourceImagePath">图像路径</param>
         /// <returns>int,1：表示运行状态，2：表示暂停状态，3：表示没有启动测量或测量完成之后；-1：表示无法打开当前目录，
         /// -2：表示运行模板图片为空；-3：表示输入图像为空或错误；-4：表示错误模板图片为空; -5: 表示其他错误；</returns>
+        [HandleProcessCorruptedStateExceptions]
         public int CheckCmmRunState(string sourceImagePath)
         {
             try
             {
-                //log.Info("确定CMM软件运行状态");
-                var res = CmmVisionInterface.CMMRunOrPauseCheck(GetPicImageData(sourceImagePath));
-                //log.Info($"CMM软件运行状态: { res }");
-
-                return res;
+                lock (_lock)
+                {
+                    //log.Info("确定CMM软件运行状态");
+                    var res = CmmVisionInterface.CMMRunOrPauseCheck(GetPicImageData(sourceImagePath));
+                    //log.Info($"CMM软件运行状态: { res }");
+                    return res;
+                }
+            }
+            catch (AccessViolationException ex)
+            {
+                log.Error($"确定CMM软件运行状态出错：{ex.Message + ex.StackTrace}");
+                return -1;
             }
             catch (Exception ex)
             {
@@ -65,17 +75,29 @@ namespace CMMAuto.CommonHelp
         /// <param name="x1">返回输入程序名称右边打开横坐标</param>
         /// <param name="y1">返回输入程序名称右边打开纵坐标</param>
         /// <returns>int, 0:表示运行成功；-1：表示运行失败； -2：表示识别阈值较低；-3:表示输入图片或模板为空； </returns>
-
+        [HandleProcessCorruptedStateExceptions]
         public int GetCmmOpenFilePos(string sourceImagePath, out float x0, out float y0, out float x1, out float y1)
         {
             try
             {
-                //log.Info("获取CMM软件打开程序的位置");
-                var res = CmmVisionInterface.CMMOpenFilePos(GetPicImageData(sourceImagePath), out x0, out y0, out x1, out y1);
-                //log.Info($"获取CMM软件打开程序的位置结果: { res }");
-                //log.Info($"输出CMM软件打开程序的位置信息: x0: { x0 }, y0: { y0 } x1: { x1 }, y1: { y1 }");
+                lock (_lock)
+                {
+                    //log.Info("获取CMM软件打开程序的位置");
+                    var res = CmmVisionInterface.CMMOpenFilePos(GetPicImageData(sourceImagePath), out x0, out y0, out x1, out y1);
+                    //log.Info($"获取CMM软件打开程序的位置结果: { res }");
+                    //log.Info($"输出CMM软件打开程序的位置信息: x0: { x0 }, y0: { y0 } x1: { x1 }, y1: { y1 }");
 
-                return res;
+                    return res;
+                }
+            }
+            catch (AccessViolationException ex)
+            {
+                log.Error($"获取CMM软件【打开】位置信息出错：{ex.Message + ex.StackTrace}");
+                x0 = 0;
+                y0 = 0;
+                x1 = 0;
+                y1 = 0;
+                return -1;
             }
             catch (Exception ex)
             {
@@ -95,16 +117,27 @@ namespace CMMAuto.CommonHelp
         /// <param name="x">返回【文件】位置的x坐标</param>
         /// <param name="y">返回【文件】位置的y坐标</param>
         /// <returns>int, 0:表示运行成功；-1：表示运行失败；-2：表示识别阈值较低； </returns>
+        [HandleProcessCorruptedStateExceptions]
         public int GetCmmFilePos(string sourceImagePath, out float x, out float y)
         {
             try
             {
-                //log.Info("获取CMM软件文件图标的位置");
-                var res = CmmVisionInterface.CMMFilePos(GetPicImageData(sourceImagePath), out x, out y);
-                //log.Info($"获取CMM软件文件图标的位置结果: { res }");
-                //log.Info($"输出CMM软件文件图标信息: x0: { x }, y0: { y }");
+                lock (_lock)
+                {
+                    //log.Info("获取CMM软件文件图标的位置");
+                    var res = CmmVisionInterface.CMMFilePos(GetPicImageData(sourceImagePath), out x, out y);
+                    //log.Info($"获取CMM软件文件图标的位置结果: { res }");
+                    //log.Info($"输出CMM软件文件图标信息: x0: { x }, y0: { y }");
 
-                return res;
+                    return res;
+                }
+            }
+            catch (AccessViolationException ex)
+            {
+                log.Error($"获取CMM软件【文件】位置信息出错：{ex.Message + ex.StackTrace}");
+                x = 0;
+                y = 0; ;
+                return -1;
             }
             catch (Exception ex)
             {
@@ -120,15 +153,24 @@ namespace CMMAuto.CommonHelp
         /// </summary>
         /// <param name="sourceImagePath">图像路径</param>
         /// <returns>int,0:表示制程正常关闭；-1：表示该制程没有关闭；</returns>
+        [HandleProcessCorruptedStateExceptions]
         public int CheckCmmIsClosed(string sourceImagePath)
         {
             try
             {
-                //log.Info("确定CMM软件是否关闭");
-                var res = CmmVisionInterface.CMMFileIsClosed(GetPicImageData(sourceImagePath));
-                //log.Info($"CMM软件运行状态: { res }");
+                lock (_lock)
+                {
+                    //log.Info("确定CMM软件是否关闭");
+                    var res = CmmVisionInterface.CMMFileIsClosed(GetPicImageData(sourceImagePath));
+                    //log.Info($"CMM软件运行状态: { res }");
 
-                return res;
+                    return res;
+                }
+            }
+            catch (AccessViolationException ex)
+            {
+                log.Error($"确定CMM软件是否关闭出错：{ex.Message + ex.StackTrace}");
+                return -1;
             }
             catch (Exception ex)
             {
@@ -144,16 +186,27 @@ namespace CMMAuto.CommonHelp
         /// <param name="x">返回【关闭】位置的x坐标</param>
         /// <param name="y">返回【关闭】位置的y坐标</param>
         /// <returns>返回int, 0:表示运行成功；-1：表示运行失败；-2：表示识别阈值较低； </returns>
+        [HandleProcessCorruptedStateExceptions]
         public int GetCmmClosedPos(string sourceImagePath, out float x, out float y)
         {
             try
             {
-                //log.Info("获取CMM软件退出图标的位置");
-                var res = CmmVisionInterface.CMMCloseBtnPos(GetPicImageData(sourceImagePath), out x, out y);
-                //log.Info($"获取CMM软件退出图标的位置结果: { res }");
-                //log.Info($"输出CMM软件退出图标信息: x0: { x }, y0: { y }");
+                lock (_lock)
+                {
+                    //log.Info("获取CMM软件退出图标的位置");
+                    var res = CmmVisionInterface.CMMCloseBtnPos(GetPicImageData(sourceImagePath), out x, out y);
+                    //log.Info($"获取CMM软件退出图标的位置结果: { res }");
+                    //log.Info($"输出CMM软件退出图标信息: x0: { x }, y0: { y }");
 
-                return res;
+                    return res;
+                }
+            }
+            catch (AccessViolationException ex)
+            {
+                log.Error($"获取CMM软件【退出】位置信息出错：{ex.Message + ex.StackTrace}");
+                x = 0;
+                y = 0; ;
+                return -1;
             }
             catch (Exception ex)
             {

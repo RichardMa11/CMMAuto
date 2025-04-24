@@ -41,10 +41,14 @@ namespace CMMAuto
         private FrmConfig _frmConfig;
         private ModbusUitl _modbusUitl;
 
-        private delegate void GetCmmStateDelegate();
-        private delegate void MeasurePrgDelegate();
         private delegate void LogTxtDelegate();
+        //private delegate void SyncLogDelegate();
         private delegate void MeasureDelegate();
+
+        private delegate void GetCmmStateDelegate();
+        private delegate void SetStateDelegate();
+        private delegate void MeasurePrgDelegate();
+        private delegate void OpenTestRunDelegate();
 
         public MainForm()
         {
@@ -206,6 +210,7 @@ namespace CMMAuto
                 {
                     await Task.Run(LoadLogTxt);
                     await Task.Run(LoadMeasureData);
+                    await Task.Run(GetCmmState);
 
                     return true; // 始终继续轮询
                 }
@@ -223,7 +228,7 @@ namespace CMMAuto
         {
             if (this.InvokeRequired)
             {
-                this.Invoke(new LogTxtDelegate(LoadLogTxt));
+                this.BeginInvoke(new LogTxtDelegate(LoadLogTxt));
                 return;
             }
             // 具体操作代码
@@ -269,7 +274,7 @@ namespace CMMAuto
         {
             if (this.InvokeRequired)
             {
-                this.Invoke(new MeasureDelegate(LoadMeasureData));
+                this.BeginInvoke(new MeasureDelegate(LoadMeasureData));
                 return;
             }
             //Log.Info("UI " + DateTime.Now.ToString("O")); // 执行你的任务
@@ -288,10 +293,10 @@ namespace CMMAuto
         private void PoolMeasure()
         {
             var pollingService = new PollingService(
-                pollingInterval: TimeSpan.FromSeconds(1),
+                pollingInterval: TimeSpan.FromSeconds(10),
                 checkAction: async () =>
                 {
-                    await Task.Run(GetCmmState);
+                    //await Task.Run(GetCmmState);
                     await Task.Run(MeasurePrg);
                     //lock (_lock)
                     //{
@@ -311,14 +316,13 @@ namespace CMMAuto
             pollingService.Start();
         }
 
-        private void GetCmmState()
+        private async void GetCmmState()
         {
             if (this.InvokeRequired)
             {
                 this.Invoke(new GetCmmStateDelegate(GetCmmState));
                 return;
             }
-            // 具体操作代码
             try
             {
                 var imageBitmap = ScreenShotHelp.GetImage();
@@ -349,10 +353,52 @@ namespace CMMAuto
             {
                 Log.Error($"获取图像状态失败: {ex}");
             }
+            // 具体操作代码
+            // 在后台线程执行耗时操作
+            await Task.Run(() =>
+            {
+                //Thread.Sleep(3000);  // 在后台线程阻塞（不影响 UI）
+                //try
+                //{
+                //    var imageBitmap = ScreenShotHelp.GetImage();
+                //    imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+
+                //    if (_cmmVisionHelp.CheckCmmIsClosed(_fullFileName) == 0)
+                //        SetState(4);
+                //    else
+                //    {
+                //        switch (_cmmVisionHelp.CheckCmmRunState(_fullFileName))
+                //        {
+                //            case 1:
+                //                SetState(1);
+                //                break;
+                //            case 2:
+                //                SetState(2);
+                //                break;
+                //            case 3:
+                //                SetState(3);
+                //                break;
+                //            default:
+                //                SetState(0);
+                //                break;
+                //        }
+                //    }
+                //}
+                //catch (Exception ex)
+                //{
+                //    Log.Error($"获取图像状态失败: {ex}");
+                //}
+            });
         }
 
         private void SetState(int stateValue)
         {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(new SetStateDelegate(() => SetState(stateValue)));
+                return;
+            }
+            // 具体操作代码
             switch (stateValue)
             {
                 case 1:
@@ -413,8 +459,14 @@ namespace CMMAuto
             }
         }
 
-        private void OpenTestRun()
+        private async void OpenTestRun()
         {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new OpenTestRunDelegate(OpenTestRun));
+                return;
+            }
+            //具体操作
             if (txtExit.BackColor == System.Drawing.Color.LimeGreen)
             {
                 //获取文件位置
@@ -436,10 +488,10 @@ namespace CMMAuto
                         // 模拟Ctrl+V
                         //SendKeys.SendWait("^v");
                         _simulator.SimiuCrtlV();
-                        Thread.Sleep(2000);
+                        await Task.Delay(2000);
                         NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
                         //判断打开但没有运行状态
-                        Thread.Sleep(3000);
+                        await Task.Delay(3000);
                         imageBitmap = ScreenShotHelp.GetImage();
                         imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
                         if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 3)//check是否打开
@@ -447,7 +499,7 @@ namespace CMMAuto
                             //SendKeys.SendWait("^Q");
                             _simulator.SimiuCrtlQ();
 
-                            Thread.Sleep(2000);
+                            await Task.Delay(2000);
                             imageBitmap = ScreenShotHelp.GetImage();
                             imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
                             if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 1 || _cmmVisionHelp.CheckCmmRunState(_fullFileName) == 2)//check是否打开
@@ -492,7 +544,7 @@ namespace CMMAuto
                     {
                         if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 3)
                         {
-                            Thread.Sleep(3000);
+                            await Task.Delay(3000);
                             //simulator.SimiuCrtlQ();
                             if (_isTheSame)
                             {
@@ -503,14 +555,14 @@ namespace CMMAuto
                                 if (_cmmVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
                                 {
                                     NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
-                                    Thread.Sleep(1000);
+                                    await Task.Delay(1000);
                                     imageBitmap = ScreenShotHelp.GetImage();
                                     imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
                                     if (_cmmVisionHelp.GetCmmClosedPos(_fullFileName, out float x1, out float y1) == 0)
                                     {
                                         NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
 
-                                        Thread.Sleep(2000);
+                                        await Task.Delay(2000);
                                         imageBitmap = ScreenShotHelp.GetImage();
                                         imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
 
@@ -539,7 +591,7 @@ namespace CMMAuto
                             {
                                 _simulator.SimiuCrtlQ();
                                 //判断是否运行成功
-                                Thread.Sleep(2000);
+                                await Task.Delay(2000);
                                 var imageBitmap = ScreenShotHelp.GetImage();
                                 imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
                                 if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 1 || _cmmVisionHelp.CheckCmmRunState(_fullFileName) == 2)
