@@ -1684,5 +1684,21 @@ namespace CMMAuto
         }
 
         #endregion
+
+        private void btnDelPrg_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(txtMeasureName.Text.Trim())
+                || string.IsNullOrEmpty(txtMeasureProgram.Text.Trim())
+                || string.IsNullOrEmpty(txtTypeKey.Text.Trim()))
+            {
+                MessageBoxX.Show("量测程序、节点以及类型码不能为空！", "提示");
+                return;
+            }
+
+            SQLiteParameter[] parameter = new SQLiteParameter[] { new SQLiteParameter("Type", txtTypeKey.Text.Trim()) };
+            _sqLiteHelpers.Delete("MeaSurePrgCfg", "Type=@Type", parameter);
+            ClearInfo();
+            MessageBoxX.Show("删除成功！", "提示");
+        }
     }
 }
