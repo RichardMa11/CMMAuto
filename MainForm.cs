@@ -241,13 +241,11 @@ namespace CMMAuto
         private string SyncLog()
         {
             var appender = LogManager.GetRepository().GetAppenders().FirstOrDefault(a => a is FileAppender) as FileAppender;
-            var logPath = appender.File;
-            if (!File.Exists(logPath))
-            {
-                MessageBoxX.Show("日志文件未找到！", "提示");
-                return "";
-            }
-            return ReadFileTail(logPath, encoding: Encoding.GetEncoding("GBK"));
+            var logPath = appender?.File;
+            if (File.Exists(logPath)) return ReadFileTail(logPath, encoding: Encoding.GetEncoding("GBK"));
+            //MessageBoxX.Show("日志文件未找到！", "提示");
+            Log.Error("日志文件未找到！");
+            return "";
 
             //var logLength = new FileInfo(logPath).Length;
             //var bakPath = logPath + ".bak";
