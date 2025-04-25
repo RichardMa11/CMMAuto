@@ -680,6 +680,8 @@ namespace CMMAuto.CommonHelp
                         cmd.CommandText = @"  CREATE TABLE IF NOT EXISTS MeaSureData(id INTEGER PRIMARY KEY AUTOINCREMENT, --自动增长的主键
                                               PrgName TEXT NOT NULL, --不能为空
                                               PrgPath TEXT NOT NULL, --不能为空
+                                              PieceId TEXT NOT NULL, --不能为空
+                                              Type TEXT NOT NULL, --不能为空
                                               CMMState TEXT NOT NULL,
                                               CMMResult INTEGER NOT NULL,--0或者1
                                               CMMTime INTEGER DEFAULT CURRENT_TIMESTAMP,-- 默认值为当前时间

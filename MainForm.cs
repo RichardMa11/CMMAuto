@@ -277,9 +277,16 @@ namespace CMMAuto
             }
             //Log.Info("UI " + DateTime.Now.ToString("O")); // 执行你的任务
             drvCmmLog.DataSource = null;
-            //string sql = $@"SELECT PrgName,PrgPath,CMMState,CMMResult,CMMTime,Remark FROM MeaSureData WHERE strftime('%Y-%m-%d %H:%M:%S', CMMTime)  >= '{DateTime.Now.AddMinutes(-10).ToString("yyyy-MM-dd HH:mm:ss")}' order by CMMTime desc ";
-            //string sql = $@"SELECT PrgName,PrgPath,CMMState,CMMResult,CMMTime,Remark FROM MeaSureData ";
-            string sql = $@"SELECT * FROM MeaSurePrgCfg ";
+            //string sql = $@"SELECT PieceId,Type,PrgName,PrgPath,CMMState,CMMResult,CMMTime,Remark FROM MeaSureData WHERE strftime('%Y-%m-%d %H:%M:%S', CMMTime)  >= '{DateTime.Now.AddMinutes(-10).ToString("yyyy-MM-dd HH:mm:ss")}' order by CMMTime desc ";
+            //string sql = $@"SELECT PieceId,Type,PrgName,PrgPath,CMMState,CMMResult,CMMTime,Remark FROM MeaSureData ";
+            //string sql = $@"SELECT * FROM MeaSurePrgCfg ";
+            string sql = $@"SELECT PieceId AS '工件码',Type as '类型码' ,PrgName as '程式节点',PrgPath as '程式路径',CMMState as '运行状态',
+  CASE 
+       WHEN CMMResult = 0 THEN '失败' 
+       WHEN CMMResult = 1 THEN '成功' 
+       ELSE 'Unknown' 
+   END as '结果',strftime('%Y-%m-%d %H:%M:%S', CMMTime) as '运行时间',Remark as '备注' FROM MeaSureData WHERE strftime('%Y-%m-%d %H:%M:%S', CMMTime)  >= '{DateTime.Now.AddMinutes(-30).ToString("yyyy-MM-dd HH:mm:ss")}' order by CMMTime desc ";
+
 
             DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, null);
             if (dataSet != null)
@@ -950,6 +957,8 @@ namespace CMMAuto
         {
             Dictionary<string, object> dic = new Dictionary<string, object>
             {
+                {"PieceId", txtWorkPiece.Text.Trim()},
+                {"Type", txtType.Text.Trim()},
                 {"PrgName", txtMeasureName.Text.Trim()},
                 {"PrgPath", txtMeasureProgram.Text.Trim()},
                 {"CMMState", state},
