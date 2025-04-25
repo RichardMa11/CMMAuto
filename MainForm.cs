@@ -323,27 +323,30 @@ namespace CMMAuto
             }
             try
             {
-                var imageBitmap = ScreenShotHelp.GetImage();
-                imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
-
-                if (_cmmVisionHelp.CheckCmmIsClosed(_fullFileName) == 0)
-                    SetState(4);
-                else
+                if (chkIsStatusCheck.Checked)
                 {
-                    switch (_cmmVisionHelp.CheckCmmRunState(_fullFileName))
+                    var imageBitmap = ScreenShotHelp.GetImage();
+                    imageBitmap.Save(_fullFileName, ImageFormat.Jpeg);
+
+                    if (_cmmVisionHelp.CheckCmmIsClosed(_fullFileName) == 0)
+                        SetState(4);
+                    else
                     {
-                        case 1:
-                            SetState(1);
-                            break;
-                        case 2:
-                            SetState(2);
-                            break;
-                        case 3:
-                            SetState(3);
-                            break;
-                        default:
-                            SetState(0);
-                            break;
+                        switch (_cmmVisionHelp.CheckCmmRunState(_fullFileName))
+                        {
+                            case 1:
+                                SetState(1);
+                                break;
+                            case 2:
+                                SetState(2);
+                                break;
+                            case 3:
+                                SetState(3);
+                                break;
+                            default:
+                                SetState(0);
+                                break;
+                        }
                     }
                 }
             }
@@ -451,8 +454,10 @@ namespace CMMAuto
             else
             {
                 if (!_isStart || !chkIsConnPLC.Checked) return;
-                SetId();
-                SetType();
+                //SetId();
+                //SetType();
+                SetPlc(ModbusClient.ConvertStringToRegisters(txtWorkPiece.Text.Trim()), "CMM_AckPartID");
+                SetPlc(ModbusClient.ConvertStringToRegisters(txtType.Text.Trim()), "CMM_AckParType");
                 OpenTestRun();
             }
         }
@@ -508,24 +513,28 @@ namespace CMMAuto
                                 _isTheSame = true;
                             }
                             else
-                            { Log.Error("测量程式运行失败。"); SetError(1); }
+                            {
+                                Log.Error("测量程式运行失败。");
+                                //SetError(1);
+                                SetPlc(new int[] { 1 }, "CMM_Alarm");
+                            }
 
                             //if (!IsCycle)
                             //    IsSingle = false;
                         }
                         else
-                        { Log.Error("打开测量程式失败。"); SetError(1); }
+                        { Log.Error("打开测量程式失败。"); SetPlc(new int[] { 1 }, "CMM_Alarm"); }
                     }
                     else
                     {
                         //RecordMeasure("开始", 0);
-                        Log.Error("获取【打开测量程式】位置失败。"); SetError(1);
+                        Log.Error("获取【打开测量程式】位置失败。"); SetPlc(new int[] { 1 }, "CMM_Alarm");
                     }
                 }
                 else
                 {
                     //RecordMeasure("开始", 0);
-                    Log.Error("获取【文件】位置失败。"); SetError(1);
+                    Log.Error("获取【文件】位置失败。"); SetPlc(new int[] { 1 }, "CMM_Alarm");
                 }
             }
             else
@@ -534,7 +543,7 @@ namespace CMMAuto
                 if (txtRun.BackColor == System.Drawing.Color.LimeGreen || txtPause.BackColor == System.Drawing.Color.LimeGreen)
                 {
                     Log.Error("运行中不能打开程式。");
-                    SetError(1);
+                    SetPlc(new int[] { 1 }, "CMM_Alarm");
                 }
                 else
                 {
@@ -570,20 +579,21 @@ namespace CMMAuto
                                             Log.Info($"退出成功。。。");
                                             //写入数据库
                                             RecordMeasure("结束", 1);
-                                            SetEnd(1);
+                                            //SetEnd(1);
+                                            SetPlc(new int[] { 1 }, "CMM_MeasureCompleted");
                                             _isTheSame = false;
 
                                             if (!_isCycle)
                                                 _isStart = false;
                                         }
                                         else
-                                        { Log.Error("程式退出失败。"); SetError(1); }
+                                        { Log.Error("程式退出失败。"); SetPlc(new int[] { 1 }, "CMM_Alarm"); }
                                     }
                                     else
-                                    { Log.Error("退出获取【退出】位置失败。"); SetError(1); }
+                                    { Log.Error("退出获取【退出】位置失败。"); SetPlc(new int[] { 1 }, "CMM_Alarm"); }
                                 }
                                 else
-                                { Log.Error("退出获取【文件】位置失败。"); SetError(1); }
+                                { Log.Error("退出获取【文件】位置失败。"); SetPlc(new int[] { 1 }, "CMM_Alarm"); }
                             }
                             else
                             {
@@ -600,13 +610,13 @@ namespace CMMAuto
                                     _isTheSame = true;
                                 }
                                 else
-                                { Log.Error("测量程式运行失败。"); SetError(1); }
+                                { Log.Error("测量程式运行失败。"); SetPlc(new int[] { 1 }, "CMM_Alarm"); }
                             }
                         }
                     }
                     else
                     {
-                        Log.Error("程序没有打开或者其他问题。"); SetError(1);
+                        Log.Error("程序没有打开或者其他问题。"); SetPlc(new int[] { 1 }, "CMM_Alarm");
                     }
                 }
             }
@@ -648,22 +658,23 @@ namespace CMMAuto
                 pollingInterval: TimeSpan.FromSeconds(3),
                 checkAction: async () =>
                 {
-                    await Task.Run(() => SetConnectPlc(1));
+                    await Task.Run(() => SetPlc(new int[] { 1 }, "CMM_Live"));
                     if (_isStart)
                     {
-                        await Task.Run(() => SetBusy(1));
-                        await Task.Run(() => SetReady(0));
+                        await Task.Run(() => SetPlc(new int[] { 1 }, "CMM_Busy"));
+                        //await Task.Run(() => SetReady(0));
+                        await Task.Run(() => SetPlc(new int[] { 0 }, "CMM_Ready"));
                     }
                     else
                     {
-                        await Task.Run(() => SetBusy(0));
-                        await Task.Run(() => SetReady(1));
+                        await Task.Run(() => SetPlc(new int[] { 0 }, "CMM_Busy"));
+                        await Task.Run(() => SetPlc(new int[] { 1 }, "CMM_Ready"));
                     }
 
                     if (chkIsConnPLC.Checked)
-                        await Task.Run(() => SetAuto(1));
+                        await Task.Run(() => SetPlc(new int[] { 1 }, "CMM_Auto"));
                     else
-                        await Task.Run(() => SetAuto(0));
+                        await Task.Run(() => SetPlc(new int[] { 0 }, "CMM_Auto"));
 
                     return true; // 始终继续轮询
                 }
@@ -1474,7 +1485,7 @@ namespace CMMAuto
                     }));
 
                     if (!_isStart)
-                        SetReady(1);
+                        SetPlc(new int[] { 1 }, "CMM_Ready");
                     else
                         Log.Error("运行中！！！");
                 }
@@ -1563,12 +1574,12 @@ namespace CMMAuto
 
         private void SetConnectPlc(int value)
         {
-            if (Global.PlcInfos.Count(p => p.PlcName == "CMM_Auto") == 0)
+            if (Global.PlcInfos.Count(p => p.PlcName == "CMM_Live") == 0)
                 return;
 
             if (_modbusUitl != null)
                 _modbusUitl.WriteMultipleRegisters
-                (Global.PlcInfos.First(p => p.PlcName == "CMM_Auto").Address,
+                (Global.PlcInfos.First(p => p.PlcName == "CMM_Live").Address,
                     new int[] { value }
                 );
         }
@@ -1619,6 +1630,20 @@ namespace CMMAuto
                 (Global.PlcInfos.First(p => p.PlcName == "CMM_Auto").Address,
                     new int[] { value }
                 );
+        }
+
+        private void SetPlc(int[] value, string type)
+        {
+            try
+            {
+                if (Global.PlcInfos.Count(p => p.PlcName == type) != 0)
+                    _modbusUitl?.WriteMultipleRegisters(Global.PlcInfos.First(p => p.PlcName == type).Address, value);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"写入PLC失败,写入值：{string.Join(", ", value ?? Array.Empty<int>())}，" +
+                          $"写入类型：{type}，失败原因：{e.Message + e.StackTrace}");
+            }
         }
 
         #endregion

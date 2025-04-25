@@ -43,6 +43,7 @@ namespace CMMAuto
             this.grpCmmlog = new System.Windows.Forms.GroupBox();
             this.drvCmmLog = new System.Windows.Forms.DataGridView();
             this.grpCmmInfo = new System.Windows.Forms.GroupBox();
+            this.btnDelPrg = new System.Windows.Forms.Button();
             this.label14 = new System.Windows.Forms.Label();
             this.txtTypeKey = new System.Windows.Forms.TextBox();
             this.btnCmmTestLogQuery = new System.Windows.Forms.Button();
@@ -102,7 +103,7 @@ namespace CMMAuto
             this.trvTestPrgChoose = new System.Windows.Forms.TreeView();
             this.grpTestPrgChoose = new System.Windows.Forms.GroupBox();
             this.panelLeft = new System.Windows.Forms.Panel();
-            this.btnDelPrg = new System.Windows.Forms.Button();
+            this.chkIsStatusCheck = new System.Windows.Forms.CheckBox();
             this.panelMiddle.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panelCmmlog.SuspendLayout();
@@ -233,6 +234,24 @@ namespace CMMAuto
             this.grpCmmInfo.TabIndex = 0;
             this.grpCmmInfo.TabStop = false;
             this.grpCmmInfo.Text = "程式信息";
+            // 
+            // btnDelPrg
+            // 
+            this.btnDelPrg.BackColor = System.Drawing.Color.LightBlue;
+            this.btnDelPrg.FlatAppearance.BorderSize = 0;
+            this.btnDelPrg.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
+            this.btnDelPrg.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
+            this.btnDelPrg.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDelPrg.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.btnDelPrg.ForeColor = System.Drawing.Color.DarkBlue;
+            this.btnDelPrg.Location = new System.Drawing.Point(508, 174);
+            this.btnDelPrg.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnDelPrg.Name = "btnDelPrg";
+            this.btnDelPrg.Size = new System.Drawing.Size(96, 42);
+            this.btnDelPrg.TabIndex = 11;
+            this.btnDelPrg.Text = "删   除";
+            this.btnDelPrg.UseVisualStyleBackColor = true;
+            this.btnDelPrg.Click += new System.EventHandler(this.btnDelPrg_Click);
             // 
             // label14
             // 
@@ -766,6 +785,7 @@ namespace CMMAuto
             // 
             // grpCmmState
             // 
+            this.grpCmmState.Controls.Add(this.chkIsStatusCheck);
             this.grpCmmState.Controls.Add(this.txtWorkPiece);
             this.grpCmmState.Controls.Add(this.label13);
             this.grpCmmState.Controls.Add(this.txtType);
@@ -967,23 +987,19 @@ namespace CMMAuto
             this.panelLeft.Size = new System.Drawing.Size(350, 825);
             this.panelLeft.TabIndex = 5;
             // 
-            // btnDelPrg
+            // chkIsStatusCheck
             // 
-            this.btnDelPrg.BackColor = System.Drawing.Color.LightBlue;
-            this.btnDelPrg.FlatAppearance.BorderSize = 0;
-            this.btnDelPrg.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
-            this.btnDelPrg.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
-            this.btnDelPrg.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnDelPrg.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.btnDelPrg.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnDelPrg.Location = new System.Drawing.Point(508, 174);
-            this.btnDelPrg.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btnDelPrg.Name = "btnDelPrg";
-            this.btnDelPrg.Size = new System.Drawing.Size(96, 42);
-            this.btnDelPrg.TabIndex = 11;
-            this.btnDelPrg.Text = "删   除";
-            this.btnDelPrg.UseVisualStyleBackColor = true;
-            this.btnDelPrg.Click += new System.EventHandler(this.btnDelPrg_Click);
+            this.chkIsStatusCheck.AutoSize = true;
+            this.chkIsStatusCheck.Checked = true;
+            this.chkIsStatusCheck.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkIsStatusCheck.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.chkIsStatusCheck.ForeColor = System.Drawing.Color.DarkBlue;
+            this.chkIsStatusCheck.Location = new System.Drawing.Point(249, 93);
+            this.chkIsStatusCheck.Name = "chkIsStatusCheck";
+            this.chkIsStatusCheck.Size = new System.Drawing.Size(73, 21);
+            this.chkIsStatusCheck.TabIndex = 18;
+            this.chkIsStatusCheck.Text = "状态检测";
+            this.chkIsStatusCheck.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
@@ -1098,6 +1114,7 @@ namespace CMMAuto
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.TextBox txtTypeKey;
         private System.Windows.Forms.Button btnDelPrg;
+        private System.Windows.Forms.CheckBox chkIsStatusCheck;
     }
 }
 
