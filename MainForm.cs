@@ -1683,6 +1683,7 @@ namespace CMMAuto
                 try
                 {
                     if (Global.PlcInfos.Count(p => p.PlcName == type) == 0) return;
+                    if (_modbusUitl == null) return;
 
                     Log.Info($"写入PLC,写入值：{string.Join(", ", value ?? Array.Empty<int>())}，" + $"写入类型：{type}");
                     _modbusUitl?.WriteMultipleRegisters(Global.PlcInfos.First(p => p.PlcName == type).Address, value);
