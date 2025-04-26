@@ -1494,6 +1494,7 @@ namespace CMMAuto
                 var type = _modbusUitl.ReadHoldingRegistersConverString
                 (Global.PlcInfos.First(p => p.PlcName == "Load_PartType").Address,
                     Global.PlcInfos.First(p => p.PlcName == "Load_PartType").Count, 10).Replace("\0", "");
+                Log.Info($"收到类型码：{type}");
 
                 if (txtTypeKey.Text.Trim() != type && !string.IsNullOrEmpty(type))
                 {
@@ -1532,11 +1533,14 @@ namespace CMMAuto
 
                 if (_modbusUitl == null) return;
 
+                var temp = _modbusUitl.ReadHoldingRegistersConverString
+                (Global.PlcInfos.First(p => p.PlcName == "Load_PartID").Address,
+                    Global.PlcInfos.First(p => p.PlcName == "Load_PartID").Count, 10).Replace("\0", "");
+                Log.Info($"收到工件码：{temp}");
+
                 this.BeginInvoke(new Action(() =>
                 {
-                    txtWorkPiece.Text = _modbusUitl.ReadHoldingRegistersConverString
-                    (Global.PlcInfos.First(p => p.PlcName == "Load_PartID").Address,
-                        Global.PlcInfos.First(p => p.PlcName == "Load_PartID").Count, 10).Replace("\0", "");
+                    txtWorkPiece.Text = temp;
                 }));
             });
         }
@@ -1678,8 +1682,10 @@ namespace CMMAuto
             {
                 try
                 {
-                    if (Global.PlcInfos.Count(p => p.PlcName == type) != 0)
-                        _modbusUitl?.WriteMultipleRegisters(Global.PlcInfos.First(p => p.PlcName == type).Address, value);
+                    if (Global.PlcInfos.Count(p => p.PlcName == type) == 0) return;
+
+                    Log.Info($"写入PLC,写入值：{string.Join(", ", value ?? Array.Empty<int>())}，" + $"写入类型：{type}");
+                    _modbusUitl?.WriteMultipleRegisters(Global.PlcInfos.First(p => p.PlcName == type).Address, value);
                 }
                 catch (Exception e)
                 {
