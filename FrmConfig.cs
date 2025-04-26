@@ -246,5 +246,24 @@ namespace CMMAuto
                 grvConfig.Rows[e.RowIndex].ErrorText = ""; // 清除错误提示
             }
         }
+
+        private void btnImport_Click(object sender, EventArgs e)
+        {
+            _configList.Add(new ConfigItem { Name = "CMM_Live", Address = "5000", Count = 1, Remark = "CMM 心跳" });
+            _configList.Add(new ConfigItem { Name = "CMM_Ready", Address = "5001", Count = 1, Remark = "CMM 空闲" });
+            _configList.Add(new ConfigItem { Name = "CMM_Busy", Address = "5002", Count = 1, Remark = "CMM 忙碌" });
+            _configList.Add(new ConfigItem { Name = "CMM_Alarm", Address = "5003", Count = 1, Remark = "CMM 报警" });
+            _configList.Add(new ConfigItem { Name = "CMM_Auto", Address = "5004", Count = 1, Remark = "CMM 联机状态" });
+            _configList.Add(new ConfigItem { Name = "CMM_SafetyPos", Address = "5005", Count = 1, Remark = "CMM 安全位置" });
+            _configList.Add(new ConfigItem { Name = "CMM_MeasureCompleted", Address = "5006", Count = 1, Remark = "CMM 测量完成" });
+            _configList.Add(new ConfigItem { Name = "CMM_AckParType", Address = "5007", Count = 10, Remark = "工件类型返回值" });
+            _configList.Add(new ConfigItem { Name = "CMM_AckPartID", Address = "5017", Count = 10, Remark = "工件 ID 返回值" });
+
+            _configList.Add(new ConfigItem { Name = "Load_Live", Address = "5050", Count = 1, Remark = "产线心跳" });
+            _configList.Add(new ConfigItem { Name = "Load_EStop", Address = "5051", Count = 1, Remark = "产线急停" });
+            _configList.Add(new ConfigItem { Name = "Load_Start", Address = "5052", Count = 1, Remark = "产线启动测量" });
+            _configList.Add(new ConfigItem { Name = "Load_PartType", Address = "5053", Count = 10, Remark = "测量工件类型" });
+            _configList.Add(new ConfigItem { Name = "Load_PartID", Address = "5063", Count = 10, Remark = "测量工件码" });
+        }
     }
 }

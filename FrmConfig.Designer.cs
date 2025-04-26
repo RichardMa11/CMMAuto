@@ -34,10 +34,11 @@ namespace CMMAuto
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmConfig));
             this.mainPanel = new System.Windows.Forms.TableLayoutPanel();
             this.bottomPanel = new System.Windows.Forms.Panel();
+            this.lblCommInfo = new System.Windows.Forms.Label();
             this.btnAdd = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.grvConfig = new System.Windows.Forms.DataGridView();
-            this.lblCommInfo = new System.Windows.Forms.Label();
+            this.btnImport = new System.Windows.Forms.Button();
             this.mainPanel.SuspendLayout();
             this.bottomPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.grvConfig)).BeginInit();
@@ -61,6 +62,7 @@ namespace CMMAuto
             // bottomPanel
             // 
             this.bottomPanel.BackColor = System.Drawing.Color.White;
+            this.bottomPanel.Controls.Add(this.btnImport);
             this.bottomPanel.Controls.Add(this.lblCommInfo);
             this.bottomPanel.Controls.Add(this.btnAdd);
             this.bottomPanel.Controls.Add(this.btnSave);
@@ -70,6 +72,18 @@ namespace CMMAuto
             this.bottomPanel.Size = new System.Drawing.Size(774, 54);
             this.bottomPanel.TabIndex = 3;
             // 
+            // lblCommInfo
+            // 
+            this.lblCommInfo.AutoSize = true;
+            this.lblCommInfo.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.lblCommInfo.ForeColor = System.Drawing.Color.Red;
+            this.lblCommInfo.Location = new System.Drawing.Point(273, 20);
+            this.lblCommInfo.Name = "lblCommInfo";
+            this.lblCommInfo.Size = new System.Drawing.Size(212, 16);
+            this.lblCommInfo.TabIndex = 9;
+            this.lblCommInfo.Text = "注：修改保存后要重启软件";
+            this.lblCommInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // btnAdd
             // 
             this.btnAdd.BackColor = System.Drawing.Color.LightBlue;
@@ -78,7 +92,7 @@ namespace CMMAuto
             this.btnAdd.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
             this.btnAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAdd.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnAdd.Location = new System.Drawing.Point(142, 8);
+            this.btnAdd.Location = new System.Drawing.Point(142, 7);
             this.btnAdd.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(96, 42);
@@ -95,7 +109,7 @@ namespace CMMAuto
             this.btnSave.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
             this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSave.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnSave.Location = new System.Drawing.Point(20, 8);
+            this.btnSave.Location = new System.Drawing.Point(20, 7);
             this.btnSave.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(96, 42);
@@ -131,17 +145,22 @@ namespace CMMAuto
             this.grvConfig.TabIndex = 4;
             this.grvConfig.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.grvConfig_CellValidating);
             // 
-            // lblCommInfo
+            // btnImport
             // 
-            this.lblCommInfo.AutoSize = true;
-            this.lblCommInfo.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lblCommInfo.ForeColor = System.Drawing.Color.Red;
-            this.lblCommInfo.Location = new System.Drawing.Point(273, 19);
-            this.lblCommInfo.Name = "lblCommInfo";
-            this.lblCommInfo.Size = new System.Drawing.Size(212, 16);
-            this.lblCommInfo.TabIndex = 9;
-            this.lblCommInfo.Text = "注：修改保存后要重启软件";
-            this.lblCommInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.btnImport.BackColor = System.Drawing.Color.LightBlue;
+            this.btnImport.FlatAppearance.BorderSize = 0;
+            this.btnImport.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
+            this.btnImport.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
+            this.btnImport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnImport.ForeColor = System.Drawing.Color.DarkBlue;
+            this.btnImport.Location = new System.Drawing.Point(660, 7);
+            this.btnImport.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnImport.Name = "btnImport";
+            this.btnImport.Size = new System.Drawing.Size(96, 42);
+            this.btnImport.TabIndex = 10;
+            this.btnImport.Text = "一键导入";
+            this.btnImport.UseVisualStyleBackColor = true;
+            this.btnImport.Click += new System.EventHandler(this.btnImport_Click);
             // 
             // FrmConfig
             // 
@@ -173,5 +192,6 @@ namespace CMMAuto
         private System.Windows.Forms.DataGridView grvConfig;
         private System.Windows.Forms.Button btnAdd;
         private System.Windows.Forms.Label lblCommInfo;
+        private System.Windows.Forms.Button btnImport;
     }
 }
