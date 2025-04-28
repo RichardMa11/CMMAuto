@@ -29,6 +29,7 @@ namespace CMMAuto
     {
         private readonly CMMVisionHelp _cmmVisionHelp = new CMMVisionHelp();
         private readonly KeyboardSimulatorHelp _simulator = new KeyboardSimulatorHelp();
+        private readonly object _lock = new object();
 
         private static string _fullFileName = "";
         private static bool _isStart = false;
@@ -460,7 +461,7 @@ namespace CMMAuto
                 OpenTestRun();
             else
             {
-                if (!_isStart || !chkIsConnPLC.Checked) return;
+                if (!_isStart) return;
                 //SetId();
                 //SetType();
                 SetPlc(ModbusClient.ConvertStringToRegisters(txtWorkPiece.Text.Trim()), "CMM_AckPartID");
@@ -642,14 +643,17 @@ namespace CMMAuto
                 pollingInterval: TimeSpan.FromSeconds(3),
                 checkAction: async () =>
                 {
-                    //bool isConnected = await CheckNetworkConnection();
-                    await Task.Run(GetPlcHeart);
-                    _isStop = await Task.Run(GetStop);
-                    await Task.Run(GetProductType);
-                    await Task.Run(GetProductId);
-                    _isStart = await Task.Run(GetStart);
-                    //if (_isStart)
-                    //    _isTheSame = false;
+                    if (chkIsConnPLC.Checked)
+                    {
+                        //bool isConnected = await CheckNetworkConnection();
+                        await Task.Run(GetPlcHeart);
+                        _isStop = await Task.Run(GetStop);
+                        await Task.Run(GetProductType);
+                        await Task.Run(GetProductId);
+                        _isStart = await Task.Run(GetStart);
+                        //if (_isStart)
+                        //    _isTheSame = false;
+                    }
 
                     return true; // 始终继续轮询
                 }
@@ -1449,51 +1453,55 @@ namespace CMMAuto
             //});
             await Task.Run(() =>
             {
-                if (Global.PlcInfos.Count(p => p.PlcName == "Load_Live") == 0)
-                    return;
+                if (Global.PlcInfos.Count(p => p.PlcName == "Load_Live") == 0) return;
+                if (_modbusUitl == null) return;
 
-                if (_modbusUitl != null)
+                int temp = 0;
+                lock (_lock)
                 {
-                    this.BeginInvoke(new Action(() =>
-                    {
-                        txtPlcConnect.BackColor = _modbusUitl.ReadHoldingRegisters
-                        (Global.PlcInfos.First(p => p.PlcName == "Load_Live").Address,
-                            Global.PlcInfos.First(p => p.PlcName == "Load_Live").Count).StrToInt() == 0 ?
-                            Color.Red : Color.LimeGreen;
-                        Log.Info(
-                            $"心跳信号：{_modbusUitl.ReadHoldingRegisters(Global.PlcInfos.First(p => p.PlcName == "Load_Live").Address, Global.PlcInfos.First(p => p.PlcName == "Load_Live").Count).StrToInt()}");
-                    }));
+                    temp = _modbusUitl.ReadHoldingRegisters
+                    (Global.PlcInfos.First(p => p.PlcName == "Load_Live").Address,
+                        Global.PlcInfos.First(p => p.PlcName == "Load_Live").Count).StrToInt();
                 }
+                Log.Info($"心跳信号：{temp}");
+                this.BeginInvoke(new Action(() =>
+                {
+                    txtPlcConnect.BackColor = temp == 0 ? Color.Red : Color.LimeGreen;
+                }));
             });
         }
         //plc收到结束信息时置0，开始和结束。表示这个流程结束
         private bool GetStart()
         {
-            if (Global.PlcInfos.Count(p => p.PlcName == "Load_Start") == 0)
-                return false;
+            if (Global.PlcInfos.Count(p => p.PlcName == "Load_Start") == 0) return false;
+            if (_modbusUitl == null) return false;
 
-            if (_modbusUitl != null)
+            int temp = 0;
+            lock (_lock)
             {
-                Log.Info($"启动信号:{_modbusUitl.ReadHoldingRegisters(Global.PlcInfos.First(p => p.PlcName == "Load_Start").Address, Global.PlcInfos.First(p => p.PlcName == "Load_Start").Count).StrToInt()}");
-                return _modbusUitl.ReadHoldingRegisters(Global.PlcInfos.First(p => p.PlcName == "Load_Start").Address,
-                    Global.PlcInfos.First(p => p.PlcName == "Load_Start").Count).StrToInt() == 1;
+                temp = _modbusUitl.ReadHoldingRegisters(
+                    Global.PlcInfos.First(p => p.PlcName == "Load_Start").Address,
+                    Global.PlcInfos.First(p => p.PlcName == "Load_Start").Count).StrToInt();
             }
-
-            return false;
+            Log.Info($"启动信号:{temp}");
+            return temp == 1;
         }
 
         private async void GetProductType()
         {
             await Task.Run(() =>
             {
-                if (Global.PlcInfos.Count(p => p.PlcName == "Load_PartType") == 0)
-                    return;
-
+                if (Global.PlcInfos.Count(p => p.PlcName == "Load_PartType") == 0) return;
                 if (_modbusUitl == null) return;
 
-                var type = _modbusUitl.ReadHoldingRegistersConverString
-                (Global.PlcInfos.First(p => p.PlcName == "Load_PartType").Address,
-                    Global.PlcInfos.First(p => p.PlcName == "Load_PartType").Count, 10).Replace("\0", "");
+                string type = "";
+                lock (_lock)
+                {
+                    type = _modbusUitl.ReadHoldingRegistersConverString
+                    (Global.PlcInfos.First(p => p.PlcName == "Load_PartType").Address,
+                        Global.PlcInfos.First(p => p.PlcName == "Load_PartType").Count, 10).Replace("\0", "");
+
+                }
                 Log.Info($"收到类型码：{type}");
 
                 if (txtTypeKey.Text.Trim() != type && !string.IsNullOrEmpty(type))
@@ -1528,16 +1536,17 @@ namespace CMMAuto
         {
             await Task.Run(() =>
             {
-                if (Global.PlcInfos.Count(p => p.PlcName == "Load_PartID") == 0)
-                    return;
-
+                if (Global.PlcInfos.Count(p => p.PlcName == "Load_PartID") == 0) return;
                 if (_modbusUitl == null) return;
 
-                var temp = _modbusUitl.ReadHoldingRegistersConverString
-                (Global.PlcInfos.First(p => p.PlcName == "Load_PartID").Address,
-                    Global.PlcInfos.First(p => p.PlcName == "Load_PartID").Count, 10).Replace("\0", "");
+                string temp = "";
+                lock (_lock)
+                {
+                    temp = _modbusUitl.ReadHoldingRegistersConverString
+                    (Global.PlcInfos.First(p => p.PlcName == "Load_PartID").Address,
+                        Global.PlcInfos.First(p => p.PlcName == "Load_PartID").Count, 10).Replace("\0", "");
+                }
                 Log.Info($"收到工件码：{temp}");
-
                 this.BeginInvoke(new Action(() =>
                 {
                     txtWorkPiece.Text = temp;
@@ -1550,18 +1559,18 @@ namespace CMMAuto
             //await Task.Run(() =>
             //{
             //});
-            if (Global.PlcInfos.Count(p => p.PlcName == "Load_EStop") == 0)
-                return false;
+            if (Global.PlcInfos.Count(p => p.PlcName == "Load_EStop") == 0) return false;
+            if (_modbusUitl == null) return false;
 
-            if (_modbusUitl != null)
+            int temp = 0;
+            lock (_lock)
             {
-                Log.Info($"急停信号：{_modbusUitl.ReadHoldingRegisters(Global.PlcInfos.First(p => p.PlcName == "Load_EStop").Address, Global.PlcInfos.First(p => p.PlcName == "Load_EStop").Count).StrToInt()}");
-                return _modbusUitl.ReadHoldingRegisters
+                temp = _modbusUitl.ReadHoldingRegisters
                 (Global.PlcInfos.First(p => p.PlcName == "Load_EStop").Address,
-                    Global.PlcInfos.First(p => p.PlcName == "Load_EStop").Count).StrToInt() == 1;
+                    Global.PlcInfos.First(p => p.PlcName == "Load_EStop").Count).StrToInt();
             }
-
-            return false;
+            Log.Info($"急停信号：{temp}");
+            return temp == 1;
         }
 
         #endregion
@@ -1686,7 +1695,10 @@ namespace CMMAuto
                     if (_modbusUitl == null) return;
 
                     Log.Info($"写入PLC,写入值：{string.Join(", ", value ?? Array.Empty<int>())}，" + $"写入类型：{type}");
-                    _modbusUitl?.WriteMultipleRegisters(Global.PlcInfos.First(p => p.PlcName == type).Address, value);
+                    lock (_lock)
+                    {
+                        _modbusUitl?.WriteMultipleRegisters(Global.PlcInfos.First(p => p.PlcName == type).Address, value);
+                    }
                 }
                 catch (Exception e)
                 {
