@@ -85,6 +85,7 @@ namespace CMMAuto
             this.label6 = new System.Windows.Forms.Label();
             this.lblCommInfo = new System.Windows.Forms.Label();
             this.grpCmmState = new System.Windows.Forms.GroupBox();
+            this.chkIsStatusCheck = new System.Windows.Forms.CheckBox();
             this.txtWorkPiece = new System.Windows.Forms.TextBox();
             this.label13 = new System.Windows.Forms.Label();
             this.txtType = new System.Windows.Forms.TextBox();
@@ -103,7 +104,6 @@ namespace CMMAuto
             this.trvTestPrgChoose = new System.Windows.Forms.TreeView();
             this.grpTestPrgChoose = new System.Windows.Forms.GroupBox();
             this.panelLeft = new System.Windows.Forms.Panel();
-            this.chkIsStatusCheck = new System.Windows.Forms.CheckBox();
             this.panelMiddle.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panelCmmlog.SuspendLayout();
@@ -603,6 +603,7 @@ namespace CMMAuto
             // btnEnd
             // 
             this.btnEnd.BackColor = System.Drawing.Color.LightBlue;
+            this.btnEnd.Enabled = false;
             this.btnEnd.FlatAppearance.BorderSize = 0;
             this.btnEnd.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
             this.btnEnd.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
@@ -620,6 +621,7 @@ namespace CMMAuto
             // btnManual
             // 
             this.btnManual.BackColor = System.Drawing.Color.LightBlue;
+            this.btnManual.Enabled = false;
             this.btnManual.FlatAppearance.BorderSize = 0;
             this.btnManual.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
             this.btnManual.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
@@ -688,6 +690,7 @@ namespace CMMAuto
             this.chkIsConnPLC.TabIndex = 17;
             this.chkIsConnPLC.Text = "联机";
             this.chkIsConnPLC.UseVisualStyleBackColor = true;
+            this.chkIsConnPLC.CheckedChanged += new System.EventHandler(this.chkIsConnPLC_CheckedChanged);
             // 
             // label11
             // 
@@ -809,6 +812,20 @@ namespace CMMAuto
             this.grpCmmState.TabIndex = 0;
             this.grpCmmState.TabStop = false;
             this.grpCmmState.Text = "CMM软件状态";
+            // 
+            // chkIsStatusCheck
+            // 
+            this.chkIsStatusCheck.AutoSize = true;
+            this.chkIsStatusCheck.Checked = true;
+            this.chkIsStatusCheck.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkIsStatusCheck.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.chkIsStatusCheck.ForeColor = System.Drawing.Color.DarkBlue;
+            this.chkIsStatusCheck.Location = new System.Drawing.Point(249, 93);
+            this.chkIsStatusCheck.Name = "chkIsStatusCheck";
+            this.chkIsStatusCheck.Size = new System.Drawing.Size(73, 21);
+            this.chkIsStatusCheck.TabIndex = 18;
+            this.chkIsStatusCheck.Text = "状态检测";
+            this.chkIsStatusCheck.UseVisualStyleBackColor = true;
             // 
             // txtWorkPiece
             // 
@@ -986,20 +1003,6 @@ namespace CMMAuto
             this.panelLeft.Name = "panelLeft";
             this.panelLeft.Size = new System.Drawing.Size(350, 825);
             this.panelLeft.TabIndex = 5;
-            // 
-            // chkIsStatusCheck
-            // 
-            this.chkIsStatusCheck.AutoSize = true;
-            this.chkIsStatusCheck.Checked = true;
-            this.chkIsStatusCheck.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkIsStatusCheck.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.chkIsStatusCheck.ForeColor = System.Drawing.Color.DarkBlue;
-            this.chkIsStatusCheck.Location = new System.Drawing.Point(249, 93);
-            this.chkIsStatusCheck.Name = "chkIsStatusCheck";
-            this.chkIsStatusCheck.Size = new System.Drawing.Size(73, 21);
-            this.chkIsStatusCheck.TabIndex = 18;
-            this.chkIsStatusCheck.Text = "状态检测";
-            this.chkIsStatusCheck.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 

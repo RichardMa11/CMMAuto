@@ -833,6 +833,12 @@ namespace CMMAuto
 
         private void btnEnd_Click(object sender, EventArgs e)
         {
+            if (chkIsConnPLC.Checked)
+            {
+                MessageBoxX.Show("联机状态下，不允许手动操作！", "提示");
+                return;
+            }
+
             _isStart = false;
         }
 
@@ -843,9 +849,17 @@ namespace CMMAuto
 
         private void btnManual_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(txtMeasureProgram.Text))
+            if (chkIsConnPLC.Checked)
             {
-                MessageBoxX.Show("量测程序不能为空！", "提示");
+                MessageBoxX.Show("联机状态下，不允许手动操作！", "提示");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(txtMeasureProgram.Text)
+                || string.IsNullOrEmpty(txtWorkPiece.Text.Trim())
+                || string.IsNullOrEmpty(txtType.Text.Trim()))
+            {
+                MessageBoxX.Show("量测程序、类型码和工件码不能为空！", "提示");
                 return;
             }
 
@@ -1786,6 +1800,20 @@ namespace CMMAuto
             _sqLiteHelpers.Delete("MeaSurePrgCfg", "Type=@Type", parameter);
             ClearInfo();
             MessageBoxX.Show("删除成功！", "提示");
+        }
+
+        private void chkIsConnPLC_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkIsConnPLC.Checked)
+            {
+                btnEnd.Enabled = false;
+                btnManual.Enabled = false;
+            }
+            else
+            {
+                btnEnd.Enabled = true;
+                btnManual.Enabled = true;
+            }
         }
     }
 }
