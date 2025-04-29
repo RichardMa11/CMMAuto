@@ -477,12 +477,13 @@ namespace CMMAuto
                 this.Invoke(new OpenTestRunDelegate(OpenTestRun));
                 return;
             }
-#if DEBUG
-            await Task.Delay(3000);
-            SetPlc(new int[] { 1 }, "CMM_MeasureCompleted");
-            await Task.Delay(3000);
-            SetPlc(new int[] { 1 }, "CMM_Alarm");
-#endif
+
+//#if DEBUG
+//            await Task.Delay(3000);
+//            SetPlc(new int[] { 1 }, "CMM_MeasureCompleted");
+//            await Task.Delay(3000);
+//            SetPlc(new int[] { 1 }, "CMM_Alarm");
+//#endif
 
             //具体操作
             if (txtExit.BackColor == System.Drawing.Color.LimeGreen)
@@ -1484,7 +1485,7 @@ namespace CMMAuto
                 }));
             });
         }
-        //plc收到结束信息时置0，开始和结束。表示这个流程结束
+        //plc收到结束信息时置0，开始和结束。表示这个流程结束(plc置0，或者我这边结束写0)
         private bool GetStart()
         {
             if (Global.PlcInfos.Count(p => p.PlcName == "Load_Start") == 0) return false;
