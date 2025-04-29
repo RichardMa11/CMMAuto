@@ -644,10 +644,11 @@ namespace CMMAuto
                 pollingInterval: TimeSpan.FromSeconds(3),
                 checkAction: async () =>
                 {
+                    await Task.Run(GetPlcHeart);
                     if (chkIsConnPLC.Checked)
                     {
                         //bool isConnected = await CheckNetworkConnection();
-                        await Task.Run(GetPlcHeart);
+                        //await Task.Run(GetPlcHeart);
                         _isStop = await Task.Run(GetStop);
                         await Task.Run(GetProductType);
                         await Task.Run(GetProductId);
