@@ -62,7 +62,7 @@ namespace CMMAuto
             this.grpAgvOperate = new System.Windows.Forms.GroupBox();
             this.btnSavePLC = new System.Windows.Forms.Button();
             this.btnTestExit = new System.Windows.Forms.Button();
-            this.btnSend = new System.Windows.Forms.Button();
+            this.btnQueryPlc = new System.Windows.Forms.Button();
             this.btnConfigPlcAddress = new System.Windows.Forms.Button();
             this.btnAutoRun = new System.Windows.Forms.Button();
             this.btnConnect = new System.Windows.Forms.Button();
@@ -104,6 +104,7 @@ namespace CMMAuto
             this.trvTestPrgChoose = new System.Windows.Forms.TreeView();
             this.grpTestPrgChoose = new System.Windows.Forms.GroupBox();
             this.panelLeft = new System.Windows.Forms.Panel();
+            this.lblPlcState = new System.Windows.Forms.Label();
             this.panelMiddle.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panelCmmlog.SuspendLayout();
@@ -427,9 +428,10 @@ namespace CMMAuto
             // 
             // grpAgvOperate
             // 
+            this.grpAgvOperate.Controls.Add(this.lblPlcState);
             this.grpAgvOperate.Controls.Add(this.btnSavePLC);
             this.grpAgvOperate.Controls.Add(this.btnTestExit);
-            this.grpAgvOperate.Controls.Add(this.btnSend);
+            this.grpAgvOperate.Controls.Add(this.btnQueryPlc);
             this.grpAgvOperate.Controls.Add(this.btnConfigPlcAddress);
             this.grpAgvOperate.Controls.Add(this.btnAutoRun);
             this.grpAgvOperate.Controls.Add(this.btnConnect);
@@ -480,22 +482,22 @@ namespace CMMAuto
             this.btnTestExit.Visible = false;
             this.btnTestExit.Click += new System.EventHandler(this.btnTestExit_Click);
             // 
-            // btnSend
+            // btnQueryPlc
             // 
-            this.btnSend.BackColor = System.Drawing.Color.LightBlue;
-            this.btnSend.FlatAppearance.BorderSize = 0;
-            this.btnSend.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
-            this.btnSend.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
-            this.btnSend.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSend.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnSend.Location = new System.Drawing.Point(52, 76);
-            this.btnSend.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btnSend.Name = "btnSend";
-            this.btnSend.Size = new System.Drawing.Size(96, 42);
-            this.btnSend.TabIndex = 3;
-            this.btnSend.Text = "读  取";
-            this.btnSend.UseVisualStyleBackColor = true;
-            this.btnSend.Click += new System.EventHandler(this.btnSend_Click);
+            this.btnQueryPlc.BackColor = System.Drawing.Color.LightBlue;
+            this.btnQueryPlc.FlatAppearance.BorderSize = 0;
+            this.btnQueryPlc.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
+            this.btnQueryPlc.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
+            this.btnQueryPlc.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnQueryPlc.ForeColor = System.Drawing.Color.DarkBlue;
+            this.btnQueryPlc.Location = new System.Drawing.Point(52, 76);
+            this.btnQueryPlc.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnQueryPlc.Name = "btnQueryPlc";
+            this.btnQueryPlc.Size = new System.Drawing.Size(96, 42);
+            this.btnQueryPlc.TabIndex = 3;
+            this.btnQueryPlc.Text = "查看PLC值";
+            this.btnQueryPlc.UseVisualStyleBackColor = true;
+            this.btnQueryPlc.Click += new System.EventHandler(this.btnQueryPlc_Click);
             // 
             // btnConfigPlcAddress
             // 
@@ -1004,6 +1006,22 @@ namespace CMMAuto
             this.panelLeft.Size = new System.Drawing.Size(350, 825);
             this.panelLeft.TabIndex = 5;
             // 
+            // lblPlcState
+            // 
+            this.lblPlcState.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblPlcState.AutoSize = true;
+            this.lblPlcState.BackColor = System.Drawing.Color.Red;
+            this.lblPlcState.Font = new System.Drawing.Font("宋体", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.lblPlcState.ForeColor = System.Drawing.Color.White;
+            this.lblPlcState.Location = new System.Drawing.Point(29, 134);
+            this.lblPlcState.Name = "lblPlcState";
+            this.lblPlcState.Size = new System.Drawing.Size(300, 33);
+            this.lblPlcState.TabIndex = 9;
+            this.lblPlcState.Text = "PLC连接断开......";
+            this.lblPlcState.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
@@ -1036,6 +1054,7 @@ namespace CMMAuto
             this.panelOperate.ResumeLayout(false);
             this.panelAgvOperate.ResumeLayout(false);
             this.grpAgvOperate.ResumeLayout(false);
+            this.grpAgvOperate.PerformLayout();
             this.grpCmmOperate.ResumeLayout(false);
             this.panelState.ResumeLayout(false);
             this.panelAgvState.ResumeLayout(false);
@@ -1085,7 +1104,7 @@ namespace CMMAuto
         private System.Windows.Forms.Button btnOpenFile;
         private System.Windows.Forms.Button btnSaveImg;
         private System.Windows.Forms.GroupBox grpAgvOperate;
-        private System.Windows.Forms.Button btnSend;
+        private System.Windows.Forms.Button btnQueryPlc;
         private System.Windows.Forms.Button btnConfigPlcAddress;
         private System.Windows.Forms.Button btnConnect;
         private System.Windows.Forms.Panel panelState;
@@ -1118,6 +1137,7 @@ namespace CMMAuto
         private System.Windows.Forms.TextBox txtTypeKey;
         private System.Windows.Forms.Button btnDelPrg;
         private System.Windows.Forms.CheckBox chkIsStatusCheck;
+        private System.Windows.Forms.Label lblPlcState;
     }
 }
 

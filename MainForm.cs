@@ -40,6 +40,7 @@ namespace CMMAuto
         private static readonly ILog Log = LogManager.GetLogger(typeof(MainForm));
         private SQLiteHelper _sqLiteHelpers = null;
         private FrmConfig _frmConfig;
+        private FrmQueryPlc _frmQueryPlc;
         private ModbusUitl _modbusUitl;
 
         private delegate void LogTxtDelegate();
@@ -478,12 +479,12 @@ namespace CMMAuto
                 return;
             }
 
-//#if DEBUG
-//            await Task.Delay(3000);
-//            SetPlc(new int[] { 1 }, "CMM_MeasureCompleted");
-//            await Task.Delay(3000);
-//            SetPlc(new int[] { 1 }, "CMM_Alarm");
-//#endif
+            //#if DEBUG
+            //            await Task.Delay(3000);
+            //            SetPlc(new int[] { 1 }, "CMM_MeasureCompleted");
+            //            await Task.Delay(3000);
+            //            SetPlc(new int[] { 1 }, "CMM_Alarm");
+            //#endif
 
             //具体操作
             if (txtExit.BackColor == System.Drawing.Color.LimeGreen)
@@ -1386,38 +1387,6 @@ namespace CMMAuto
             _frmConfig.BringToFront();  // 激活并置顶窗体
         }
 
-        private void btnSend_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if (_modbusUitl != null)
-                {
-                    if (GetPlcAddressInfo("TEST").Rows.Count != 0)
-                    {
-                        _modbusUitl.WriteMultipleRegisters(GetPlcAddressInfo("TEST").Rows[0]["Address"].ToString().StrToInt(),
-                            ModbusClient.ConvertStringToRegisters(txtMeasureName.Text.Trim()));
-
-                        txtMeasureProgram.Text = _modbusUitl.ReadHoldingRegistersConverString
-                            (GetPlcAddressInfo("TEST").Rows[0]["Address"].ToString().StrToInt(),
-                            GetPlcAddressInfo("TEST").Rows[0]["Count"].ToString().StrToInt(),
-                            txtMeasureName.Text.Trim().Length + 1).Replace("\0", "");
-
-                        //_modbusUitl.WriteMultipleRegisters(100, new int[] { 200 }); // 告知PLC终止任务
-                        //var t = _modbusUitl.ReadHoldingRegisters(100, 1);
-                    }
-                    else
-                    {
-                        MessageBoxX.Show("PLC信号地址【TEST】没有配置", "提示");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBoxX.Show($"读取PLC失败: {ex.Message}", "提示");
-                Log.Error($"读取PLC失败: {ex.Message}");
-            }
-        }
-
         private void btnSavePLC_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(txtIp.Text.Trim()))
@@ -1482,7 +1451,8 @@ namespace CMMAuto
                 Log.Info($"心跳信号：{temp}");
                 this.BeginInvoke(new Action(() =>
                 {
-                    txtPlcConnect.BackColor = temp == 0 ? Color.Red : Color.LimeGreen;
+                    txtPlcConnect.BackColor = temp != 1 ? Color.Red : Color.LimeGreen;
+                    lblPlcState.Text = temp != 1 ? "PLC连接断开......" : "";
                 }));
             });
         }
@@ -1515,7 +1485,8 @@ namespace CMMAuto
                 {
                     type = _modbusUitl.ReadHoldingRegistersConverString
                     (Global.PlcInfos.First(p => p.PlcName == "Load_PartType").Address,
-                        Global.PlcInfos.First(p => p.PlcName == "Load_PartType").Count, 10).Replace("\0", "");
+                        Global.PlcInfos.First(p => p.PlcName == "Load_PartType").Count,
+                        Global.PlcInfos.First(p => p.PlcName == "Load_PartType").Count).Replace("\0", "");
 
                 }
                 Log.Info($"收到类型码：{type}");
@@ -1560,7 +1531,8 @@ namespace CMMAuto
                 {
                     temp = _modbusUitl.ReadHoldingRegistersConverString
                     (Global.PlcInfos.First(p => p.PlcName == "Load_PartID").Address,
-                        Global.PlcInfos.First(p => p.PlcName == "Load_PartID").Count, 10).Replace("\0", "");
+                        Global.PlcInfos.First(p => p.PlcName == "Load_PartID").Count,
+                        Global.PlcInfos.First(p => p.PlcName == "Load_PartID").Count).Replace("\0", "");
                 }
                 Log.Info($"收到工件码：{temp}");
                 this.BeginInvoke(new Action(() =>
@@ -1816,6 +1788,17 @@ namespace CMMAuto
                 btnEnd.Enabled = true;
                 btnManual.Enabled = true;
             }
+        }
+
+        private void btnQueryPlc_Click(object sender, EventArgs e)
+        {
+            if (_frmQueryPlc == null || _frmQueryPlc.IsDisposed)
+            {
+                _frmQueryPlc = new FrmQueryPlc(_sqLiteHelpers, _modbusUitl);
+                _frmQueryPlc.FormClosed += (s, args) => { _frmQueryPlc = null; };
+            }
+            _frmQueryPlc.Show();
+            _frmQueryPlc.BringToFront();  // 激活并置顶窗体
         }
     }
 }
