@@ -60,6 +60,7 @@ namespace CMMAuto
             this.panelOperate = new System.Windows.Forms.Panel();
             this.panelAgvOperate = new System.Windows.Forms.Panel();
             this.grpAgvOperate = new System.Windows.Forms.GroupBox();
+            this.lblPlcState = new System.Windows.Forms.Label();
             this.btnSavePLC = new System.Windows.Forms.Button();
             this.btnTestExit = new System.Windows.Forms.Button();
             this.btnQueryPlc = new System.Windows.Forms.Button();
@@ -104,7 +105,7 @@ namespace CMMAuto
             this.trvTestPrgChoose = new System.Windows.Forms.TreeView();
             this.grpTestPrgChoose = new System.Windows.Forms.GroupBox();
             this.panelLeft = new System.Windows.Forms.Panel();
-            this.lblPlcState = new System.Windows.Forms.Label();
+            this.btnDicConfig = new System.Windows.Forms.Button();
             this.panelMiddle.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panelCmmlog.SuspendLayout();
@@ -428,6 +429,7 @@ namespace CMMAuto
             // 
             // grpAgvOperate
             // 
+            this.grpAgvOperate.Controls.Add(this.btnDicConfig);
             this.grpAgvOperate.Controls.Add(this.lblPlcState);
             this.grpAgvOperate.Controls.Add(this.btnSavePLC);
             this.grpAgvOperate.Controls.Add(this.btnTestExit);
@@ -446,6 +448,22 @@ namespace CMMAuto
             this.grpAgvOperate.TabIndex = 4;
             this.grpAgvOperate.TabStop = false;
             this.grpAgvOperate.Text = "PLC操作";
+            // 
+            // lblPlcState
+            // 
+            this.lblPlcState.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblPlcState.AutoSize = true;
+            this.lblPlcState.BackColor = System.Drawing.Color.Red;
+            this.lblPlcState.Font = new System.Drawing.Font("宋体", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.lblPlcState.ForeColor = System.Drawing.Color.White;
+            this.lblPlcState.Location = new System.Drawing.Point(29, 176);
+            this.lblPlcState.Name = "lblPlcState";
+            this.lblPlcState.Size = new System.Drawing.Size(300, 33);
+            this.lblPlcState.TabIndex = 9;
+            this.lblPlcState.Text = "PLC连接断开......";
+            this.lblPlcState.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // btnSavePLC
             // 
@@ -472,7 +490,7 @@ namespace CMMAuto
             this.btnTestExit.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
             this.btnTestExit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnTestExit.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnTestExit.Location = new System.Drawing.Point(194, 198);
+            this.btnTestExit.Location = new System.Drawing.Point(194, 206);
             this.btnTestExit.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnTestExit.Name = "btnTestExit";
             this.btnTestExit.Size = new System.Drawing.Size(96, 42);
@@ -524,7 +542,7 @@ namespace CMMAuto
             this.btnAutoRun.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
             this.btnAutoRun.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAutoRun.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnAutoRun.Location = new System.Drawing.Point(52, 198);
+            this.btnAutoRun.Location = new System.Drawing.Point(52, 206);
             this.btnAutoRun.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnAutoRun.Name = "btnAutoRun";
             this.btnAutoRun.Size = new System.Drawing.Size(96, 42);
@@ -560,7 +578,7 @@ namespace CMMAuto
             this.btnOpenFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnOpenFile.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.btnOpenFile.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnOpenFile.Location = new System.Drawing.Point(52, 241);
+            this.btnOpenFile.Location = new System.Drawing.Point(52, 249);
             this.btnOpenFile.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnOpenFile.Name = "btnOpenFile";
             this.btnOpenFile.Size = new System.Drawing.Size(96, 42);
@@ -578,7 +596,7 @@ namespace CMMAuto
             this.btnSaveImg.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
             this.btnSaveImg.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSaveImg.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnSaveImg.Location = new System.Drawing.Point(194, 241);
+            this.btnSaveImg.Location = new System.Drawing.Point(194, 249);
             this.btnSaveImg.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnSaveImg.Name = "btnSaveImg";
             this.btnSaveImg.Size = new System.Drawing.Size(96, 42);
@@ -1006,21 +1024,22 @@ namespace CMMAuto
             this.panelLeft.Size = new System.Drawing.Size(350, 825);
             this.panelLeft.TabIndex = 5;
             // 
-            // lblPlcState
+            // btnDicConfig
             // 
-            this.lblPlcState.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblPlcState.AutoSize = true;
-            this.lblPlcState.BackColor = System.Drawing.Color.Red;
-            this.lblPlcState.Font = new System.Drawing.Font("宋体", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lblPlcState.ForeColor = System.Drawing.Color.White;
-            this.lblPlcState.Location = new System.Drawing.Point(29, 134);
-            this.lblPlcState.Name = "lblPlcState";
-            this.lblPlcState.Size = new System.Drawing.Size(300, 33);
-            this.lblPlcState.TabIndex = 9;
-            this.lblPlcState.Text = "PLC连接断开......";
-            this.lblPlcState.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.btnDicConfig.BackColor = System.Drawing.Color.LightBlue;
+            this.btnDicConfig.FlatAppearance.BorderSize = 0;
+            this.btnDicConfig.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
+            this.btnDicConfig.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
+            this.btnDicConfig.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDicConfig.ForeColor = System.Drawing.Color.DarkBlue;
+            this.btnDicConfig.Location = new System.Drawing.Point(52, 126);
+            this.btnDicConfig.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnDicConfig.Name = "btnDicConfig";
+            this.btnDicConfig.Size = new System.Drawing.Size(96, 42);
+            this.btnDicConfig.TabIndex = 10;
+            this.btnDicConfig.Text = "数据字典";
+            this.btnDicConfig.UseVisualStyleBackColor = true;
+            this.btnDicConfig.Click += new System.EventHandler(this.btnDicConfig_Click);
             // 
             // MainForm
             // 
@@ -1138,6 +1157,7 @@ namespace CMMAuto
         private System.Windows.Forms.Button btnDelPrg;
         private System.Windows.Forms.CheckBox chkIsStatusCheck;
         private System.Windows.Forms.Label lblPlcState;
+        private System.Windows.Forms.Button btnDicConfig;
     }
 }
 

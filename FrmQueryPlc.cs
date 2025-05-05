@@ -103,9 +103,9 @@ namespace CMMAuto
                         Count = r["Count"].ToString().StrToInt(),
                         Remark = r["Remark"].ToString(),
                         //Content = _modbusUitl.ReadHoldingRegisters(r["Address"].ToString().StrToInt(), r["Count"].ToString().StrToInt())
-                        Content = r["Count"].ToString().StrToInt() != 1 ? _modbusUitl.ReadHoldingRegistersConverString
+                        Content = r["Count"].ToString().StrToInt() != 1 ? _modbusUitl?.ReadHoldingRegistersConverString
                             (r["Address"].ToString().StrToInt(), r["Count"].ToString().StrToInt(), r["Count"].ToString().StrToInt()).Replace("\0", "")
-                            : _modbusUitl.ReadHoldingRegisters(r["Address"].ToString().StrToInt(), r["Count"].ToString().StrToInt())
+                            : _modbusUitl?.ReadHoldingRegisters(r["Address"].ToString().StrToInt(), r["Count"].ToString().StrToInt())
                     });
                 }
             }
