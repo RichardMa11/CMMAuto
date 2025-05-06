@@ -206,6 +206,8 @@ namespace CMMAuto
             _configList.Add(new ConfigItem { Key = "InterfaceIsStart", Value = "select_ machinereadyresult", Remark = "查询机台是否就绪" });
             _configList.Add(new ConfigItem { Key = "InterfaceSignal", Value = "receive_measuring_signal", Remark = "上下料请求及完成信号" });
             _configList.Add(new ConfigItem { Key = "InterfaceIsLoading", Value = "receive_loading_unloading", Remark = "上下料接口" });
+
+            _configList.Add(new ConfigItem { Key = "RefreshTime", Value = "2", Remark = "量测数据结果显示时效（注：单位小时/h）" });
         }
     }
 }

@@ -36,6 +36,7 @@ namespace CMMAuto
         private static bool _isCycle = false;
         private static bool _isTheSame = false;
         private static bool _isStop = false;
+        private static double _refreshTime = 2.0;
 
         private static readonly ILog Log = LogManager.GetLogger(typeof(MainForm));
         private SQLiteHelper _sqLiteHelpers = null;
@@ -159,6 +160,11 @@ namespace CMMAuto
             //var port = dataSet.Tables[0].Rows.Count == 0 ? txtPort.Text.Trim() : dataSet.Tables[0].Rows[0]["Value"].ToString();
             if (dataSet.Tables[0].Rows.Count != 0)
                 txtPort.Text = dataSet.Tables[0].Rows[0]["Value"].ToString();
+
+            parameter = new SQLiteParameter[] { new SQLiteParameter("Key", "RefreshTime") };
+            dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
+            if (dataSet.Tables[0].Rows.Count != 0)
+                _refreshTime = Convert.ToDouble(dataSet.Tables[0].Rows[0]["Value"].ToString());
 
             dataSet = _sqLiteHelpers.ExecuteDataSet("SELECT * FROM PLCCfg", null);
             if (dataSet != null)
@@ -288,7 +294,7 @@ namespace CMMAuto
        WHEN CMMResult = 0 THEN '失败' 
        WHEN CMMResult = 1 THEN '成功' 
        ELSE 'Unknown' 
-   END as '结果',strftime('%Y-%m-%d %H:%M:%S', CMMTime) as '运行时间',Remark as '备注' FROM MeaSureData WHERE strftime('%Y-%m-%d %H:%M:%S', CMMTime)  >= '{DateTime.Now.AddMinutes(-30).ToString("yyyy-MM-dd HH:mm:ss")}' order by CMMTime desc ";
+   END as '结果',strftime('%Y-%m-%d %H:%M:%S', CMMTime) as '运行时间',Remark as '备注' FROM MeaSureData WHERE strftime('%Y-%m-%d %H:%M:%S', CMMTime)  >= '{DateTime.Now.AddMinutes(-(_refreshTime * 60)).ToString("yyyy-MM-dd HH:mm:ss")}' order by CMMTime desc ";
 
 
             DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, null);
