@@ -11,19 +11,24 @@ namespace CMMAuto.CommonHelp
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(CMMVisionHelp));
         private readonly object _lock = new object();
+        private readonly object _lockReadImg = new object();
 
         public ImageData GetPicImageData(string sourceImagePath)
         {
             try
             {
-                var mat = Cv2.ImRead(sourceImagePath, ImreadModes.Color);
-                var imageData = new ImageData
+                ImageData imageData;
+                lock (_lockReadImg)
                 {
-                    Image = mat.Data,
-                    Width = mat.Width,
-                    Height = mat.Height,
-                    Channels = mat.Channels()
-                };
+                    var mat = Cv2.ImRead(sourceImagePath, ImreadModes.Color);
+                    imageData = new ImageData
+                    {
+                        Image = mat.Data,
+                        Width = mat.Width,
+                        Height = mat.Height,
+                        Channels = mat.Channels()
+                    };
+                }
                 //log.Info($"原图信息 width: {imageData.Width}, height: {imageData.Height}, channels: {imageData.Channels}");
 
                 return imageData;

@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Net;
+using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using CMMAuto.Config;
 using log4net;
@@ -100,5 +103,27 @@ namespace CMMAuto.CommonHelp
         //{
         //    return new ModelSettingJson(entities);
         //}
+
+        public static string[] GetLocalIPv4Addresses()
+        {
+            try
+            {
+                var hostName = Dns.GetHostName();
+                IPAddress[] addresses = Dns.GetHostAddresses(hostName);
+                List<string> ipv4List = new List<string>();
+
+                foreach (IPAddress ip in addresses)
+                {
+                    if (ip.AddressFamily == AddressFamily.InterNetwork)
+                        ipv4List.Add(ip.ToString());
+                }
+                return ipv4List.ToArray();
+            }
+            catch (Exception e)
+            {
+                log.Error($"获取IP地址失败{e.Message + e.StackTrace}");
+                throw;
+            }
+        }
     }
 }

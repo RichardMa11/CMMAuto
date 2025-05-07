@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,6 +38,10 @@ namespace CMMAuto
         private static bool _isTheSame = false;
         private static bool _isStop = false;
         private static double _refreshTime = 2.0;
+        private static string _ip = "127.0.0.1";
+        private static ApiClient _apiClient;
+        private static int _status = 0;
+        //private static string _httpUrl = "http://localhost:8200/autolink";
 
         private static readonly ILog Log = LogManager.GetLogger(typeof(MainForm));
         private SQLiteHelper _sqLiteHelpers = null;
@@ -59,6 +64,7 @@ namespace CMMAuto
             InitializeComponent();
             InitSqliteHelps();
             InitScreenImgPath();
+            InitApiClient();
         }
 
         private void InitSqliteHelps()
@@ -118,6 +124,39 @@ namespace CMMAuto
             return path;
         }
 
+        private void InitApiClient()
+        {
+            _ip = UtilHelp.GetLocalIPv4Addresses().FirstOrDefault();
+
+            //SQLiteParameter[] parameter = new SQLiteParameter[] { new SQLiteParameter("Key", "Http") };
+            //string sql = "SELECT * FROM Cfg WHERE Key=@Key";
+            //DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
+            //if (dataSet.Tables[0].Rows.Count != 0)
+            //    _httpUrl = dataSet.Tables[0].Rows[0]["Value"].ToString();
+
+            DataSet dataSet = _sqLiteHelpers.ExecuteDataSet("SELECT * FROM Cfg", null);
+            if (dataSet != null)
+            {
+                foreach (DataRow r in dataSet.Tables[0].Rows)
+                {
+                    Global.CfgInfos.Add(new CfgInfo
+                    {
+                        Key = r["Key"].ToString(),
+                        Value = r["Value"].ToString()
+                    });
+                }
+            }
+
+            _apiClient = new ApiClient(Global.CfgInfos.Count(p => p.Key == "Http") != 0 ? Global.CfgInfos.First(p => p.Key == "Http").Value : "http://localhost:8200/autolink")
+            {
+                LogRequestResponse = msg =>
+                {
+                    Log.Info($"[API] {DateTime.Now:HH:mm:ss} {msg}");
+                    //File.AppendAllText("api.log", $"{msg}\n\n");
+                }
+            };
+        }
+
         private void MainForm_Load(object sender, EventArgs e)
         {
             //LoadLogTxt();
@@ -129,6 +168,7 @@ namespace CMMAuto
             PoolMeasure();
             PoolGetPlc();
             PoolSetPlc();
+            PoolPostUrl();
         }
 
         private void LoadTreeView()
@@ -148,25 +188,34 @@ namespace CMMAuto
 
         private void LoadPlcTxt()
         {
-            SQLiteParameter[] parameter = new SQLiteParameter[] { new SQLiteParameter("Key", "PLCIp") };
-            string sql = "SELECT * FROM Cfg WHERE Key=@Key";
-            DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
-            //var ip = dataSet.Tables[0].Rows.Count == 0 ? txtIp.Text.Trim() : dataSet.Tables[0].Rows[0]["Value"].ToString();
-            if (dataSet.Tables[0].Rows.Count != 0)
-                txtIp.Text = dataSet.Tables[0].Rows[0]["Value"].ToString();
+            //SQLiteParameter[] parameter = new SQLiteParameter[] { new SQLiteParameter("Key", "PLCIp") };
+            //string sql = "SELECT * FROM Cfg WHERE Key=@Key";
+            //DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
+            ////var ip = dataSet.Tables[0].Rows.Count == 0 ? txtIp.Text.Trim() : dataSet.Tables[0].Rows[0]["Value"].ToString();
+            //if (dataSet.Tables[0].Rows.Count != 0)
+            //    txtIp.Text = dataSet.Tables[0].Rows[0]["Value"].ToString();
 
-            parameter = new SQLiteParameter[] { new SQLiteParameter("Key", "PLCPort") };
-            dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
-            //var port = dataSet.Tables[0].Rows.Count == 0 ? txtPort.Text.Trim() : dataSet.Tables[0].Rows[0]["Value"].ToString();
-            if (dataSet.Tables[0].Rows.Count != 0)
-                txtPort.Text = dataSet.Tables[0].Rows[0]["Value"].ToString();
+            //parameter = new SQLiteParameter[] { new SQLiteParameter("Key", "PLCPort") };
+            //dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
+            ////var port = dataSet.Tables[0].Rows.Count == 0 ? txtPort.Text.Trim() : dataSet.Tables[0].Rows[0]["Value"].ToString();
+            //if (dataSet.Tables[0].Rows.Count != 0)
+            //    txtPort.Text = dataSet.Tables[0].Rows[0]["Value"].ToString();
 
-            parameter = new SQLiteParameter[] { new SQLiteParameter("Key", "RefreshTime") };
-            dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
-            if (dataSet.Tables[0].Rows.Count != 0)
-                _refreshTime = Convert.ToDouble(dataSet.Tables[0].Rows[0]["Value"].ToString());
+            //parameter = new SQLiteParameter[] { new SQLiteParameter("Key", "RefreshTime") };
+            //dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
+            //if (dataSet.Tables[0].Rows.Count != 0)
+            //    _refreshTime = Convert.ToDouble(dataSet.Tables[0].Rows[0]["Value"].ToString());
 
-            dataSet = _sqLiteHelpers.ExecuteDataSet("SELECT * FROM PLCCfg", null);
+            if (Global.CfgInfos.Count(p => p.Key == "PLCIp") != 0)
+                txtIp.Text = Global.CfgInfos.First(p => p.Key == "PLCIp").Value;
+
+            if (Global.CfgInfos.Count(p => p.Key == "PLCPort") != 0)
+                txtPort.Text = Global.CfgInfos.First(p => p.Key == "PLCPort").Value;
+
+            if (Global.CfgInfos.Count(p => p.Key == "RefreshTime") != 0)
+                _refreshTime = Convert.ToDouble(Global.CfgInfos.First(p => p.Key == "RefreshTime").Value);
+
+            DataSet dataSet = _sqLiteHelpers.ExecuteDataSet("SELECT * FROM PLCCfg", null);
             if (dataSet != null)
             {
                 foreach (DataRow r in dataSet.Tables[0].Rows)
@@ -179,6 +228,7 @@ namespace CMMAuto
                     });
                 }
             }
+
             ConnPlc();
         }
 
@@ -424,6 +474,7 @@ namespace CMMAuto
                     txtPause.BackColor = System.Drawing.Color.White;
                     txtExit.BackColor = System.Drawing.Color.White;
                     txtPreOrEnd.BackColor = System.Drawing.Color.White;
+                    _status = 1;
                     break;
                 case 2:
                     txtOther.BackColor = System.Drawing.Color.White;
@@ -431,6 +482,7 @@ namespace CMMAuto
                     txtPause.BackColor = System.Drawing.Color.LimeGreen;
                     txtExit.BackColor = System.Drawing.Color.White;
                     txtPreOrEnd.BackColor = System.Drawing.Color.White;
+                    _status = 2;
                     break;
                 case 3:
                     txtOther.BackColor = System.Drawing.Color.White;
@@ -438,6 +490,7 @@ namespace CMMAuto
                     txtPause.BackColor = System.Drawing.Color.White;
                     txtExit.BackColor = System.Drawing.Color.White;
                     txtPreOrEnd.BackColor = System.Drawing.Color.LimeGreen;
+                    _status = 3;
                     break;
                 case 4:
                     txtOther.BackColor = System.Drawing.Color.White;
@@ -445,6 +498,7 @@ namespace CMMAuto
                     txtPause.BackColor = System.Drawing.Color.White;
                     txtExit.BackColor = System.Drawing.Color.LimeGreen;
                     txtPreOrEnd.BackColor = System.Drawing.Color.White;
+                    _status = 4;
                     break;
                 default:
                     txtOther.BackColor = System.Drawing.Color.LimeGreen;
@@ -452,6 +506,7 @@ namespace CMMAuto
                     txtPause.BackColor = System.Drawing.Color.White;
                     txtExit.BackColor = System.Drawing.Color.White;
                     txtPreOrEnd.BackColor = System.Drawing.Color.White;
+                    _status = 0;
                     break;
             }
         }
@@ -1817,6 +1872,60 @@ namespace CMMAuto
             }
             _frmDicConfig.Show();
             _frmDicConfig.BringToFront();  // 激活并置顶窗体
+        }
+
+        private void PoolPostUrl()
+        {
+            var pollingService = new PollingService(
+                pollingInterval: TimeSpan.FromSeconds(1),
+                checkAction: async () =>
+                {
+                    if (chkIsSend.Checked)
+                        await Task.Run(SendImgToServer);
+
+                    return true; // 始终继续轮询
+                }
+            );
+
+            // 订阅错误事件
+            pollingService.OnError += ex =>
+                Log.Error($"PoolPostUrl error: {ex.Message}");
+
+            // 启动轮询
+            pollingService.Start();
+        }
+
+        private async void SendImgToServer()
+        {
+            await Task.Run(async () =>
+            {
+                // 初始化客户端
+                //var apiClient = new ApiClient("https://api.example.com/v1");
+                // 设置认证令牌
+                //_apiClient.SetBearerToken("your-access-token");
+
+                try
+                {
+                    // POST 请求示例
+                    var requestData = new Request
+                    {
+                        Status = _status,
+                        Ip = _ip,
+                        ImageData = _cmmVisionHelp.GetPicImageData(_fullFileName)
+                    };
+
+                    await _apiClient.PostAsync<Response>(Global.CfgInfos.Count(p => p.Key == "InterfaceName") != 0 ?
+                            Global.CfgInfos.First(p => p.Key == "InterfaceName").Value : "/api/testpost", requestData);
+                }
+                catch (HttpRequestException ex)
+                {
+                    Log.Error($@"网络请求错误: {ex.Message}");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Log.Error($@"数据处理错误: {ex.Message}");
+                }
+            });
         }
     }
 }

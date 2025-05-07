@@ -208,6 +208,8 @@ namespace CMMAuto
             _configList.Add(new ConfigItem { Key = "InterfaceIsLoading", Value = "receive_loading_unloading", Remark = "上下料接口" });
 
             _configList.Add(new ConfigItem { Key = "RefreshTime", Value = "2", Remark = "量测数据结果显示时效（注：单位小时/h）" });
+            _configList.Add(new ConfigItem { Key = "Http", Value = "http://localhost:8200/autolink", Remark = "监控接口地址" });
+            _configList.Add(new ConfigItem { Key = "InterfaceName", Value = "/api/testpost", Remark = "监控接口地址后缀" });
         }
     }
 }

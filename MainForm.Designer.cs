@@ -60,6 +60,7 @@ namespace CMMAuto
             this.panelOperate = new System.Windows.Forms.Panel();
             this.panelAgvOperate = new System.Windows.Forms.Panel();
             this.grpAgvOperate = new System.Windows.Forms.GroupBox();
+            this.btnDicConfig = new System.Windows.Forms.Button();
             this.lblPlcState = new System.Windows.Forms.Label();
             this.btnSavePLC = new System.Windows.Forms.Button();
             this.btnTestExit = new System.Windows.Forms.Button();
@@ -105,7 +106,7 @@ namespace CMMAuto
             this.trvTestPrgChoose = new System.Windows.Forms.TreeView();
             this.grpTestPrgChoose = new System.Windows.Forms.GroupBox();
             this.panelLeft = new System.Windows.Forms.Panel();
-            this.btnDicConfig = new System.Windows.Forms.Button();
+            this.chkIsSend = new System.Windows.Forms.CheckBox();
             this.panelMiddle.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panelCmmlog.SuspendLayout();
@@ -448,6 +449,23 @@ namespace CMMAuto
             this.grpAgvOperate.TabIndex = 4;
             this.grpAgvOperate.TabStop = false;
             this.grpAgvOperate.Text = "PLC操作";
+            // 
+            // btnDicConfig
+            // 
+            this.btnDicConfig.BackColor = System.Drawing.Color.LightBlue;
+            this.btnDicConfig.FlatAppearance.BorderSize = 0;
+            this.btnDicConfig.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
+            this.btnDicConfig.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
+            this.btnDicConfig.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDicConfig.ForeColor = System.Drawing.Color.DarkBlue;
+            this.btnDicConfig.Location = new System.Drawing.Point(52, 126);
+            this.btnDicConfig.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnDicConfig.Name = "btnDicConfig";
+            this.btnDicConfig.Size = new System.Drawing.Size(96, 42);
+            this.btnDicConfig.TabIndex = 10;
+            this.btnDicConfig.Text = "数据字典";
+            this.btnDicConfig.UseVisualStyleBackColor = true;
+            this.btnDicConfig.Click += new System.EventHandler(this.btnDicConfig_Click);
             // 
             // lblPlcState
             // 
@@ -808,6 +826,7 @@ namespace CMMAuto
             // 
             // grpCmmState
             // 
+            this.grpCmmState.Controls.Add(this.chkIsSend);
             this.grpCmmState.Controls.Add(this.chkIsStatusCheck);
             this.grpCmmState.Controls.Add(this.txtWorkPiece);
             this.grpCmmState.Controls.Add(this.label13);
@@ -840,7 +859,7 @@ namespace CMMAuto
             this.chkIsStatusCheck.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkIsStatusCheck.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.chkIsStatusCheck.ForeColor = System.Drawing.Color.DarkBlue;
-            this.chkIsStatusCheck.Location = new System.Drawing.Point(249, 93);
+            this.chkIsStatusCheck.Location = new System.Drawing.Point(238, 137);
             this.chkIsStatusCheck.Name = "chkIsStatusCheck";
             this.chkIsStatusCheck.Size = new System.Drawing.Size(73, 21);
             this.chkIsStatusCheck.TabIndex = 18;
@@ -1024,22 +1043,19 @@ namespace CMMAuto
             this.panelLeft.Size = new System.Drawing.Size(350, 825);
             this.panelLeft.TabIndex = 5;
             // 
-            // btnDicConfig
+            // chkIsSend
             // 
-            this.btnDicConfig.BackColor = System.Drawing.Color.LightBlue;
-            this.btnDicConfig.FlatAppearance.BorderSize = 0;
-            this.btnDicConfig.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
-            this.btnDicConfig.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
-            this.btnDicConfig.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnDicConfig.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnDicConfig.Location = new System.Drawing.Point(52, 126);
-            this.btnDicConfig.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btnDicConfig.Name = "btnDicConfig";
-            this.btnDicConfig.Size = new System.Drawing.Size(96, 42);
-            this.btnDicConfig.TabIndex = 10;
-            this.btnDicConfig.Text = "数据字典";
-            this.btnDicConfig.UseVisualStyleBackColor = true;
-            this.btnDicConfig.Click += new System.EventHandler(this.btnDicConfig_Click);
+            this.chkIsSend.AutoSize = true;
+            this.chkIsSend.Checked = true;
+            this.chkIsSend.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkIsSend.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.chkIsSend.ForeColor = System.Drawing.Color.DarkBlue;
+            this.chkIsSend.Location = new System.Drawing.Point(238, 178);
+            this.chkIsSend.Name = "chkIsSend";
+            this.chkIsSend.Size = new System.Drawing.Size(73, 21);
+            this.chkIsSend.TabIndex = 19;
+            this.chkIsSend.Text = "发送监控";
+            this.chkIsSend.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
@@ -1158,6 +1174,7 @@ namespace CMMAuto
         private System.Windows.Forms.CheckBox chkIsStatusCheck;
         private System.Windows.Forms.Label lblPlcState;
         private System.Windows.Forms.Button btnDicConfig;
+        private System.Windows.Forms.CheckBox chkIsSend;
     }
 }
 

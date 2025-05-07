@@ -141,6 +141,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommonHelp\ApiClient.cs" />
     <Compile Include="CommonHelp\ClsLock.cs" />
     <Compile Include="CommonHelp\KeyboardSimulatorHelp.cs" />
     <Compile Include="CommonHelp\NativeWindowHelp.cs" />
