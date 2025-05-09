@@ -234,7 +234,7 @@ namespace CMMAuto.CommonHelp
             /// <returns>int,1：表示运行状态，2：表示暂停状态，3：表示没有启动测量或测量完成之后；-1：表示无法打开当前目录，
             /// 2：表示运行模板图片为空；-3：表示输入图像为空或错误；-4：表示错误模板图片为空; -5: 表示其他错误；</returns>
             [DllImport(@"dll\CMMMiddlewareImg.dll", CallingConvention = CallingConvention.Cdecl)]
-            public static extern int CMMRunOrPauseCheck(ImageData inImage, float score = 80.0f);
+            public static extern int CMMRunOrPauseCheck(ImageData inImage, float score = 75.0f);
 
             /// <summary>
             /// 确认输入制程名称的位置
@@ -247,7 +247,7 @@ namespace CMMAuto.CommonHelp
             /// <param name="score">识别分数阈值</param>
             /// <returns>int, 0:表示运行成功；-1：表示运行失败； -2：表示识别阈值较低；-3:表示输入图片或模板为空； </returns>
             [DllImport(@"dll\CMMMiddlewareImg.dll", CallingConvention = CallingConvention.Cdecl)]
-            public static extern int CMMOpenFilePos(ImageData inImage, out float x0, out float y0, out float x1, out float y1, float score = 80.0f);
+            public static extern int CMMOpenFilePos(ImageData inImage, out float x0, out float y0, out float x1, out float y1, float score = 75.0f);
 
             /// <summary>
             /// 确定【文件】位置用于打开或关闭文件
@@ -258,7 +258,7 @@ namespace CMMAuto.CommonHelp
             /// <param name="score">识别分数阈值</param>
             /// <returns>int, 0:表示运行成功；-1：表示运行失败；-2：表示识别阈值较低； </returns>
             [DllImport(@"dll\CMMMiddlewareImg.dll", CallingConvention = CallingConvention.Cdecl)]
-            public static extern int CMMFilePos(ImageData inImage, out float x, out float y, float score = 80.0f);
+            public static extern int CMMFilePos(ImageData inImage, out float x, out float y, float score = 75.0f);
 
             /// <summary>
             /// 确定当前制程是否正确关闭
@@ -278,7 +278,7 @@ namespace CMMAuto.CommonHelp
             /// <returns>返回int, 0:表示运行成功；-1：表示运行失败；-2：表示识别阈值较低；</returns>
 
             [DllImport(@"dll\CMMMiddlewareImg.dll", CallingConvention = CallingConvention.Cdecl)]
-            public static extern int CMMCloseBtnPos(ImageData inImage, out float x, out float y, float score = 80.0f);
+            public static extern int CMMCloseBtnPos(ImageData inImage, out float x, out float y, float score = 75.0f);
         }
 
     }

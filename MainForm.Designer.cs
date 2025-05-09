@@ -87,6 +87,7 @@ namespace CMMAuto
             this.label6 = new System.Windows.Forms.Label();
             this.lblCommInfo = new System.Windows.Forms.Label();
             this.grpCmmState = new System.Windows.Forms.GroupBox();
+            this.chkIsSend = new System.Windows.Forms.CheckBox();
             this.chkIsStatusCheck = new System.Windows.Forms.CheckBox();
             this.txtWorkPiece = new System.Windows.Forms.TextBox();
             this.label13 = new System.Windows.Forms.Label();
@@ -106,7 +107,6 @@ namespace CMMAuto
             this.trvTestPrgChoose = new System.Windows.Forms.TreeView();
             this.grpTestPrgChoose = new System.Windows.Forms.GroupBox();
             this.panelLeft = new System.Windows.Forms.Panel();
-            this.chkIsSend = new System.Windows.Forms.CheckBox();
             this.panelMiddle.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panelCmmlog.SuspendLayout();
@@ -603,7 +603,6 @@ namespace CMMAuto
             this.btnOpenFile.TabIndex = 0;
             this.btnOpenFile.Text = "测试打开";
             this.btnOpenFile.UseVisualStyleBackColor = true;
-            this.btnOpenFile.Visible = false;
             this.btnOpenFile.Click += new System.EventHandler(this.btnOpenFile_Click);
             // 
             // btnSaveImg
@@ -621,7 +620,6 @@ namespace CMMAuto
             this.btnSaveImg.TabIndex = 1;
             this.btnSaveImg.Text = "截屏并读取";
             this.btnSaveImg.UseVisualStyleBackColor = true;
-            this.btnSaveImg.Visible = false;
             this.btnSaveImg.Click += new System.EventHandler(this.btnSaveImg_Click);
             // 
             // grpCmmOperate
@@ -819,7 +817,7 @@ namespace CMMAuto
             this.lblCommInfo.ForeColor = System.Drawing.Color.Red;
             this.lblCommInfo.Location = new System.Drawing.Point(32, 160);
             this.lblCommInfo.Name = "lblCommInfo";
-            this.lblCommInfo.Size = new System.Drawing.Size(229, 16);
+            this.lblCommInfo.Size = new System.Drawing.Size(228, 16);
             this.lblCommInfo.TabIndex = 8;
             this.lblCommInfo.Text = "注：修改完要重新连接并保存";
             this.lblCommInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -851,6 +849,20 @@ namespace CMMAuto
             this.grpCmmState.TabIndex = 0;
             this.grpCmmState.TabStop = false;
             this.grpCmmState.Text = "CMM软件状态";
+            // 
+            // chkIsSend
+            // 
+            this.chkIsSend.AutoSize = true;
+            this.chkIsSend.Checked = true;
+            this.chkIsSend.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkIsSend.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.chkIsSend.ForeColor = System.Drawing.Color.DarkBlue;
+            this.chkIsSend.Location = new System.Drawing.Point(238, 178);
+            this.chkIsSend.Name = "chkIsSend";
+            this.chkIsSend.Size = new System.Drawing.Size(73, 21);
+            this.chkIsSend.TabIndex = 19;
+            this.chkIsSend.Text = "发送监控";
+            this.chkIsSend.UseVisualStyleBackColor = true;
             // 
             // chkIsStatusCheck
             // 
@@ -1042,20 +1054,6 @@ namespace CMMAuto
             this.panelLeft.Name = "panelLeft";
             this.panelLeft.Size = new System.Drawing.Size(350, 825);
             this.panelLeft.TabIndex = 5;
-            // 
-            // chkIsSend
-            // 
-            this.chkIsSend.AutoSize = true;
-            this.chkIsSend.Checked = true;
-            this.chkIsSend.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkIsSend.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.chkIsSend.ForeColor = System.Drawing.Color.DarkBlue;
-            this.chkIsSend.Location = new System.Drawing.Point(238, 178);
-            this.chkIsSend.Name = "chkIsSend";
-            this.chkIsSend.Size = new System.Drawing.Size(73, 21);
-            this.chkIsSend.TabIndex = 19;
-            this.chkIsSend.Text = "发送监控";
-            this.chkIsSend.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
