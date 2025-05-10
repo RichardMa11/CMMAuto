@@ -169,6 +169,24 @@
     <Compile Include="FrmDicConfig.Designer.cs">
       <DependentUpon>FrmDicConfig.cs</DependentUpon>
     </Compile>
+    <Compile Include="FrmMeasureEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmMeasureEdit.Designer.cs">
+      <DependentUpon>FrmMeasureEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmPassword.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmPassword.Designer.cs">
+      <DependentUpon>FrmPassword.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmMeasure.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmMeasure.Designer.cs">
+      <DependentUpon>FrmMeasure.cs</DependentUpon>
+    </Compile>
     <Compile Include="FrmQueryPlc.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -201,6 +219,15 @@
     <Compile Include="Protocol\Tcp\TcpWriteSingleMessage.cs" />
     <EmbeddedResource Include="FrmDicConfig.resx">
       <DependentUpon>FrmDicConfig.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmMeasureEdit.resx">
+      <DependentUpon>FrmMeasureEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmPassword.resx">
+      <DependentUpon>FrmPassword.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmMeasure.resx">
+      <DependentUpon>FrmMeasure.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FrmQueryPlc.resx">
       <DependentUpon>FrmQueryPlc.cs</DependentUpon>

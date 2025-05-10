@@ -247,7 +247,7 @@ namespace CMMAuto
             this.btnDelPrg.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDelPrg.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.btnDelPrg.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnDelPrg.Location = new System.Drawing.Point(508, 174);
+            this.btnDelPrg.Location = new System.Drawing.Point(6, 174);
             this.btnDelPrg.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnDelPrg.Name = "btnDelPrg";
             this.btnDelPrg.Size = new System.Drawing.Size(96, 42);
@@ -283,7 +283,7 @@ namespace CMMAuto
             this.btnCmmTestLogQuery.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCmmTestLogQuery.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.btnCmmTestLogQuery.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnCmmTestLogQuery.Location = new System.Drawing.Point(376, 174);
+            this.btnCmmTestLogQuery.Location = new System.Drawing.Point(458, 174);
             this.btnCmmTestLogQuery.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnCmmTestLogQuery.Name = "btnCmmTestLogQuery";
             this.btnCmmTestLogQuery.Size = new System.Drawing.Size(96, 42);
@@ -301,12 +301,12 @@ namespace CMMAuto
             this.btnClearInfo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClearInfo.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.btnClearInfo.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnClearInfo.Location = new System.Drawing.Point(244, 174);
+            this.btnClearInfo.Location = new System.Drawing.Point(309, 174);
             this.btnClearInfo.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnClearInfo.Name = "btnClearInfo";
             this.btnClearInfo.Size = new System.Drawing.Size(96, 42);
             this.btnClearInfo.TabIndex = 7;
-            this.btnClearInfo.Text = "清   空";
+            this.btnClearInfo.Text = "重新加载";
             this.btnClearInfo.UseVisualStyleBackColor = true;
             this.btnClearInfo.Click += new System.EventHandler(this.btnClearInfo_Click);
             // 
@@ -319,12 +319,12 @@ namespace CMMAuto
             this.btnInputTestPrg.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnInputTestPrg.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.btnInputTestPrg.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnInputTestPrg.Location = new System.Drawing.Point(112, 174);
+            this.btnInputTestPrg.Location = new System.Drawing.Point(160, 174);
             this.btnInputTestPrg.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnInputTestPrg.Name = "btnInputTestPrg";
             this.btnInputTestPrg.Size = new System.Drawing.Size(96, 42);
             this.btnInputTestPrg.TabIndex = 6;
-            this.btnInputTestPrg.Text = "程式录入";
+            this.btnInputTestPrg.Text = "程式编辑";
             this.btnInputTestPrg.UseVisualStyleBackColor = true;
             this.btnInputTestPrg.Click += new System.EventHandler(this.btnInputTestPrg_Click);
             // 
@@ -817,7 +817,7 @@ namespace CMMAuto
             this.lblCommInfo.ForeColor = System.Drawing.Color.Red;
             this.lblCommInfo.Location = new System.Drawing.Point(32, 160);
             this.lblCommInfo.Name = "lblCommInfo";
-            this.lblCommInfo.Size = new System.Drawing.Size(228, 16);
+            this.lblCommInfo.Size = new System.Drawing.Size(229, 16);
             this.lblCommInfo.TabIndex = 8;
             this.lblCommInfo.Text = "注：修改完要重新连接并保存";
             this.lblCommInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;

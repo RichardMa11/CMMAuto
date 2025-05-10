@@ -28,7 +28,7 @@ namespace CMMAuto
 
         private readonly SQLiteHelper _sqLiteHelpers = null;
         private readonly BindingList<ConfigItem> _configList = new BindingList<ConfigItem>();
-        private static readonly ILog Log = LogManager.GetLogger(typeof(FrmConfig));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(FrmDicConfig));
         public FrmDicConfig(SQLiteHelper sqLiteHelpers)
         {
             _sqLiteHelpers = sqLiteHelpers;
@@ -210,6 +210,7 @@ namespace CMMAuto
             _configList.Add(new ConfigItem { Key = "RefreshTime", Value = "2", Remark = "量测数据结果显示时效（注：单位小时/h）" });
             _configList.Add(new ConfigItem { Key = "Http", Value = "http://localhost:8200/autolink", Remark = "监控接口地址" });
             _configList.Add(new ConfigItem { Key = "InterfaceName", Value = "/api/testpost", Remark = "监控接口地址后缀" });
+            _configList.Add(new ConfigItem { Key = "Password", Value = "1234", Remark = "程式编辑的权限密码" });
         }
     }
 }

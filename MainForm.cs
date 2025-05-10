@@ -958,39 +958,62 @@ namespace CMMAuto
 
         private void btnInputTestPrg_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(txtMeasureName.Text.Trim())
-                || string.IsNullOrEmpty(txtMeasureProgram.Text.Trim())
-                || string.IsNullOrEmpty(txtTypeKey.Text.Trim()))
+            if (Global.CfgInfos.Count(p => p.Key == "Password") == 0)
             {
-                MessageBoxX.Show("量测程序、节点以及类型码不能为空！", "提示");
+                MessageBoxX.Show("密码没有设置，请去数据字典设置！", "提示");
                 return;
             }
 
-            // check 是否已经存在
-            if (_sqLiteHelpers.QueryOne("MeaSurePrgCfg", "PrgName", txtMeasureName.Text.Trim()) != null)
+            using (FrmPassword pwdForm = new FrmPassword())
             {
-                MessageBoxX.Show("该量测节点已经存在！", "提示");
-                return;
+                if (pwdForm.ShowDialog() == DialogResult.OK)
+                {
+                    // 验证密码（示例密码为"1234"）
+                    if (pwdForm.EnteredPassword == Global.CfgInfos.First(p => p.Key == "Password").Value)
+                    {
+                        FrmMeasure opForm = new FrmMeasure(_sqLiteHelpers);
+                        opForm.Show(); // 打开操作窗体
+                    }
+                    else
+                    {
+                        MessageBoxX.Show("密码错误，请重试！", "提示");
+                    }
+                }
             }
 
-            // check 是否已经存在
-            if (_sqLiteHelpers.QueryOne("MeaSurePrgCfg", "Type", txtTypeKey.Text.Trim()) != null)
-            {
-                MessageBoxX.Show("该类型码已经存在！", "提示");
-                return;
-            }
+            //if (string.IsNullOrEmpty(txtMeasureName.Text.Trim())
+            //    || string.IsNullOrEmpty(txtMeasureProgram.Text.Trim())
+            //    || string.IsNullOrEmpty(txtTypeKey.Text.Trim()))
+            //{
+            //    MessageBoxX.Show("量测程序、节点以及类型码不能为空！", "提示");
+            //    return;
+            //}
 
-            Dictionary<string, object> dic = new Dictionary<string, object>
-            {
-                {"PrgName", txtMeasureName.Text.Trim()},
-                {"PrgPath", txtMeasureProgram.Text.Trim()},
-                {"Type", txtTypeKey.Text.Trim()},
-                {"CreateDate", DateTime.Now}
-            };
+            //// check 是否已经存在
+            //if (_sqLiteHelpers.QueryOne("MeaSurePrgCfg", "PrgName", txtMeasureName.Text.Trim()) != null)
+            //{
+            //    MessageBoxX.Show("该量测节点已经存在！", "提示");
+            //    return;
+            //}
 
-            int result = _sqLiteHelpers.InsertData("MeaSurePrgCfg", dic);
-            LoadTreeView();
-            MessageBoxX.Show("录入成功！", "提示");
+            //// check 是否已经存在
+            //if (_sqLiteHelpers.QueryOne("MeaSurePrgCfg", "Type", txtTypeKey.Text.Trim()) != null)
+            //{
+            //    MessageBoxX.Show("该类型码已经存在！", "提示");
+            //    return;
+            //}
+
+            //Dictionary<string, object> dic = new Dictionary<string, object>
+            //{
+            //    {"PrgName", txtMeasureName.Text.Trim()},
+            //    {"PrgPath", txtMeasureProgram.Text.Trim()},
+            //    {"Type", txtTypeKey.Text.Trim()},
+            //    {"CreateDate", DateTime.Now}
+            //};
+
+            //int result = _sqLiteHelpers.InsertData("MeaSurePrgCfg", dic);
+            //LoadTreeView();
+            //MessageBoxX.Show("录入成功！", "提示");
         }
 
         private void btnClearInfo_Click(object sender, EventArgs e)

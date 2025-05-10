@@ -36,7 +36,7 @@ namespace CMMAuto
 
         private readonly SQLiteHelper _sqLiteHelpers = null;
         private BindingList<ConfigItem> _configList = new BindingList<ConfigItem>();
-        private static readonly ILog Log = LogManager.GetLogger(typeof(FrmConfig));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(FrmQueryPlc));
         private ModbusUitl _modbusUitl;
 
         public FrmQueryPlc(SQLiteHelper sqLiteHelpers, ModbusUitl modbusUitl)
