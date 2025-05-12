@@ -354,32 +354,6 @@ namespace CMMAuto
             }
         }
 
-        private void PoolMeasure()
-        {
-            var pollingService = new PollingService(
-                pollingInterval: TimeSpan.FromSeconds(15),
-                checkAction: async () =>
-                {
-                    //await Task.Run(GetCmmState);
-                    await Task.Run(MeasurePrg);
-                    //lock (_lock)
-                    //{
-                    //    this.BeginInvoke(new Action(GetCmmState));
-                    //    this.BeginInvoke(new Action(MeasurePrg));
-                    //}
-
-                    return true; // 始终继续轮询
-                }
-            );
-
-            // 订阅错误事件
-            pollingService.OnError += ex =>
-                Log.Error($"PoolMeasure error: {ex.Message}");
-
-            // 启动轮询
-            pollingService.Start();
-        }
-
         private async void GetCmmState()
         {
             if (this.InvokeRequired)
@@ -509,6 +483,32 @@ namespace CMMAuto
                     _status = 0;
                     break;
             }
+        }
+
+        private void PoolMeasure()
+        {
+            var pollingService = new PollingService(
+                pollingInterval: TimeSpan.FromSeconds(15),
+                checkAction: async () =>
+                {
+                    //await Task.Run(GetCmmState);
+                    await Task.Run(MeasurePrg);
+                    //lock (_lock)
+                    //{
+                    //    this.BeginInvoke(new Action(GetCmmState));
+                    //    this.BeginInvoke(new Action(MeasurePrg));
+                    //}
+
+                    return true; // 始终继续轮询
+                }
+            );
+
+            // 订阅错误事件
+            pollingService.OnError += ex =>
+                Log.Error($"PoolMeasure error: {ex.Message}");
+
+            // 启动轮询
+            pollingService.Start();
         }
 
         private void MeasurePrg()
