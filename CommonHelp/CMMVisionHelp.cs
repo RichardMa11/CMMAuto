@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Drawing;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using CMMAuto.Model;
 using log4net;
 using OpenCvSharp;
+using OpenCvSharp.Extensions;
 
 namespace CMMAuto.CommonHelp
 {
@@ -40,12 +42,62 @@ namespace CMMAuto.CommonHelp
             }
         }
 
+        public ImageData GetPicImageData(Bitmap sourceImage)
+        {
+            try
+            {
+                var mat = new Bitmap(sourceImage).ToMat();
+                //Cv2.CvtColor(mat,mat,ColorConversionCodes.BGRA2GRAY);
+                Cv2.CvtColor(mat, mat, ColorConversionCodes.BGRA2BGR);
+                ImageData imageData = new ImageData
+                {
+                    Image = mat.Data,
+                    Width = mat.Width,
+                    Height = mat.Height,
+                    Channels = mat.Channels()
+                };
+
+                return imageData;
+            }
+            catch (Exception ex)
+            {
+                log.Error($"GetPicImageData出错：{ex.Message + ex.StackTrace}");
+                throw;
+            }
+        }
+
         /// <summary>
         /// 确定CMM软件运行状态
         /// </summary>
         /// <param name="sourceImagePath">图像路径</param>
         /// <returns>int,1：表示运行状态，2：表示暂停状态，3：表示没有启动测量或测量完成之后；-1：表示无法打开当前目录，
         /// -2：表示运行模板图片为空；-3：表示输入图像为空或错误；-4：表示错误模板图片为空; -5: 表示其他错误；</returns>
+        [HandleProcessCorruptedStateExceptions]
+        public int CheckCmmRunState(Bitmap sourceImagePath)
+        {
+            try
+            {
+                lock (_lock)
+                {
+                    //log.Info("确定CMM软件运行状态");
+                    var res = CmmVisionInterface.CMMRunOrPauseCheck(GetPicImageData(sourceImagePath));
+                    //log.Info($"CMM软件运行状态: { res }");
+                    return res;
+                }
+            }
+            catch (AccessViolationException ex)
+            {
+                log.Error($"确定CMM软件运行状态出错：{ex.Message + ex.StackTrace}");
+                return -1;
+            }
+            catch (Exception ex)
+            {
+                log.Error($"确定CMM软件运行状态出错：{ex.Message + ex.StackTrace}");
+                return -1;
+            }
+        }
+
+
         [HandleProcessCorruptedStateExceptions]
         public int CheckCmmRunState(string sourceImagePath)
         {
@@ -81,7 +133,7 @@ namespace CMMAuto.CommonHelp
         /// <param name="y1">返回输入程序名称右边打开纵坐标</param>
         /// <returns>int, 0:表示运行成功；-1：表示运行失败； -2：表示识别阈值较低；-3:表示输入图片或模板为空； </returns>
         [HandleProcessCorruptedStateExceptions]
-        public int GetCmmOpenFilePos(string sourceImagePath, out float x0, out float y0, out float x1, out float y1)
+        public int GetCmmOpenFilePos(Bitmap sourceImagePath, out float x0, out float y0, out float x1, out float y1)
         {
             try
             {
@@ -123,7 +175,7 @@ namespace CMMAuto.CommonHelp
         /// <param name="y">返回【文件】位置的y坐标</param>
         /// <returns>int, 0:表示运行成功；-1：表示运行失败；-2：表示识别阈值较低； </returns>
         [HandleProcessCorruptedStateExceptions]
-        public int GetCmmFilePos(string sourceImagePath, out float x, out float y)
+        public int GetCmmFilePos(Bitmap sourceImagePath, out float x, out float y)
         {
             try
             {
@@ -159,7 +211,7 @@ namespace CMMAuto.CommonHelp
         /// <param name="sourceImagePath">图像路径</param>
         /// <returns>int,0:表示制程正常关闭；-1：表示该制程没有关闭；</returns>
         [HandleProcessCorruptedStateExceptions]
-        public int CheckCmmIsClosed(string sourceImagePath)
+        public int CheckCmmIsClosed(Bitmap sourceImagePath)
         {
             try
             {
@@ -192,7 +244,7 @@ namespace CMMAuto.CommonHelp
         /// <param name="y">返回【关闭】位置的y坐标</param>
         /// <returns>返回int, 0:表示运行成功；-1：表示运行失败；-2：表示识别阈值较低； </returns>
         [HandleProcessCorruptedStateExceptions]
-        public int GetCmmClosedPos(string sourceImagePath, out float x, out float y)
+        public int GetCmmClosedPos(Bitmap sourceImagePath, out float x, out float y)
         {
             try
             {

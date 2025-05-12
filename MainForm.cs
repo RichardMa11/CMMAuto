@@ -32,7 +32,7 @@ namespace CMMAuto
         private readonly KeyboardSimulatorHelp _simulator = new KeyboardSimulatorHelp();
         private readonly object _lock = new object();
 
-        private static string _fullFileName = "";
+        //private static string _fullFileName = "";
         private static bool _isStart = false;
         private static bool _isCycle = false;
         private static bool _isTheSame = false;
@@ -63,7 +63,7 @@ namespace CMMAuto
         {
             InitializeComponent();
             InitSqliteHelps();
-            InitScreenImgPath();
+            //InitScreenImgPath();
             InitApiClient();
         }
 
@@ -102,7 +102,7 @@ namespace CMMAuto
                 Directory.CreateDirectory(basePath);
 
             //var fullFileName = Path.Combine(basePath, $"{DateTime.Now.ToString("yyyyMMddHHmmss")}.{CommonConstant.IMAGE_SUFFIX}");
-            _fullFileName = Path.Combine(basePath, $"AutoScreenflash.png");
+            //_fullFileName = Path.Combine(basePath, $"AutoScreenflash.png");
         }
 
         private string GetImageBasePath()
@@ -365,14 +365,14 @@ namespace CMMAuto
             {
                 if (chkIsStatusCheck.Checked)
                 {
-                    var imageBitmap = ScreenShotHelp.GetImage();
-                    imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                    //var imageBitmap = ScreenShotHelp.GetImage();
+                    //imageBitmap.Save(_fullFileName, ImageFormat.Png);
 
-                    if (_cmmVisionHelp.CheckCmmIsClosed(_fullFileName) == 0)
+                    if (_cmmVisionHelp.CheckCmmIsClosed(ScreenShotHelp.GetImage()) == 0)
                         SetState(4);
                     else
                     {
-                        switch (_cmmVisionHelp.CheckCmmRunState(_fullFileName))
+                        switch (_cmmVisionHelp.CheckCmmRunState(ScreenShotHelp.GetImage()))
                         {
                             case 1:
                                 SetState(1);
@@ -552,17 +552,17 @@ namespace CMMAuto
             if (txtExit.BackColor == System.Drawing.Color.LimeGreen)
             {
                 //获取文件位置
-                if (_cmmVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
+                if (_cmmVisionHelp.GetCmmFilePos(ScreenShotHelp.GetImage(), out float x, out float y) == 0)
                 {
                     //鼠标点击
                     Log.Info($"[Auto][Run] 弹出文件窗口 - Start Button: X: {x}, Y: {y}");
                     //NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
                     _simulator.SimiuCrtlO();
                     await Task.Delay(2000);
-                    var imageBitmap = ScreenShotHelp.GetImage();
-                    imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                    //var imageBitmap = ScreenShotHelp.GetImage();
+                    //imageBitmap.Save(_fullFileName, ImageFormat.Png);
 
-                    if (_cmmVisionHelp.GetCmmOpenFilePos(_fullFileName, out float x0, out float y0, out float x1, out float y1) == 0)
+                    if (_cmmVisionHelp.GetCmmOpenFilePos(ScreenShotHelp.GetImage(), out float x0, out float y0, out float x1, out float y1) == 0)
                     {
                         Log.Info($"[Auto][Run] 打开量测程式 - Start Button: X: {x0}, Y: {y0}");
                         //NativeWindowHelp.Click(Convert.ToInt32(x0), Convert.ToInt32(y0));
@@ -575,17 +575,17 @@ namespace CMMAuto
                         NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
                         //判断打开但没有运行状态
                         await Task.Delay(3000);
-                        imageBitmap = ScreenShotHelp.GetImage();
-                        imageBitmap.Save(_fullFileName, ImageFormat.Png);
-                        if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 3)//check是否打开
+                        //imageBitmap = ScreenShotHelp.GetImage();
+                        //imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                        if (_cmmVisionHelp.CheckCmmRunState(ScreenShotHelp.GetImage()) == 3)//check是否打开
                         {
                             //SendKeys.SendWait("^Q");
                             _simulator.SimiuCrtlQ();
 
                             await Task.Delay(2000);
-                            imageBitmap = ScreenShotHelp.GetImage();
-                            imageBitmap.Save(_fullFileName, ImageFormat.Png);
-                            if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 1 || _cmmVisionHelp.CheckCmmRunState(_fullFileName) == 2)//check是否打开
+                            //imageBitmap = ScreenShotHelp.GetImage();
+                            //imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                            if (_cmmVisionHelp.CheckCmmRunState(ScreenShotHelp.GetImage()) == 1 || _cmmVisionHelp.CheckCmmRunState(ScreenShotHelp.GetImage()) == 2)//check是否打开
                             {
                                 Log.Info($"开始运行1。。。");
                                 //写入数据库
@@ -629,31 +629,31 @@ namespace CMMAuto
                 {
                     if (txtPreOrEnd.BackColor == System.Drawing.Color.LimeGreen)
                     {
-                        if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 3)
+                        if (_cmmVisionHelp.CheckCmmRunState(ScreenShotHelp.GetImage()) == 3)
                         {
                             await Task.Delay(3000);
                             //simulator.SimiuCrtlQ();
                             if (_isTheSame)
                             {
                                 //-----判断结束，并退出；
-                                var imageBitmap = ScreenShotHelp.GetImage();
-                                imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                                //var imageBitmap = ScreenShotHelp.GetImage();
+                                //imageBitmap.Save(_fullFileName, ImageFormat.Png);
 
-                                if (_cmmVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
+                                if (_cmmVisionHelp.GetCmmFilePos(ScreenShotHelp.GetImage(), out float x, out float y) == 0)
                                 {
                                     NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
                                     await Task.Delay(1000);
-                                    imageBitmap = ScreenShotHelp.GetImage();
-                                    imageBitmap.Save(_fullFileName, ImageFormat.Png);
-                                    if (_cmmVisionHelp.GetCmmClosedPos(_fullFileName, out float x1, out float y1) == 0)
+                                    //imageBitmap = ScreenShotHelp.GetImage();
+                                    //imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                                    if (_cmmVisionHelp.GetCmmClosedPos(ScreenShotHelp.GetImage(), out float x1, out float y1) == 0)
                                     {
                                         NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
 
                                         await Task.Delay(2000);
-                                        imageBitmap = ScreenShotHelp.GetImage();
-                                        imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                                        //imageBitmap = ScreenShotHelp.GetImage();
+                                        //imageBitmap.Save(_fullFileName, ImageFormat.Png);
 
-                                        if (_cmmVisionHelp.CheckCmmIsClosed(_fullFileName) == 0)
+                                        if (_cmmVisionHelp.CheckCmmIsClosed(ScreenShotHelp.GetImage()) == 0)
                                         {
                                             //是同一个就关闭
                                             Log.Info($"退出成功。。。");
@@ -680,9 +680,9 @@ namespace CMMAuto
                                 _simulator.SimiuCrtlQ();
                                 //判断是否运行成功
                                 await Task.Delay(2000);
-                                var imageBitmap = ScreenShotHelp.GetImage();
-                                imageBitmap.Save(_fullFileName, ImageFormat.Png);
-                                if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 1 || _cmmVisionHelp.CheckCmmRunState(_fullFileName) == 2)
+                                //var imageBitmap = ScreenShotHelp.GetImage();
+                                //imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                                if (_cmmVisionHelp.CheckCmmRunState(ScreenShotHelp.GetImage()) == 1 || _cmmVisionHelp.CheckCmmRunState(ScreenShotHelp.GetImage()) == 2)
                                 {
                                     Log.Info($"开始运行2。。。");
                                     //写入数据库
@@ -799,21 +799,21 @@ namespace CMMAuto
         public async Task TestOpenPrgAsync()
         {
             await Task.Delay(3000);
-            var imageBitmap = ScreenShotHelp.GetImage();
-            imageBitmap.Save(_fullFileName, ImageFormat.Png);
+            //var imageBitmap = ScreenShotHelp.GetImage();
+            //imageBitmap.Save(_fullFileName, ImageFormat.Png);
 
             //获取文件位置
-            if (_cmmVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
+            if (_cmmVisionHelp.GetCmmFilePos(ScreenShotHelp.GetImage(), out float x, out float y) == 0)
             {
                 //鼠标点击
                 Log.Info($"[Auto][Run] 弹出文件窗口 - Start Button: X: {x}, Y: {y}");
                 //NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
                 _simulator.SimiuCrtlO();
                 await Task.Delay(4000);
-                imageBitmap = ScreenShotHelp.GetImage();
-                imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                //imageBitmap = ScreenShotHelp.GetImage();
+                //imageBitmap.Save(_fullFileName, ImageFormat.Png);
 
-                if (_cmmVisionHelp.GetCmmOpenFilePos(_fullFileName, out float x0, out float y0, out float x1, out float y1) == 0)
+                if (_cmmVisionHelp.GetCmmOpenFilePos(ScreenShotHelp.GetImage(), out float x0, out float y0, out float x1, out float y1) == 0)
                 {
                     Log.Info($"[Auto][Run] 打开量测程序 - Start Button: X: {x0}, Y: {y0}");
                     //NativeWindowHelp.Click(Convert.ToInt32(x0), Convert.ToInt32(y0));
@@ -826,18 +826,18 @@ namespace CMMAuto
                     NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
 
                     await Task.Delay(3000);
-                    imageBitmap = ScreenShotHelp.GetImage();
-                    imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                    //imageBitmap = ScreenShotHelp.GetImage();
+                    //imageBitmap.Save(_fullFileName, ImageFormat.Png);
                     //判断打开但没有运行状态  
-                    if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 3)
+                    if (_cmmVisionHelp.CheckCmmRunState(ScreenShotHelp.GetImage()) == 3)
                     {
                         //SendKeys.SendWait("^Q");
                         _simulator.SimiuCrtlQ();
                         //判断是否运行成功
                         await Task.Delay(2000);
-                        imageBitmap = ScreenShotHelp.GetImage();
-                        imageBitmap.Save(_fullFileName, ImageFormat.Png);
-                        if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 1 || _cmmVisionHelp.CheckCmmRunState(_fullFileName) == 2)
+                        //imageBitmap = ScreenShotHelp.GetImage();
+                        //imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                        if (_cmmVisionHelp.CheckCmmRunState(ScreenShotHelp.GetImage()) == 1 || _cmmVisionHelp.CheckCmmRunState(ScreenShotHelp.GetImage()) == 2)
                         {
                             Log.Info($"开始运行3。。。");
                             //写入数据库
@@ -894,11 +894,11 @@ namespace CMMAuto
                     Directory.CreateDirectory(basePath);
 
                 //var fullFileName = Path.Combine(basePath, $"{DateTime.Now.ToString("yyyyMMddHHmmss")}.{CommonConstant.IMAGE_SUFFIX}");
-                string fullFileName = Path.Combine(basePath, $"Screenflash.png");
-                var imageBitmap = ScreenShotHelp.GetImage();
-                imageBitmap.Save(fullFileName, ImageFormat.Png);
+                //string fullFileName = Path.Combine(basePath, $"Screenflash.png");
+                //var imageBitmap = ScreenShotHelp.GetImage();
+                //imageBitmap.Save(fullFileName, ImageFormat.Png);
                 //_cmmVisionHelp.CheckCmmIsClosed(fullFileName);
-                var temp = _cmmVisionHelp.GetCmmOpenFilePos(fullFileName, out float x0, out float y0, out float x1, out float y1);
+                var temp = _cmmVisionHelp.GetCmmOpenFilePos(ScreenShotHelp.GetImage(), out float x0, out float y0, out float x1, out float y1);
                 Log.Info($"输出CMM软件打开程序的位置结果: {temp},位置信息: x0: {x0}, y0: {y0} x1: {x1}, y1: {y1}");
             }
             catch (Exception ex)
@@ -1123,7 +1123,7 @@ namespace CMMAuto
         {
             await Task.Delay(3000);
 
-            if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 3)
+            if (_cmmVisionHelp.CheckCmmRunState(ScreenShotHelp.GetImage()) == 3)
             {
                 //log.Info($"结束运行。。。");
                 ////写入数据库
@@ -1149,24 +1149,24 @@ namespace CMMAuto
                 //else
                 //{ log.Error("退出获取文件位置失败。"); }
                 //-----判断结束，并退出；
-                var imageBitmap = ScreenShotHelp.GetImage();
-                imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                //var imageBitmap = ScreenShotHelp.GetImage();
+                //imageBitmap.Save(_fullFileName, ImageFormat.Png);
 
-                if (_cmmVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
+                if (_cmmVisionHelp.GetCmmFilePos(ScreenShotHelp.GetImage(), out float x, out float y) == 0)
                 {
                     NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
                     await Task.Delay(1000);
-                    imageBitmap = ScreenShotHelp.GetImage();
-                    imageBitmap.Save(_fullFileName, ImageFormat.Png);
-                    if (_cmmVisionHelp.GetCmmClosedPos(_fullFileName, out float x1, out float y1) == 0)
+                    //imageBitmap = ScreenShotHelp.GetImage();
+                    //imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                    if (_cmmVisionHelp.GetCmmClosedPos(ScreenShotHelp.GetImage(), out float x1, out float y1) == 0)
                     {
                         NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
 
                         await Task.Delay(2000);
-                        imageBitmap = ScreenShotHelp.GetImage();
-                        imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                        //imageBitmap = ScreenShotHelp.GetImage();
+                        //imageBitmap.Save(_fullFileName, ImageFormat.Png);
 
-                        if (_cmmVisionHelp.CheckCmmIsClosed(_fullFileName) == 0)
+                        if (_cmmVisionHelp.CheckCmmIsClosed(ScreenShotHelp.GetImage()) == 0)
                         {
                             //是同一个就关闭
                             Log.Info($"退出成功。。。");
@@ -1945,7 +1945,7 @@ namespace CMMAuto
                     {
                         Status = _status,
                         Ip = _ip,
-                        ImageData = _cmmVisionHelp.GetPicImageData(_fullFileName)
+                        ImageData = _cmmVisionHelp.GetPicImageData(ScreenShotHelp.GetImage())
                     };
 
                     await _apiClient.PostAsync<Response>(Global.CfgInfos.Count(p => p.Key == "InterfaceName") != 0 ?
@@ -1996,17 +1996,17 @@ namespace CMMAuto
             if (txtExit.BackColor == System.Drawing.Color.LimeGreen)
             {
                 //获取文件位置
-                if (_cmmVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
+                if (_cmmVisionHelp.GetCmmFilePos(ScreenShotHelp.GetImage(), out float x, out float y) == 0)
                 {
                     //鼠标点击
                     Log.Info($"[Auto][Run] 弹出文件窗口 - Start Button: X: {x}, Y: {y}");
                     //NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
                     _simulator.SimiuCrtlO();
                     Thread.Sleep(2000);
-                    var imageBitmap = ScreenShotHelp.GetImage();
-                    imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                    //var imageBitmap = ScreenShotHelp.GetImage();
+                    //imageBitmap.Save(_fullFileName, ImageFormat.Png);
 
-                    if (_cmmVisionHelp.GetCmmOpenFilePos(_fullFileName, out float x0, out float y0, out float x1, out float y1) == 0)
+                    if (_cmmVisionHelp.GetCmmOpenFilePos(ScreenShotHelp.GetImage(), out float x0, out float y0, out float x1, out float y1) == 0)
                     {
                         Log.Info($"[Auto][Run] 打开量测程式 - Start Button: X: {x0}, Y: {y0}");
                         // 将文本放入剪贴板
@@ -2018,16 +2018,16 @@ namespace CMMAuto
                         NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
                         //判断打开但没有运行状态
                         Thread.Sleep(3000);
-                        imageBitmap = ScreenShotHelp.GetImage();
-                        imageBitmap.Save(_fullFileName, ImageFormat.Png);
-                        if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 3)//check是否打开
+                        //imageBitmap = ScreenShotHelp.GetImage();
+                        //imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                        if (_cmmVisionHelp.CheckCmmRunState(ScreenShotHelp.GetImage()) == 3)//check是否打开
                         {
                             _simulator.SimiuCrtlQ();
 
                             Thread.Sleep(2000);
-                            imageBitmap = ScreenShotHelp.GetImage();
-                            imageBitmap.Save(_fullFileName, ImageFormat.Png);
-                            if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 1 || _cmmVisionHelp.CheckCmmRunState(_fullFileName) == 2)//check是否打开
+                            //imageBitmap = ScreenShotHelp.GetImage();
+                            //imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                            if (_cmmVisionHelp.CheckCmmRunState(ScreenShotHelp.GetImage()) == 1 || _cmmVisionHelp.CheckCmmRunState(ScreenShotHelp.GetImage()) == 2)//check是否打开
                             {
                                 Log.Info($"【回家】开始运行1。。。");
                                 _isTheSame = true;
@@ -2060,31 +2060,31 @@ namespace CMMAuto
                 {
                     if (txtPreOrEnd.BackColor == System.Drawing.Color.LimeGreen)
                     {
-                        if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 3)
+                        if (_cmmVisionHelp.CheckCmmRunState(ScreenShotHelp.GetImage()) == 3)
                         {
                             Thread.Sleep(3000);
 
                             if (_isTheSame)
                             {
                                 //-----判断结束，并退出；
-                                var imageBitmap = ScreenShotHelp.GetImage();
-                                imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                                //var imageBitmap = ScreenShotHelp.GetImage();
+                                //imageBitmap.Save(_fullFileName, ImageFormat.Png);
 
-                                if (_cmmVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
+                                if (_cmmVisionHelp.GetCmmFilePos(ScreenShotHelp.GetImage(), out float x, out float y) == 0)
                                 {
                                     NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
                                     Thread.Sleep(1000);
-                                    imageBitmap = ScreenShotHelp.GetImage();
-                                    imageBitmap.Save(_fullFileName, ImageFormat.Png);
-                                    if (_cmmVisionHelp.GetCmmClosedPos(_fullFileName, out float x1, out float y1) == 0)
+                                    //imageBitmap = ScreenShotHelp.GetImage();
+                                    //imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                                    if (_cmmVisionHelp.GetCmmClosedPos(ScreenShotHelp.GetImage(), out float x1, out float y1) == 0)
                                     {
                                         NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
 
                                         Thread.Sleep(2000);
-                                        imageBitmap = ScreenShotHelp.GetImage();
-                                        imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                                        //imageBitmap = ScreenShotHelp.GetImage();
+                                        //imageBitmap.Save(_fullFileName, ImageFormat.Png);
 
-                                        if (_cmmVisionHelp.CheckCmmIsClosed(_fullFileName) == 0)
+                                        if (_cmmVisionHelp.CheckCmmIsClosed(ScreenShotHelp.GetImage()) == 0)
                                         {
                                             //是同一个就关闭
                                             Log.Info($"【回家】退出成功。。。");
@@ -2105,9 +2105,9 @@ namespace CMMAuto
                                 _simulator.SimiuCrtlQ();
                                 //判断是否运行成功
                                 Thread.Sleep(2000);
-                                var imageBitmap = ScreenShotHelp.GetImage();
-                                imageBitmap.Save(_fullFileName, ImageFormat.Png);
-                                if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 1 || _cmmVisionHelp.CheckCmmRunState(_fullFileName) == 2)
+                                //var imageBitmap = ScreenShotHelp.GetImage();
+                                //imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                                if (_cmmVisionHelp.CheckCmmRunState(ScreenShotHelp.GetImage()) == 1 || _cmmVisionHelp.CheckCmmRunState(ScreenShotHelp.GetImage()) == 2)
                                 {
                                     Log.Info($"【回家】开始运行2。。。");
                                     _isTheSame = true;
@@ -2123,6 +2123,22 @@ namespace CMMAuto
                     }
                 }
             }
+        }
+
+        private void Test()
+        {
+            Log.Error($@"不存图的值: {_cmmVisionHelp.CheckCmmRunState(ScreenShotHelp.GetImage())}");
+
+            //Thread.Sleep(4000);
+            var basePath = GetImageBasePath();
+            if (!Directory.Exists(basePath))
+                Directory.CreateDirectory(basePath);
+
+            string fullFileName = Path.Combine(basePath, $"Screenflash.png");
+            var imageBitmap = ScreenShotHelp.GetImage();
+            imageBitmap.Save(fullFileName, ImageFormat.Png);
+
+            Log.Error($@"存图的值: {_cmmVisionHelp.CheckCmmRunState(fullFileName)}");
         }
     }
 }
