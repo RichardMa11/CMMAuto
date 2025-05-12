@@ -43,7 +43,6 @@ namespace CMMAuto
             this.grpCmmlog = new System.Windows.Forms.GroupBox();
             this.drvCmmLog = new System.Windows.Forms.DataGridView();
             this.grpCmmInfo = new System.Windows.Forms.GroupBox();
-            this.btnDelPrg = new System.Windows.Forms.Button();
             this.label14 = new System.Windows.Forms.Label();
             this.txtTypeKey = new System.Windows.Forms.TextBox();
             this.btnCmmTestLogQuery = new System.Windows.Forms.Button();
@@ -107,6 +106,7 @@ namespace CMMAuto
             this.trvTestPrgChoose = new System.Windows.Forms.TreeView();
             this.grpTestPrgChoose = new System.Windows.Forms.GroupBox();
             this.panelLeft = new System.Windows.Forms.Panel();
+            this.btnGoHome = new System.Windows.Forms.Button();
             this.panelMiddle.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panelCmmlog.SuspendLayout();
@@ -218,7 +218,7 @@ namespace CMMAuto
             // 
             // grpCmmInfo
             // 
-            this.grpCmmInfo.Controls.Add(this.btnDelPrg);
+            this.grpCmmInfo.Controls.Add(this.btnGoHome);
             this.grpCmmInfo.Controls.Add(this.label14);
             this.grpCmmInfo.Controls.Add(this.txtTypeKey);
             this.grpCmmInfo.Controls.Add(this.btnCmmTestLogQuery);
@@ -237,24 +237,6 @@ namespace CMMAuto
             this.grpCmmInfo.TabIndex = 0;
             this.grpCmmInfo.TabStop = false;
             this.grpCmmInfo.Text = "程式信息";
-            // 
-            // btnDelPrg
-            // 
-            this.btnDelPrg.BackColor = System.Drawing.Color.LightBlue;
-            this.btnDelPrg.FlatAppearance.BorderSize = 0;
-            this.btnDelPrg.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
-            this.btnDelPrg.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
-            this.btnDelPrg.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnDelPrg.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.btnDelPrg.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnDelPrg.Location = new System.Drawing.Point(6, 174);
-            this.btnDelPrg.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btnDelPrg.Name = "btnDelPrg";
-            this.btnDelPrg.Size = new System.Drawing.Size(96, 42);
-            this.btnDelPrg.TabIndex = 11;
-            this.btnDelPrg.Text = "删   除";
-            this.btnDelPrg.UseVisualStyleBackColor = true;
-            this.btnDelPrg.Click += new System.EventHandler(this.btnDelPrg_Click);
             // 
             // label14
             // 
@@ -283,7 +265,7 @@ namespace CMMAuto
             this.btnCmmTestLogQuery.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCmmTestLogQuery.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.btnCmmTestLogQuery.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnCmmTestLogQuery.Location = new System.Drawing.Point(458, 174);
+            this.btnCmmTestLogQuery.Location = new System.Drawing.Point(376, 174);
             this.btnCmmTestLogQuery.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnCmmTestLogQuery.Name = "btnCmmTestLogQuery";
             this.btnCmmTestLogQuery.Size = new System.Drawing.Size(96, 42);
@@ -301,7 +283,7 @@ namespace CMMAuto
             this.btnClearInfo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClearInfo.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.btnClearInfo.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnClearInfo.Location = new System.Drawing.Point(309, 174);
+            this.btnClearInfo.Location = new System.Drawing.Point(244, 174);
             this.btnClearInfo.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnClearInfo.Name = "btnClearInfo";
             this.btnClearInfo.Size = new System.Drawing.Size(96, 42);
@@ -319,7 +301,7 @@ namespace CMMAuto
             this.btnInputTestPrg.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnInputTestPrg.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.btnInputTestPrg.ForeColor = System.Drawing.Color.DarkBlue;
-            this.btnInputTestPrg.Location = new System.Drawing.Point(160, 174);
+            this.btnInputTestPrg.Location = new System.Drawing.Point(112, 174);
             this.btnInputTestPrg.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnInputTestPrg.Name = "btnInputTestPrg";
             this.btnInputTestPrg.Size = new System.Drawing.Size(96, 42);
@@ -603,6 +585,7 @@ namespace CMMAuto
             this.btnOpenFile.TabIndex = 0;
             this.btnOpenFile.Text = "测试打开";
             this.btnOpenFile.UseVisualStyleBackColor = true;
+            this.btnOpenFile.Visible = false;
             this.btnOpenFile.Click += new System.EventHandler(this.btnOpenFile_Click);
             // 
             // btnSaveImg
@@ -620,6 +603,7 @@ namespace CMMAuto
             this.btnSaveImg.TabIndex = 1;
             this.btnSaveImg.Text = "截屏并读取";
             this.btnSaveImg.UseVisualStyleBackColor = true;
+            this.btnSaveImg.Visible = false;
             this.btnSaveImg.Click += new System.EventHandler(this.btnSaveImg_Click);
             // 
             // grpCmmOperate
@@ -1055,6 +1039,24 @@ namespace CMMAuto
             this.panelLeft.Size = new System.Drawing.Size(350, 825);
             this.panelLeft.TabIndex = 5;
             // 
+            // btnGoHome
+            // 
+            this.btnGoHome.BackColor = System.Drawing.Color.LightBlue;
+            this.btnGoHome.FlatAppearance.BorderSize = 0;
+            this.btnGoHome.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LightGray;
+            this.btnGoHome.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gainsboro;
+            this.btnGoHome.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnGoHome.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.btnGoHome.ForeColor = System.Drawing.Color.DarkBlue;
+            this.btnGoHome.Location = new System.Drawing.Point(508, 174);
+            this.btnGoHome.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnGoHome.Name = "btnGoHome";
+            this.btnGoHome.Size = new System.Drawing.Size(96, 42);
+            this.btnGoHome.TabIndex = 11;
+            this.btnGoHome.Text = "回安全位置";
+            this.btnGoHome.UseVisualStyleBackColor = true;
+            this.btnGoHome.Click += new System.EventHandler(this.btnGoHome_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
@@ -1168,11 +1170,11 @@ namespace CMMAuto
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.TextBox txtTypeKey;
-        private System.Windows.Forms.Button btnDelPrg;
         private System.Windows.Forms.CheckBox chkIsStatusCheck;
         private System.Windows.Forms.Label lblPlcState;
         private System.Windows.Forms.Button btnDicConfig;
         private System.Windows.Forms.CheckBox chkIsSend;
+        private System.Windows.Forms.Button btnGoHome;
     }
 }
 

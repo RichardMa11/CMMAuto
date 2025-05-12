@@ -587,7 +587,7 @@ namespace CMMAuto
                             imageBitmap.Save(_fullFileName, ImageFormat.Png);
                             if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 1 || _cmmVisionHelp.CheckCmmRunState(_fullFileName) == 2)//check是否打开
                             {
-                                Log.Info($"开始运行。。。");
+                                Log.Info($"开始运行1。。。");
                                 //写入数据库
                                 RecordMeasure("开始", 1);
                                 _isTheSame = true;
@@ -684,7 +684,7 @@ namespace CMMAuto
                                 imageBitmap.Save(_fullFileName, ImageFormat.Png);
                                 if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 1 || _cmmVisionHelp.CheckCmmRunState(_fullFileName) == 2)
                                 {
-                                    Log.Info($"开始运行。。。");
+                                    Log.Info($"开始运行2。。。");
                                     //写入数据库
                                     RecordMeasure("开始", 1);
                                     _isTheSame = true;
@@ -839,7 +839,7 @@ namespace CMMAuto
                         imageBitmap.Save(_fullFileName, ImageFormat.Png);
                         if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 1 || _cmmVisionHelp.CheckCmmRunState(_fullFileName) == 2)
                         {
-                            Log.Info($"开始运行。。。");
+                            Log.Info($"开始运行3。。。");
                             //写入数据库
                             RecordMeasure("开始", 1);
                         }
@@ -1960,6 +1960,169 @@ namespace CMMAuto
                     Log.Error($@"数据处理错误: {ex.Message}");
                 }
             });
+        }
+
+        private void btnGoHome_Click(object sender, EventArgs e)
+        {
+            if (_isStart)
+            {
+                MessageBoxX.Show("运行过程中不能回安全位置！", "提示");
+                return;
+            }
+
+            SQLiteParameter[] parameter = new SQLiteParameter[] { new SQLiteParameter("Type", "Home") };
+            string sql = "SELECT PrgName,PrgPath,Type FROM MeaSurePrgCfg WHERE Type = @Type";
+            DataSet dataSet = _sqLiteHelpers.ExecuteDataSet(sql, parameter);
+            if (dataSet.Tables[0].Rows.Count == 0)
+            {
+                MessageBoxX.Show("回安全位置的程式没有配置，请去程式编辑配置！", "提示");
+                return;
+            }
+
+            this.WindowState = FormWindowState.Minimized;
+            bool goHomeStart = true;
+            while (true)
+            {
+                GoHome(dataSet.Tables[0].Rows[0]["PrgPath"].ToString(), ref goHomeStart);
+                if (!goHomeStart)
+                    break;
+                Thread.Sleep(3000);
+            }
+        }
+
+        private void GoHome(string path, ref bool goHomeStart)
+        {
+            //具体操作
+            if (txtExit.BackColor == System.Drawing.Color.LimeGreen)
+            {
+                //获取文件位置
+                if (_cmmVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
+                {
+                    //鼠标点击
+                    Log.Info($"[Auto][Run] 弹出文件窗口 - Start Button: X: {x}, Y: {y}");
+                    //NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
+                    _simulator.SimiuCrtlO();
+                    Thread.Sleep(2000);
+                    var imageBitmap = ScreenShotHelp.GetImage();
+                    imageBitmap.Save(_fullFileName, ImageFormat.Png);
+
+                    if (_cmmVisionHelp.GetCmmOpenFilePos(_fullFileName, out float x0, out float y0, out float x1, out float y1) == 0)
+                    {
+                        Log.Info($"[Auto][Run] 打开量测程式 - Start Button: X: {x0}, Y: {y0}");
+                        // 将文本放入剪贴板
+                        Clipboard.SetText(path);
+                        // 模拟Ctrl+V
+                        //SendKeys.SendWait("^v");
+                        _simulator.SimiuCrtlV();
+                        Thread.Sleep(2000);
+                        NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
+                        //判断打开但没有运行状态
+                        Thread.Sleep(3000);
+                        imageBitmap = ScreenShotHelp.GetImage();
+                        imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                        if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 3)//check是否打开
+                        {
+                            _simulator.SimiuCrtlQ();
+
+                            Thread.Sleep(2000);
+                            imageBitmap = ScreenShotHelp.GetImage();
+                            imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                            if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 1 || _cmmVisionHelp.CheckCmmRunState(_fullFileName) == 2)//check是否打开
+                            {
+                                Log.Info($"【回家】开始运行1。。。");
+                                _isTheSame = true;
+                            }
+                            else
+                            {
+                                Log.Error("【回家】测量程式运行失败1。");
+                            }
+                        }
+                        else
+                        { Log.Error("【回家】打开测量程式失败。"); }
+                    }
+                    else
+                    {
+                        Log.Error("【回家】获取【打开测量程式】位置失败。");
+                    }
+                }
+                else
+                {
+                    Log.Error("【回家】获取【文件】位置失败。");
+                }
+            }
+            else
+            {
+                if (txtRun.BackColor == System.Drawing.Color.LimeGreen || txtPause.BackColor == System.Drawing.Color.LimeGreen)
+                {
+                    Log.Error("【回家】运行中不能打开程式。");
+                }
+                else
+                {
+                    if (txtPreOrEnd.BackColor == System.Drawing.Color.LimeGreen)
+                    {
+                        if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 3)
+                        {
+                            Thread.Sleep(3000);
+
+                            if (_isTheSame)
+                            {
+                                //-----判断结束，并退出；
+                                var imageBitmap = ScreenShotHelp.GetImage();
+                                imageBitmap.Save(_fullFileName, ImageFormat.Png);
+
+                                if (_cmmVisionHelp.GetCmmFilePos(_fullFileName, out float x, out float y) == 0)
+                                {
+                                    NativeWindowHelp.Click(Convert.ToInt32(x), Convert.ToInt32(y));
+                                    Thread.Sleep(1000);
+                                    imageBitmap = ScreenShotHelp.GetImage();
+                                    imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                                    if (_cmmVisionHelp.GetCmmClosedPos(_fullFileName, out float x1, out float y1) == 0)
+                                    {
+                                        NativeWindowHelp.Click(Convert.ToInt32(x1), Convert.ToInt32(y1));
+
+                                        Thread.Sleep(2000);
+                                        imageBitmap = ScreenShotHelp.GetImage();
+                                        imageBitmap.Save(_fullFileName, ImageFormat.Png);
+
+                                        if (_cmmVisionHelp.CheckCmmIsClosed(_fullFileName) == 0)
+                                        {
+                                            //是同一个就关闭
+                                            Log.Info($"【回家】退出成功。。。");
+                                            _isTheSame = false;
+                                            goHomeStart = false;
+                                        }
+                                        else
+                                        { Log.Error("【回家】程式退出失败。"); }
+                                    }
+                                    else
+                                    { Log.Error("【回家】退出获取【退出】位置失败。"); }
+                                }
+                                else
+                                { Log.Error("【回家】退出获取【文件】位置失败。"); }
+                            }
+                            else
+                            {
+                                _simulator.SimiuCrtlQ();
+                                //判断是否运行成功
+                                Thread.Sleep(2000);
+                                var imageBitmap = ScreenShotHelp.GetImage();
+                                imageBitmap.Save(_fullFileName, ImageFormat.Png);
+                                if (_cmmVisionHelp.CheckCmmRunState(_fullFileName) == 1 || _cmmVisionHelp.CheckCmmRunState(_fullFileName) == 2)
+                                {
+                                    Log.Info($"【回家】开始运行2。。。");
+                                    _isTheSame = true;
+                                }
+                                else
+                                { Log.Error("【回家】测量程式运行失败2。"); }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Log.Error("【回家】程序没有打开或者其他问题。");
+                    }
+                }
+            }
         }
     }
 }
